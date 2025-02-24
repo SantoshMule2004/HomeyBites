@@ -16,7 +16,6 @@ public class CategoryDto {
 	
 	private boolean isActive;
 	
-	@JsonManagedReference(value = "category-menuitem")
 	private List<MenuItemDto> menuItems = new ArrayList<>();
 	
 	public CategoryDto() {

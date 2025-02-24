@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 public class SubscriptionDto {
@@ -15,13 +16,12 @@ public class SubscriptionDto {
 	private String status;
 	private LocalDateTime createdAt;
 
-	@JsonBackReference
+	@JsonIgnore
 	private UserDto user;
 
-	@JsonBackReference
+	@JsonIgnore
 	private OrderInfoDto order;
 
-	@JsonManagedReference
 	private TiffinPlanDto tiffinPlan;
 
 	public SubscriptionDto() {

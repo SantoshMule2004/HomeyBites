@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 public class OrderInfoDto {
@@ -15,16 +16,14 @@ public class OrderInfoDto {
 	private String quantity;
 	private String orderStatus;
 	
-	@JsonBackReference
+	@JsonIgnore
 	private UserDto user;
 	
-	@JsonManagedReference
 	private SubscriptionDto subscription;
 	
-	@JsonManagedReference(value = "order-menuitem")
 	private List<MenuItemDto> menuItems;
 	
-	@JsonBackReference
+	@JsonIgnore
 	private PaymentDto payment;
 	
 	public OrderInfoDto() {

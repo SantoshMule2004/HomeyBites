@@ -9,10 +9,8 @@ public class UserCartDto {
 	
 	private Integer cId;
 	
-	@JsonManagedReference
 	private UserDto user;
 	
-	@JsonManagedReference(value = "cart-menuitem")
 	private List<MenuItemDto> menuItems = new ArrayList<>();
 
 	public Integer getcId() {

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -32,19 +33,19 @@ public class MenuItemDto {
 	@NotBlank(message = "menu type cannot be empty..!")
 	private String menuType;
 	
-	@JsonBackReference(value = "category-menuitem")
+	@JsonIgnore
 	private CategoryDto category;
 	
-	@JsonBackReference(value = "tiffin-menuitem")
+	@JsonIgnore
 	private List<TiffinPlanDto> tiffinPlan;
 	
-	@JsonBackReference(value = "order-menuitem")
+	@JsonIgnore
 	private List<OrderInfoDto> order;
 	
-	@JsonBackReference(value ="user-menuitem")
+	@JsonIgnore
 	private UserDto userDto;
 	
-	@JsonBackReference(value = "cart-menuitem")
+	@JsonIgnore
 	private List<UserCartDto> userCarts = new ArrayList<>();
 	
 	public MenuItemDto() {

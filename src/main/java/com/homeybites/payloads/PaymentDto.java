@@ -2,6 +2,8 @@ package com.homeybites.payloads;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 public class PaymentDto {
@@ -12,10 +14,9 @@ public class PaymentDto {
 	private String paymentStatus;
 	private double amount;
 	
-	@JsonManagedReference
+	@JsonIgnore
 	private UserDto user;
 	
-	@JsonManagedReference
 	private OrderInfoDto order;
 	
 	public PaymentDto() {

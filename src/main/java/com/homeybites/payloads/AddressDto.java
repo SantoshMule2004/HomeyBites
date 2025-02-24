@@ -1,6 +1,7 @@
 package com.homeybites.payloads;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class AddressDto {
 	
@@ -14,7 +15,7 @@ public class AddressDto {
 	private double longitude;
 	private String serviceRadius;
 	
-	@JsonBackReference
+	@JsonIgnore
 	private UserDto user;
 	
 	private UserRoles userRoles;

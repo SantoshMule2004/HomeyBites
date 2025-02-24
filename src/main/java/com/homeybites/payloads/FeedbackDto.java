@@ -1,5 +1,6 @@
 package com.homeybites.payloads;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 public class FeedbackDto {
@@ -7,7 +8,7 @@ public class FeedbackDto {
 	private String emailId;
 	private String description;
 	
-	@JsonManagedReference
+	@JsonIgnore
 	private UserDto user;
 	
 	public FeedbackDto() {

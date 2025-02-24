@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.homeybites.entities.MenuItem;
 
@@ -64,28 +65,22 @@ public class UserDto {
 	
 	private String userRole;
 	
-	@JsonManagedReference
 	private List<AddressDto> address = new ArrayList<>();
 	
-	@JsonManagedReference
 	private List<OrderInfoDto> orders = new ArrayList<>();
 
-	@JsonManagedReference
 	private List<SubscriptionDto> subscriptions = new ArrayList<>();
 	
-	@JsonBackReference
 	private List<TiffinPlanDto> tiffinPlans = new ArrayList<>();
 	
-	@JsonBackReference
 	private List<PaymentDto> payments = new ArrayList<>();
 
-	@JsonBackReference
 	private List<FeedbackDto> feedbacks = new ArrayList<>();
 	
-	@JsonManagedReference(value = "user-menuitem")
+	@JsonIgnore
 	private List<MenuItem> menuItems = new ArrayList<>();
 	
-	@JsonBackReference
+	@JsonIgnore
 	private UserCartDto userCart;
 	
 	public UserDto() {
@@ -262,5 +257,13 @@ public class UserDto {
 	}
 	public void setUserCart(UserCartDto userCart) {
 		this.userCart = userCart;
+	}
+
+	public List<MenuItem> getMenuItems() {
+		return menuItems;
+	}
+
+	public void setMenuItems(List<MenuItem> menuItems) {
+		this.menuItems = menuItems;
 	}
 }

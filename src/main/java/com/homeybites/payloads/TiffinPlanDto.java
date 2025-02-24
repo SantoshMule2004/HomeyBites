@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 public class TiffinPlanDto {
@@ -17,13 +18,12 @@ public class TiffinPlanDto {
 	private boolean isActive = false;
 	private LocalDateTime createdAt;
 	
-	@JsonManagedReference
+	@JsonIgnore
 	private UserDto user;
 	
-	@JsonManagedReference(value = "tiffin-menuitem")
 	private List<MenuItemDto> menuItems = new ArrayList<>();
 	
-	@JsonBackReference
+	@JsonIgnore
 	private SubscriptionDto subscription;
 	
 	public TiffinPlanDto() {
