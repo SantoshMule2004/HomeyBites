@@ -1,0 +1,51 @@
+package com.homeybites.entities;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "order_menuitem")
+public class OrderMenuItem {
+	
+	
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Id
+	private Integer id;
+	
+	@ManyToOne
+	@JoinColumn(name = "order_id", nullable = false)
+	private OrderInfo order;
+	
+	@ManyToOne
+	@JoinColumn(name = "menu_id", nullable = false)
+	private MenuItem menuItem;
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public OrderInfo getOrder() {
+		return order;
+	}
+
+	public void setOrder(OrderInfo order) {
+		this.order = order;
+	}
+
+	public MenuItem getMenuItem() {
+		return menuItem;
+	}
+
+	public void setMenuItem(MenuItem menuItem) {
+		this.menuItem = menuItem;
+	}
+}
