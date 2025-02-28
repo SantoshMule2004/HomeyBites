@@ -1,5 +1,7 @@
 package com.homeybites.controllers;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,24 +26,23 @@ public class CartController {
 
 	// get user cart
 	@GetMapping("/{userId}")
-	public ResponseEntity<UserCartDto> getUserCart(@PathVariable Integer userId) {
-		UserCartDto cart = this.cartService.getCart(userId);
-		return new ResponseEntity<UserCartDto>(cart, HttpStatus.OK);
+	public ResponseEntity<List<UserCartDto>> getUserCart(@PathVariable Integer userId) {
+		List<UserCartDto> cart = this.cartService.getCart(userId);
+		return new ResponseEntity<List<UserCartDto>>(cart, HttpStatus.OK);
 	}
 
 	// add item to cart
-	@PostMapping("/{cartId}/item/{itemId}")
-	public ResponseEntity<ApiResponse> addItemToCart(@PathVariable Integer cartId, @PathVariable Integer itemId) {
-		UserCartDto itemsToCart = this.cartService.addItemsToCart(cartId, itemId);
+	@PostMapping("/{userId}/item/{itemId}")
+	public ResponseEntity<ApiResponse> addItemToCart(@PathVariable Integer userId, @PathVariable Integer itemId) {
+		UserCartDto itemsToCart = this.cartService.addItemsToCart(userId, itemId);
 		ApiResponse response = new ApiResponse("Item added successfully..!", true, itemsToCart);
 		return new ResponseEntity<ApiResponse>(response, HttpStatus.OK);
 	}
 
 	// update menu item in cart
-	@PutMapping("/{cartId}/item/{itemId}/{quantity}")
-	public ResponseEntity<ApiResponse> updateCartItem(@PathVariable Integer cartId, @PathVariable Integer itemId,
-			@PathVariable Integer quantity) {
-		this.cartService.updateItemInfo(cartId, itemId, quantity);
+	@PutMapping("/{cartId}/quantity/{quantity}")
+	public ResponseEntity<ApiResponse> updateCartItem(@PathVariable Integer cartId, @PathVariable Integer quantity) {
+		this.cartService.updateItemInfo(cartId, quantity);
 
 		ApiResponse response = new ApiResponse();
 		response.setMessage("quantity updated successfully..!");
@@ -50,18 +51,18 @@ public class CartController {
 	}
 
 	// delete item from cart
-	@DeleteMapping("/{cartId}/item/{itemId}")
-	public ResponseEntity<ApiResponse> deleteItemFromCart(@PathVariable Integer cartId, @PathVariable Integer itemId) {
-		UserCartDto itemsToCart = this.cartService.deleteItemFromCart(cartId, itemId);
-		ApiResponse response = new ApiResponse("Item deleted successfully..!", true, itemsToCart);
+	@DeleteMapping("/delete/{cartId}")
+	public ResponseEntity<ApiResponse> deleteItemFromCart(@PathVariable Integer cartId) {
+		this.cartService.deleteItemFromCart(cartId);
+		ApiResponse response = new ApiResponse("Item deleted successfully..!", true);
 		return new ResponseEntity<ApiResponse>(response, HttpStatus.OK);
 	}
 
 	// delete all items from cart
-	@DeleteMapping("/{cartId}")
-	public ResponseEntity<ApiResponse> deleteAllItems(@PathVariable Integer cartId) {
-		UserCartDto itemsToCart = this.cartService.deleteAllItems(cartId);
-		ApiResponse response = new ApiResponse("All items removed successfully..!", true, itemsToCart);
+	@DeleteMapping("/{userId}")
+	public ResponseEntity<ApiResponse> deleteAllItems(@PathVariable Integer userId) {
+		this.cartService.deleteAllItems(userId);
+		ApiResponse response = new ApiResponse("All items removed successfully..!", true);
 		return new ResponseEntity<ApiResponse>(response, HttpStatus.OK);
 	}
 }

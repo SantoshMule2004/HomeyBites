@@ -1,16 +1,11 @@
 package com.homeybites.entities;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.ManyToOne;
 
 @Entity
 public class UserCart {
@@ -19,13 +14,17 @@ public class UserCart {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer cId;
 
-	@OneToOne
+	@ManyToOne
 	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
 
-	@ManyToMany
-	@JoinTable(name = "cart_menuitem", joinColumns = @JoinColumn(name = "cart_id"), inverseJoinColumns = @JoinColumn(name = "menu_id"))
-	private List<MenuItem> menuItems = new ArrayList<>();
+	@ManyToOne
+	@JoinColumn(name = "menu_id", nullable = false)
+	private MenuItem menuItem;
+	
+	private Integer quantity;
+	
+	private double totalPrice;
 
 	public Integer getcId() {
 		return cId;
@@ -43,11 +42,27 @@ public class UserCart {
 		this.user = user;
 	}
 
-	public List<MenuItem> getMenuItems() {
-		return menuItems;
+	public MenuItem getMenuItem() {
+		return menuItem;
 	}
 
-	public void setMenuItems(List<MenuItem> menuItems) {
-		this.menuItems = menuItems;
+	public void setMenuItem(MenuItem menuItem) {
+		this.menuItem = menuItem;
+	}
+
+	public Integer getQuantity() {
+		return quantity;
+	}
+
+	public void setQuantity(Integer quantity) {
+		this.quantity = quantity;
+	}
+
+	public double getTotalPrice() {
+		return totalPrice;
+	}
+
+	public void setTotalPrice(double totalPrice) {
+		this.totalPrice = totalPrice;
 	}
 }

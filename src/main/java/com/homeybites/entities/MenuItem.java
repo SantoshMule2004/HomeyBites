@@ -11,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 
 @Entity
 public class MenuItem {
@@ -39,8 +40,8 @@ public class MenuItem {
 	@ManyToMany(mappedBy = "menuItems")
 	private List<OrderInfo> order = new ArrayList<>();
 	
-	@ManyToMany(mappedBy = "menuItems")
-	private List<UserCart> userCarts = new ArrayList<>();
+	@OneToMany(mappedBy = "menuItem")
+	private List<UserCart> userCart;
 	
 	@ManyToOne
 	@JoinColumn(name = "user_id")
@@ -129,10 +130,12 @@ public class MenuItem {
 	public void setOrder(List<OrderInfo> order) {
 		this.order = order;
 	}
-	public List<UserCart> getUserCarts() {
-		return userCarts;
+
+	public List<UserCart> getUserCart() {
+		return userCart;
 	}
-	public void setUserCarts(List<UserCart> userCarts) {
-		this.userCarts = userCarts;
+
+	public void setUserCart(List<UserCart> userCart) {
+		this.userCart = userCart;
 	}
 }

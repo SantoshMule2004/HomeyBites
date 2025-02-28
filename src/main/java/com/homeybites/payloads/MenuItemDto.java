@@ -1,9 +1,7 @@
 package com.homeybites.payloads;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.validation.constraints.NotBlank;
@@ -46,7 +44,7 @@ public class MenuItemDto {
 	private UserDto userDto;
 	
 	@JsonIgnore
-	private List<UserCartDto> userCarts = new ArrayList<>();
+	private List<UserCartDto> userCart;
 	
 	public MenuItemDto() {
 		super();
@@ -133,10 +131,12 @@ public class MenuItemDto {
 	public void setOrder(List<OrderInfoDto> order) {
 		this.order = order;
 	}
-	public List<UserCartDto> getUserCarts() {
-		return userCarts;
+
+	public List<UserCartDto> getUserCart() {
+		return userCart;
 	}
-	public void setUserCarts(List<UserCartDto> userCarts) {
-		this.userCarts = userCarts;
+
+	public void setUserCart(List<UserCartDto> userCart) {
+		this.userCart = userCart;
 	}
 }

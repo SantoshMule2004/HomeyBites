@@ -1,16 +1,17 @@
 package com.homeybites.services.impl;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.homeybites.entities.CartMenuItem;
 import com.homeybites.entities.MenuItem;
 import com.homeybites.entities.User;
 import com.homeybites.entities.UserCart;
 import com.homeybites.exceptions.ResourceNotFoundException;
 import com.homeybites.payloads.UserCartDto;
-import com.homeybites.repositories.CartMenuItemRepository;
 import com.homeybites.repositories.CartRepository;
 import com.homeybites.repositories.MenuItemRepository;
 import com.homeybites.repositories.UserRepository;
@@ -29,68 +30,70 @@ public class CartServiceImpl implements CartService {
 	private MenuItemRepository menuItemRepository;
 
 	@Autowired
-	private CartMenuItemRepository cartMenuItemRepository;
-
-	@Autowired
 	private ModelMapper modelMapper;
 
 	@Override
-	public UserCartDto addItemsToCart(Integer cartId, Integer itemId) {
-		UserCart cart = this.cartRepository.findById(cartId)
-				.orElseThrow(() -> new ResourceNotFoundException("cart", "Id", cartId));
-
-		MenuItem menuItem = this.menuItemRepository.findById(itemId)
-				.orElseThrow(() -> new ResourceNotFoundException("Menu item", "id", itemId));
-		cart.getMenuItems().add(menuItem);
-		UserCart userCart = this.cartRepository.save(cart);
-		return this.modelMapper.map(userCart, UserCartDto.class);
-	}
-
-	@Override
-	public void updateItemInfo(Integer cartId, Integer itemId, Integer quantity) {
-		UserCart cart = this.cartRepository.findById(cartId)
-				.orElseThrow(() -> new ResourceNotFoundException("cart", "Id", cartId));
-
-		MenuItem menuItem = this.menuItemRepository.findById(itemId)
-				.orElseThrow(() -> new ResourceNotFoundException("Menu item", "id", itemId));
-
-		CartMenuItem cartMenuItem = this.cartMenuItemRepository.findByCartAndMenuItem(cart, menuItem).get();
-		
-		cartMenuItem.setQuantity(quantity);
-		this.cartMenuItemRepository.save(cartMenuItem);
-	}
-
-	@Override
-	public UserCartDto getCart(Integer userId) {
+	public UserCartDto addItemsToCart(Integer userId, Integer itemId) {
 		User user = this.userRepository.findById(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
 
-		UserCart userCart = this.cartRepository.findByUser(user);
-		return this.modelMapper.map(userCart, UserCartDto.class);
-	}
-
-	@Override
-	public UserCartDto deleteItemFromCart(Integer cartId, Integer itemId) {
-		UserCart cart = this.cartRepository.findById(cartId)
-				.orElseThrow(() -> new ResourceNotFoundException("cart", "Id", cartId));
-
 		MenuItem menuItem = this.menuItemRepository.findById(itemId)
 				.orElseThrow(() -> new ResourceNotFoundException("Menu item", "id", itemId));
 
-		cart.getMenuItems().remove(menuItem);
-		UserCart userCart = this.cartRepository.save(cart);
+		UserCart byMenuItem = this.cartRepository.findByMenuItem(menuItem);
 
-		return this.modelMapper.map(userCart, UserCartDto.class);
+		if (byMenuItem != null) {
+			byMenuItem.setQuantity(byMenuItem.getQuantity() + 1);
+			byMenuItem.setTotalPrice(byMenuItem.getQuantity() * menuItem.getPrice());
+			this.cartRepository.save(byMenuItem);
+			return this.modelMapper.map(byMenuItem, UserCartDto.class);
+		} else {
+			UserCart cart = new UserCart();
+			cart.setMenuItem(menuItem);
+			cart.setUser(user);
+			cart.setQuantity(1);
+			cart.setTotalPrice(menuItem.getPrice());
+			UserCart userCart = this.cartRepository.save(cart);
+			return this.modelMapper.map(userCart, UserCartDto.class);
+		}
 	}
 
 	@Override
-	public UserCartDto deleteAllItems(Integer cartId) {
+	public void updateItemInfo(Integer cartId, Integer quantity) {
 		UserCart cart = this.cartRepository.findById(cartId)
 				.orElseThrow(() -> new ResourceNotFoundException("cart", "Id", cartId));
 
-		cart.getMenuItems().clear();
-		UserCart userCart = this.cartRepository.save(cart);
+		cart.setQuantity(quantity);
+		cart.setTotalPrice(quantity * (cart.getMenuItem().getPrice()));
+		this.cartRepository.save(cart);
+	}
 
-		return this.modelMapper.map(userCart, UserCartDto.class);
+	@Override
+	public List<UserCartDto> getCart(Integer userId) {
+		User user = this.userRepository.findById(userId)
+				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
+
+		List<UserCart> list = this.cartRepository.findByUser(user);
+		List<UserCartDto> collect = list.stream().map(cart -> this.modelMapper.map(cart, UserCartDto.class))
+				.collect(Collectors.toList());
+
+		return collect;
+	}
+
+	@Override
+	public void deleteItemFromCart(Integer cartId) {
+		UserCart cart = this.cartRepository.findById(cartId)
+				.orElseThrow(() -> new ResourceNotFoundException("cart", "Id", cartId));
+
+		this.cartRepository.delete(cart);
+	}
+
+	@Override
+	public void deleteAllItems(Integer userId) {
+		User user = this.userRepository.findById(userId)
+				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
+
+		List<UserCart> list = this.cartRepository.findByUser(user);
+		this.cartRepository.deleteAll(list);
 	}
 }

@@ -1,17 +1,16 @@
 package com.homeybites.payloads;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-
 public class UserCartDto {
-	
+
 	private Integer cId;
-	
+
 	private UserDto user;
-	
-	private List<MenuItemDto> menuItems = new ArrayList<>();
+
+	private MenuItemDto menuItem;
+
+	private Integer quantity;
+
+	private double totalPrice;
 
 	public Integer getcId() {
 		return cId;
@@ -29,11 +28,27 @@ public class UserCartDto {
 		this.user = user;
 	}
 
-	public List<MenuItemDto> getMenuItems() {
-		return menuItems;
+	public MenuItemDto getMenuItem() {
+		return menuItem;
 	}
 
-	public void setMenuItems(List<MenuItemDto> menuItems) {
-		this.menuItems = menuItems;
+	public void setMenuItem(MenuItemDto menuItem) {
+		this.menuItem = menuItem;
+	}
+
+	public Integer getQuantity() {
+		return quantity;
+	}
+
+	public void setQuantity(Integer quantity) {
+		this.quantity = quantity;
+	}
+
+	public double getTotalPrice() {
+		return totalPrice;
+	}
+
+	public void setTotalPrice(double totalPrice) {
+		this.totalPrice = totalPrice;
 	}
 }

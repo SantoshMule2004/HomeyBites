@@ -66,8 +66,8 @@ public class User implements UserDetails{
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
 	private List<MenuItem> menuItems = new ArrayList<>();
 	
-	@OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-	private UserCart userCart;
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+	private List<UserCart> userCart;
 	
 	public User() {
 		super();
@@ -232,10 +232,10 @@ public class User implements UserDetails{
 	public void setGSTIN(String gSTIN) {
 		GSTIN = gSTIN;
 	}
-	public UserCart getUserCart() {
+	public List<UserCart> getUserCart() {
 		return userCart;
 	}
-	public void setUserCart(UserCart userCart) {
+	public void setUserCart(List<UserCart> userCart) {
 		this.userCart = userCart;
 	}
 

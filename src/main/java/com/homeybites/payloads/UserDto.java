@@ -3,9 +3,7 @@ package com.homeybites.payloads;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.homeybites.entities.MenuItem;
 
 import jakarta.validation.constraints.Email;
@@ -81,7 +79,7 @@ public class UserDto {
 	private List<MenuItem> menuItems = new ArrayList<>();
 	
 	@JsonIgnore
-	private UserCartDto userCart;
+	private List<UserCartDto> userCart;
 	
 	public UserDto() {
 		super();
@@ -252,10 +250,10 @@ public class UserDto {
 	public void setcPassword(String cPassword) {
 		this.cPassword = cPassword;
 	}
-	public UserCartDto getUserCart() {
+	public List<UserCartDto> getUserCart() {
 		return userCart;
 	}
-	public void setUserCart(UserCartDto userCart) {
+	public void setUserCart(List<UserCartDto> userCart) {
 		this.userCart = userCart;
 	}
 
