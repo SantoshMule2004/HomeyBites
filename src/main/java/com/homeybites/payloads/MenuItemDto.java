@@ -35,9 +35,6 @@ public class MenuItemDto {
 	private CategoryDto category;
 	
 	@JsonIgnore
-	private List<TiffinPlanDto> tiffinPlan;
-	
-	@JsonIgnore
 	private List<OrderInfoDto> order;
 	
 	@JsonIgnore
@@ -45,6 +42,9 @@ public class MenuItemDto {
 	
 	@JsonIgnore
 	private List<UserCartDto> userCart;
+	
+	@JsonIgnore
+	private TiffinDaysDto tiffinDays; 
 	
 	public MenuItemDto() {
 		super();
@@ -86,12 +86,6 @@ public class MenuItemDto {
 	}
 	public void setCategory(CategoryDto category) {
 		this.category = category;
-	}
-	public List<TiffinPlanDto> getTiffinPlan() {
-		return tiffinPlan;
-	}
-	public void setTiffinPlan(List<TiffinPlanDto> tiffinPlan) {
-		this.tiffinPlan = tiffinPlan;
 	}
 	public String getImageUrl() {
 		return imageUrl;
@@ -138,5 +132,13 @@ public class MenuItemDto {
 
 	public void setUserCart(List<UserCartDto> userCart) {
 		this.userCart = userCart;
+	}
+
+	public TiffinDaysDto getTiffinDays() {
+		return tiffinDays;
+	}
+
+	public void setTiffinDays(TiffinDaysDto tiffinDays) {
+		this.tiffinDays = tiffinDays;
 	}
 }

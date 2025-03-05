@@ -19,7 +19,7 @@ public class UserCart {
 	private User user;
 
 	@ManyToOne
-	@JoinColumn(name = "menu_id", nullable = false)
+	@JoinColumn(name = "menu_id", nullable = true)
 	private MenuItem menuItem;
 	
 	private Integer quantity;

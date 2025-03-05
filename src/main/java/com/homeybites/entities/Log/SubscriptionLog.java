@@ -1,41 +1,56 @@
-package com.homeybites.payloads;
+package com.homeybites.entities.Log;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.homeybites.entities.OrderInfo;
+import com.homeybites.entities.TiffinPlan;
+import com.homeybites.entities.User;
 
-public class SubscriptionDto {
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
+
+public class SubscriptionLog {
 	
+	@Id
 	private Integer planId;
 	private LocalDate startDate;
 	private LocalDate endDate;
 	private double totalPrice;
 	private String status;
-	private LocalDateTime createdAt;
-	private int planDuration;
-
-	@JsonIgnore
-	private UserDto user;
-
-	@JsonIgnore
-	private OrderInfoDto order;
-
-	private TiffinPlanDto tiffinPlan;
+	private long planDuration;
 	
-	private boolean monday;
-	private boolean tuesday;
-	private boolean wednesday;
-	private boolean thursday;
-	private boolean friday;
-	private boolean saturday;
-	private boolean sunday;
-	
-	private boolean isBreakFast;
-	private boolean isLunch;
-	private boolean isDinner;
+	@Column(nullable = false, updatable = false)
+	private LocalDateTime archievedAt;
 
-	public SubscriptionDto() {
+	@ManyToOne
+	@JoinColumn(name = "user_id")
+	private User user;
+
+	@OneToOne(mappedBy = "subscription", cascade = CascadeType.ALL)
+	private OrderInfo order;
+
+	@ManyToOne
+	@JoinColumn(name = "tiffin_id", nullable = false)
+	private TiffinPlan tiffinPlan;
+	
+	private boolean monday = false;
+	private boolean tuesday = false;
+	private boolean wednesday = false;
+	private boolean thursday = false;
+	private boolean friday = false;
+	private boolean saturday = false;
+	private boolean sunday = false;
+	
+	private boolean isBreakFast = false;
+	private boolean isLunch = false;
+	private boolean isDinner = false;
+
+	public SubscriptionLog() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
@@ -64,22 +79,6 @@ public class SubscriptionDto {
 		this.endDate = endDate;
 	}
 
-	public UserDto getUser() {
-		return user;
-	}
-
-	public void setUser(UserDto user) {
-		this.user = user;
-	}
-
-	public OrderInfoDto getOrder() {
-		return order;
-	}
-
-	public void setOrder(OrderInfoDto order) {
-		this.order = order;
-	}
-
 	public double getTotalPrice() {
 		return totalPrice;
 	}
@@ -96,19 +95,43 @@ public class SubscriptionDto {
 		this.status = status;
 	}
 
+	public long getPlanDuration() {
+		return planDuration;
+	}
+
+	public void setPlanDuration(long planDuration) {
+		this.planDuration = planDuration;
+	}
+
 	public LocalDateTime getCreatedAt() {
-		return createdAt;
+		return archievedAt;
 	}
 
 	public void setCreatedAt(LocalDateTime createdAt) {
-		this.createdAt = createdAt;
+		this.archievedAt = createdAt;
 	}
 
-	public TiffinPlanDto getTiffinPlan() {
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+
+	public OrderInfo getOrder() {
+		return order;
+	}
+
+	public void setOrder(OrderInfo order) {
+		this.order = order;
+	}
+
+	public TiffinPlan getTiffinPlan() {
 		return tiffinPlan;
 	}
 
-	public void setTiffinPlan(TiffinPlanDto tiffinPlan) {
+	public void setTiffinPlan(TiffinPlan tiffinPlan) {
 		this.tiffinPlan = tiffinPlan;
 	}
 
@@ -190,13 +213,5 @@ public class SubscriptionDto {
 
 	public void setDinner(boolean isDinner) {
 		this.isDinner = isDinner;
-	}
-
-	public int getPlanDuration() {
-		return planDuration;
-	}
-
-	public void setPlanDuration(int planDuration) {
-		this.planDuration = planDuration;
 	}
 }

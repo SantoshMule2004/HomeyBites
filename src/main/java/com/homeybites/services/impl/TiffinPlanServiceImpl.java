@@ -9,12 +9,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.homeybites.entities.MenuItem;
+import com.homeybites.entities.TiffinDays;
 import com.homeybites.entities.TiffinPlan;
+import com.homeybites.entities.User;
 import com.homeybites.exceptions.ResourceNotFoundException;
-import com.homeybites.payloads.MenuItemDto;
 import com.homeybites.payloads.TiffinPlanDto;
 import com.homeybites.repositories.MenuItemRepository;
+import com.homeybites.repositories.TiffindaysRepository;
 import com.homeybites.repositories.TiffinplanRepository;
+import com.homeybites.repositories.UserRepository;
 import com.homeybites.services.TiffinPlanService;
 
 @Service
@@ -24,28 +27,41 @@ public class TiffinPlanServiceImpl implements TiffinPlanService {
 	private TiffinplanRepository tiffinplanRepository;
 
 	@Autowired
+	private TiffindaysRepository tiffindaysRepository;
+
+	@Autowired
+	private UserRepository userRepository;
+
+	@Autowired
 	private MenuItemRepository menuItemRepository;
 
 	@Autowired
 	private ModelMapper modelMapper;
 
 	@Override
-	public TiffinPlanDto addTiffinPlan(TiffinPlanDto tiffinPlanDto) {
+	public TiffinPlanDto addTiffinPlan(TiffinPlanDto tiffinPlanDto, Integer providerId) {
+
+		User provider = this.userRepository.findById(providerId)
+				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", providerId));
+
 		TiffinPlan tiffinPlan = this.modelMapper.map(tiffinPlanDto, TiffinPlan.class);
+		tiffinPlan.setUser(provider);
 		tiffinPlan.setCreatedAt(LocalDateTime.now());
-		TiffinPlan save = this.tiffinplanRepository.save(tiffinPlan);
-		return this.modelMapper.map(save, TiffinPlanDto.class);
-	}
 
-	@Override
-	public TiffinPlanDto addMenuItems(Integer planId, List<Integer> menuIds) {
+		List<TiffinDays> tiffinDays = tiffinPlan.getTiffinDays().stream().map(day -> {
 
-		TiffinPlan tiffinPlan = this.tiffinplanRepository.findById(planId)
-				.orElseThrow(() -> new ResourceNotFoundException("TiffinPlan", "Id", planId));
+			TiffinDays tiffin = new TiffinDays();
+			tiffin.setWeekDay(day.getWeekDay());
+			tiffin.setTiffinPlan(tiffinPlan);
 
-		List<MenuItem> allMenuitems = this.menuItemRepository.findAllById(menuIds);
-		tiffinPlan.getMenuItems().addAll(allMenuitems);
+			List<MenuItem> menuItems = this.menuItemRepository.findAllById(day.getMenuIds());
+			tiffin.setMenuItem(menuItems);
 
+			return tiffin;
+
+		}).collect(Collectors.toList());
+
+		tiffinPlan.setTiffinDays(tiffinDays);
 		TiffinPlan save = this.tiffinplanRepository.save(tiffinPlan);
 
 		return this.modelMapper.map(save, TiffinPlanDto.class);
@@ -62,13 +78,33 @@ public class TiffinPlanServiceImpl implements TiffinPlanService {
 		tiffinPlan.setActive(tiffinPlanDto.isActive());
 		tiffinPlan.setPlanType(tiffinPlanDto.getPlanType());
 
-		List<MenuItemDto> menuItems = tiffinPlanDto.getMenuItems();
-		List<MenuItem> allMenuitems = menuItems.stream().map(menuItem -> this.modelMapper.map(menuItem, MenuItem.class))
-				.collect(Collectors.toList());
-
-		tiffinPlan.getMenuItems().addAll(allMenuitems);
-
 		TiffinPlan save = this.tiffinplanRepository.save(tiffinPlan);
+		return this.modelMapper.map(save, TiffinPlanDto.class);
+	}
+
+	@Override
+	public TiffinPlanDto updateMenuItemOnDay(Integer planId, String day, Integer oldMenuId, Integer newMenuId) {
+		
+		TiffinPlan tiffinPlan = this.tiffinplanRepository.findById(planId)
+				.orElseThrow(() -> new ResourceNotFoundException("TiffinPlan", "Id", planId));
+
+		TiffinDays tiffinDays = this.tiffindaysRepository.findByTiffinPlanAndWeekDay(tiffinPlan, day)
+				.orElseThrow(() -> new ResourceNotFoundException(day, "plan Id", planId));
+
+		List<MenuItem> menuItems = tiffinDays.getMenuItem();
+		
+		MenuItem oldItem = menuItems.stream().filter(menu -> menu.getMenuId().equals(oldMenuId)).findFirst().get();
+		menuItems.remove(oldItem);
+		
+		MenuItem newMenuItem = this.menuItemRepository.findById(newMenuId)
+				.orElseThrow(() -> new ResourceNotFoundException("Menu item", "id", newMenuId));
+		
+		menuItems.add(newMenuItem);
+		tiffinDays.setMenuItem(menuItems);
+		
+		tiffinPlan.getTiffinDays().add(tiffinDays);
+		TiffinPlan save = this.tiffinplanRepository.save(tiffinPlan);
+		
 		return this.modelMapper.map(save, TiffinPlanDto.class);
 	}
 
@@ -77,6 +113,20 @@ public class TiffinPlanServiceImpl implements TiffinPlanService {
 		TiffinPlan tiffinPlan = this.tiffinplanRepository.findById(planId)
 				.orElseThrow(() -> new ResourceNotFoundException("TiffinPlan", "Id", planId));
 		return this.modelMapper.map(tiffinPlan, TiffinPlanDto.class);
+	}
+
+	@Override
+	public List<TiffinPlanDto> getAllTiffinPlansOfProvider(Integer providerId) {
+
+		User provider = this.userRepository.findById(providerId)
+				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", providerId));
+
+		List<TiffinPlan> list = this.tiffinplanRepository.findByUser(provider);
+
+		List<TiffinPlanDto> listOfPlans = list.stream().map(plan -> this.modelMapper.map(plan, TiffinPlanDto.class))
+				.collect(Collectors.toList());
+
+		return listOfPlans;
 	}
 
 	@Override
@@ -92,20 +142,5 @@ public class TiffinPlanServiceImpl implements TiffinPlanService {
 		TiffinPlan tiffinPlan = this.tiffinplanRepository.findById(planId)
 				.orElseThrow(() -> new ResourceNotFoundException("TiffinPlan", "Id", planId));
 		this.tiffinplanRepository.delete(tiffinPlan);
-	}
-
-	@Override
-	public TiffinPlanDto deleteMenuItemFromPlan(Integer planId, Integer menuId) {
-		TiffinPlan tiffinPlan = this.tiffinplanRepository.findById(planId)
-				.orElseThrow(() -> new ResourceNotFoundException("TiffinPlan", "Id", planId));
-
-		MenuItem menuItem = this.menuItemRepository.findById(menuId)
-				.orElseThrow(() -> new ResourceNotFoundException("Menuitem", "Id", menuId));
-
-		tiffinPlan.getMenuItems().remove(menuItem);
-		TiffinPlan save = this.tiffinplanRepository.save(tiffinPlan);
-
-		return this.modelMapper.map(save, TiffinPlanDto.class);
-
 	}
 }

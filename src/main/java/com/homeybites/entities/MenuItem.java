@@ -35,9 +35,6 @@ public class MenuItem {
 	private Category category;
 	
 	@ManyToMany(mappedBy = "menuItems")
-	private List<TiffinPlan> tiffinPlan = new ArrayList<>();
-	
-	@ManyToMany(mappedBy = "menuItems")
 	private List<OrderInfo> order = new ArrayList<>();
 	
 	@OneToMany(mappedBy = "menuItem")
@@ -46,6 +43,9 @@ public class MenuItem {
 	@ManyToOne
 	@JoinColumn(name = "user_id")
 	private User user;
+	
+	@ManyToMany(mappedBy = "menuItem")
+	private List<TiffinDays> tiffinDays;
 	
 	public MenuItem() {
 		super();
@@ -87,12 +87,6 @@ public class MenuItem {
 	}
 	public void setCategory(Category category) {
 		this.category = category;
-	}
-	public List<TiffinPlan> getTiffinPlan() {
-		return tiffinPlan;
-	}
-	public void setTiffinPlan(List<TiffinPlan> tiffinPlan) {
-		this.tiffinPlan = tiffinPlan;
 	}
 	public User getUser() {
 		return user;
@@ -137,5 +131,13 @@ public class MenuItem {
 
 	public void setUserCart(List<UserCart> userCart) {
 		this.userCart = userCart;
+	}
+
+	public List<TiffinDays> getTiffinDays() {
+		return tiffinDays;
+	}
+
+	public void setTiffinDays(List<TiffinDays> tiffinDays) {
+		this.tiffinDays = tiffinDays;
 	}
 }

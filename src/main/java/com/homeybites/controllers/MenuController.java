@@ -30,7 +30,7 @@ public class MenuController {
 	@Autowired
 	private MenuItemService menuItemService;
 
-	// add menu item controller
+	// add menu item
 	@PostMapping("/user/{userId}/category/{cId}/menuitem/")
 	public ResponseEntity<ApiResponse> addMenuItem(@Valid @RequestBody MenuItemDto menuItemDto,
 			@PathVariable Integer cId, @PathVariable Integer userId) {

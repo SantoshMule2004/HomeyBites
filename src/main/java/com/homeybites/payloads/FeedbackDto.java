@@ -1,7 +1,6 @@
 package com.homeybites.payloads;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 public class FeedbackDto {
 	private Integer fId;

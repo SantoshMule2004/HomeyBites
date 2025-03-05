@@ -140,6 +140,11 @@ public class UserServiceImpl implements UserService {
 	public void deleteUser(Integer userId) {
 		User user = this.userRepository.findById(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
+		
+		List<UserCart> userCart = this.cartRepository.findByUser(user);
+		userCart.stream().forEach(cart -> cart.setMenuItem(null));
+		this.cartRepository.deleteAll(userCart);
+		
 		this.userRepository.delete(user);
 	}
 

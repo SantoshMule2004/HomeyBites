@@ -5,6 +5,7 @@ public class JwtResponse {
 	private String status;
 	private String message;
 	private String token;
+	private UserDto user;
 
 	public JwtResponse() {
 		super();
@@ -34,5 +35,13 @@ public class JwtResponse {
 
 	public void setToken(String token) {
 		this.token = token;
+	}
+
+	public UserDto getUser() {
+		return user;
+	}
+
+	public void setUser(UserDto user) {
+		this.user = user;
 	}
 }

@@ -50,6 +50,7 @@ public class AuthController {
 			response.setMessage("User logged in successfully..!");
 			response.setStatus("success");
 			response.setToken(token);
+			response.setUser(userDto);
 
 			return new ResponseEntity<JwtResponse>(response, HttpStatus.OK);
 		} else {

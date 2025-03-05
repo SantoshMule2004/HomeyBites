@@ -9,35 +9,37 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "tiffin_menuitem")
-public class TiffinMenuitem {
+@Table(name = "tiffin_days_menuitem")
+public class TiffinDaysMenuItem {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int id;
+	private Integer tiffinMenuId;
 	
 	@ManyToOne
-	@JoinColumn(name = "tiffin_id", nullable = false)
-	private TiffinPlan tiffinPlan;
+	@JoinColumn(name = "tiffin_day_id", nullable = false)
+	private TiffinDays tiffinDays;
 	
 	@ManyToOne
 	@JoinColumn(name = "menu_id", nullable = false)
 	private MenuItem menuItem;
+	
+	
 
-	public int getId() {
-		return id;
+	public Integer getTiffinMenuId() {
+		return tiffinMenuId;
 	}
 
-	public void setId(int id) {
-		this.id = id;
+	public void setTiffinMenuId(Integer tiffinMenuId) {
+		this.tiffinMenuId = tiffinMenuId;
 	}
 
-	public TiffinPlan getTiffinPlan() {
-		return tiffinPlan;
+	public TiffinDays getTiffinDays() {
+		return tiffinDays;
 	}
 
-	public void setTiffinPlan(TiffinPlan tiffinPlan) {
-		this.tiffinPlan = tiffinPlan;
+	public void setTiffinDays(TiffinDays tiffinDays) {
+		this.tiffinDays = tiffinDays;
 	}
 
 	public MenuItem getMenuItem() {

@@ -1,12 +1,15 @@
-package com.homeybites.entities;
+package com.homeybites.entities.Log;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.homeybites.entities.Subscription;
+import com.homeybites.entities.TiffinDays;
+import com.homeybites.entities.User;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -14,9 +17,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 
-@Entity
-public class TiffinPlan {
-	
+public class TiffinPlanLog {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer tiffinPlanId;
@@ -29,7 +30,7 @@ public class TiffinPlan {
 	private boolean isActive;
 	
 	@Column(nullable = false, updatable = false)
-	private LocalDateTime createdAt;
+	private LocalDateTime archievedAt;
 	
 	@ManyToOne
 	@JoinColumn(name = "user_id")
@@ -41,7 +42,7 @@ public class TiffinPlan {
 	@OneToMany(mappedBy = "tiffinPlan", cascade = CascadeType.ALL)
 	private List<TiffinDays> tiffinDays = new ArrayList<>();
 	
-	public TiffinPlan() {
+	public TiffinPlanLog() {
 		super();
 	}
 
@@ -94,11 +95,11 @@ public class TiffinPlan {
 	}
 
 	public LocalDateTime getCreatedAt() {
-		return createdAt;
+		return archievedAt;
 	}
 
 	public void setCreatedAt(LocalDateTime createdAt) {
-		this.createdAt = createdAt;
+		this.archievedAt = createdAt;
 	}
 
 	public User getUser() {

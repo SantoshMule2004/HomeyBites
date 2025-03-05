@@ -3,8 +3,6 @@ package com.homeybites.payloads;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-
 import jakarta.validation.constraints.NotBlank;
 
 public class CategoryDto {

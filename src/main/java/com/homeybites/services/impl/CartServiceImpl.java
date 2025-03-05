@@ -74,10 +74,9 @@ public class CartServiceImpl implements CartService {
 				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
 
 		List<UserCart> list = this.cartRepository.findByUser(user);
-		List<UserCartDto> collect = list.stream().map(cart -> this.modelMapper.map(cart, UserCartDto.class))
-				.collect(Collectors.toList());
+		List<UserCartDto> userCarts = list.stream().map(cart -> this.modelMapper.map(cart, UserCartDto.class)).collect(Collectors.toList());
 
-		return collect;
+		return userCarts;
 	}
 
 	@Override

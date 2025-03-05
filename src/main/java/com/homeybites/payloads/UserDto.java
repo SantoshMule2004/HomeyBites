@@ -63,16 +63,22 @@ public class UserDto {
 	
 	private String userRole;
 	
+	@JsonIgnore
 	private List<AddressDto> address = new ArrayList<>();
 	
+	@JsonIgnore
 	private List<OrderInfoDto> orders = new ArrayList<>();
 
+	@JsonIgnore
 	private List<SubscriptionDto> subscriptions = new ArrayList<>();
 	
+	@JsonIgnore
 	private List<TiffinPlanDto> tiffinPlans = new ArrayList<>();
 	
+	@JsonIgnore
 	private List<PaymentDto> payments = new ArrayList<>();
 
+	@JsonIgnore
 	private List<FeedbackDto> feedbacks = new ArrayList<>();
 	
 	@JsonIgnore

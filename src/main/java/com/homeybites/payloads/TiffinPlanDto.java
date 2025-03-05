@@ -4,9 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 public class TiffinPlanDto {
 	
@@ -21,10 +19,10 @@ public class TiffinPlanDto {
 	@JsonIgnore
 	private UserDto user;
 	
-	private List<MenuItemDto> menuItems = new ArrayList<>();
-	
 	@JsonIgnore
-	private SubscriptionDto subscription;
+	private List<SubscriptionDto> subscription;
+	
+	private List<TiffinDaysDto> tiffinDays = new ArrayList<>();
 	
 	public TiffinPlanDto() {
 		super();
@@ -72,18 +70,6 @@ public class TiffinPlanDto {
 	public void setUserDto(UserDto user) {
 		this.user = user;
 	}
-	public List<MenuItemDto> getMenuItems() {
-		return menuItems;
-	}
-	public void setMenuItems(List<MenuItemDto> menuItems) {
-		this.menuItems = menuItems;
-	}
-	public SubscriptionDto getSubscriptions() {
-		return subscription;
-	}
-	public void setSubscriptions(SubscriptionDto subscription) {
-		this.subscription = subscription;
-	}
 	public LocalDateTime getCreatedAt() {
 		return createdAt;
 	}
@@ -95,5 +81,21 @@ public class TiffinPlanDto {
 	}
 	public void setUser(UserDto user) {
 		this.user = user;
+	}
+
+	public List<SubscriptionDto> getSubscription() {
+		return subscription;
+	}
+
+	public void setSubscription(List<SubscriptionDto> subscription) {
+		this.subscription = subscription;
+	}
+
+	public List<TiffinDaysDto> getTiffinDays() {
+		return tiffinDays;
+	}
+
+	public void setTiffinDays(List<TiffinDaysDto> tiffinDays) {
+		this.tiffinDays = tiffinDays;
 	}
 }
