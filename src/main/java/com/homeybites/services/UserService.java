@@ -51,7 +51,7 @@ public interface UserService {
 	String resetPassword(PasswordDto passwordDto, UserDto userDto);
 	
 	//reset pssword after email verification (forget password)
-	String resetPass(PasswordDto passwordDto, UserDto userDto);
+	boolean resetPass(PasswordDto passwordDto, UserDto userDto);
 	
 	//forget password
 	boolean forgetPassword(String username);

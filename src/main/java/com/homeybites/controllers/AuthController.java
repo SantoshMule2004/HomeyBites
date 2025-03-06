@@ -200,10 +200,17 @@ public class AuthController {
 	@PostMapping("/reset-pass")
 	public ResponseEntity<ApiResponse> ResetPasswordAfterVerificationHandler(
 			@Valid @RequestBody PasswordDto passwordDto, @RequestParam String emailId) {
+		
+		System.out.println("Password" + passwordDto.getNewPassword());
+		System.out.println("C-Password" + passwordDto.getcPassword());
 
 		UserDto userDto = this.userService.getUserByEmail(emailId);
 
-		String response = this.userService.resetPass(passwordDto, userDto);
-		return new ResponseEntity<ApiResponse>(new ApiResponse(response), HttpStatus.OK);
+		boolean response = this.userService.resetPass(passwordDto, userDto);
+		if (response)
+			return new ResponseEntity<ApiResponse>(new ApiResponse("Password updated successfully..!"), HttpStatus.OK);
+		else
+			return new ResponseEntity<ApiResponse>(new ApiResponse("Password and confirm password does nto match.."),
+					HttpStatus.BAD_REQUEST);
 	}
 }

@@ -217,7 +217,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public String resetPass(PasswordDto passwordDto, UserDto userDto) {
+	public boolean resetPass(PasswordDto passwordDto, UserDto userDto) {
 		
 			if (passwordDto.getNewPassword() != null && passwordDto.getcPassword() != null
 					&& passwordDto.getNewPassword().equals(passwordDto.getcPassword())) {
@@ -226,8 +226,8 @@ public class UserServiceImpl implements UserService {
 				User user = this.modelMapper.map(userDto, User.class);
 				this.userRepository.save(user);
 				
-				return "Password updated successfully..!";
+				return true;
 			}
-			return "new password and confirm password does not match";
+			return false;
 	}
 }
