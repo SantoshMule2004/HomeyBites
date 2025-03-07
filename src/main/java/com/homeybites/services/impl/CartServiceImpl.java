@@ -40,7 +40,7 @@ public class CartServiceImpl implements CartService {
 		MenuItem menuItem = this.menuItemRepository.findById(itemId)
 				.orElseThrow(() -> new ResourceNotFoundException("Menu item", "id", itemId));
 
-		UserCart byMenuItem = this.cartRepository.findByMenuItem(menuItem);
+		UserCart byMenuItem = this.cartRepository.findByUserAndMenuItem(user, menuItem);
 
 		if (byMenuItem != null) {
 			byMenuItem.setQuantity(byMenuItem.getQuantity() + 1);
