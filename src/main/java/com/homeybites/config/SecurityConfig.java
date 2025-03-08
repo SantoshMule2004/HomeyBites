@@ -91,9 +91,4 @@ public class SecurityConfig {
 		
 		return source;
 	}
-	
-//	.requestMatchers("/api/v1/auth/login").permitAll()
-//	.requestMatchers("/api/v1/users/create").permitAll()
-//	.requestMatchers("/api/v1/users/verify-otp").permitAll()
-//	.requestMatchers("/v3/api-docs").permitAll()
 }

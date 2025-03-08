@@ -41,14 +41,9 @@ public class UserServiceImpl implements UserService {
 	public UserDto registerNewUser(UserDto userDto) {
 
 		User user = this.modelMapper.map(userDto, User.class);
-		user.setUserRole("NORMAL_USER");
+		user.setUserRole("ROLE_NORMAL_USER");
 		user.setPassword(this.passwordEncoder.encode(user.getPassword()));
 		User savedUser = this.userRepository.save(user);
-		
-		// creating cart for every user after registration
-		UserCart cart = new UserCart();
-		cart.setUser(savedUser);
-		this.cartRepository.save(cart);
 		
 		this.sendOtp(savedUser.getEmailId());
 
@@ -58,7 +53,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public UserDto registerTiffinProvider(UserDto userDto) {
 		User user = this.modelMapper.map(userDto, User.class);
-		user.setUserRole("TIFFIN_PROVIDER");
+		user.setUserRole("ROLE_TIFFIN_PROVIDER");
 		user.setPassword(this.passwordEncoder.encode(user.getPassword()));
 		User savedUser = this.userRepository.save(user);
 		// this.sendOtp(savedUser.getEmailId());
