@@ -10,16 +10,16 @@ import com.homeybites.entities.User;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
+import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 
+@Entity
 public class TiffinPlanLog {
+	
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer tiffinPlanId;
 	private String planName;
 	private String planType;
@@ -30,17 +30,24 @@ public class TiffinPlanLog {
 	private boolean isActive;
 	
 	@Column(nullable = false, updatable = false)
+	private LocalDateTime createdAt;
+	
+	@Column(nullable = false, updatable = false)
 	private LocalDateTime archievedAt;
 	
 	@ManyToOne
 	@JoinColumn(name = "user_id")
 	private User user;
 	
-	@OneToMany(mappedBy = "tiffinPlan", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "tiffinPlanLog", cascade = CascadeType.ALL)
 	private List<Subscription> subscription;
 	
-	@OneToMany(mappedBy = "tiffinPlan", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "tiffinPlanLog", cascade = CascadeType.ALL)
+	private List<SubscriptionLog> subscriptionLog;
+	
+	@OneToMany(mappedBy = "tiffinPlanLog", cascade = CascadeType.ALL)
 	private List<TiffinDays> tiffinDays = new ArrayList<>();
+	
 	
 	public TiffinPlanLog() {
 		super();
@@ -94,14 +101,6 @@ public class TiffinPlanLog {
 		this.isActive = isActive;
 	}
 
-	public LocalDateTime getCreatedAt() {
-		return archievedAt;
-	}
-
-	public void setCreatedAt(LocalDateTime createdAt) {
-		this.archievedAt = createdAt;
-	}
-
 	public User getUser() {
 		return user;
 	}
@@ -124,5 +123,29 @@ public class TiffinPlanLog {
 
 	public void setTiffinDays(List<TiffinDays> tiffinDays) {
 		this.tiffinDays = tiffinDays;
+	}
+
+	public LocalDateTime getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(LocalDateTime createdAt) {
+		this.createdAt = createdAt;
+	}
+
+	public LocalDateTime getArchievedAt() {
+		return archievedAt;
+	}
+
+	public void setArchievedAt(LocalDateTime archievedAt) {
+		this.archievedAt = archievedAt;
+	}
+
+	public List<SubscriptionLog> getSubscriptionLog() {
+		return subscriptionLog;
+	}
+
+	public void setSubscriptionLog(List<SubscriptionLog> subscriptionLog) {
+		this.subscriptionLog = subscriptionLog;
 	}
 }

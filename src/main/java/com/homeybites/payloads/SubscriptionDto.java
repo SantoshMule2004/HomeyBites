@@ -15,7 +15,6 @@ public class SubscriptionDto {
 	private LocalDateTime createdAt;
 	private int planDuration;
 
-	@JsonIgnore
 	private UserDto user;
 
 	@JsonIgnore

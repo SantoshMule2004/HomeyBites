@@ -54,6 +54,13 @@ public class SubscriptionController {
 		return new ResponseEntity<List<SubscriptionDto>>(allSubscriptions, HttpStatus.OK);
 	}
 
+	// get all subscriptions of user
+	@GetMapping("/tiffin-provider/{userId}")
+	public ResponseEntity<List<SubscriptionDto>> getAllSubscriptionsOfTiffinProvider(@PathVariable Integer userId) {
+		List<SubscriptionDto> allSubscriptions = this.subscriptionService.getAllSubscriptionOfTiffinProvider(userId);
+		return new ResponseEntity<List<SubscriptionDto>>(allSubscriptions, HttpStatus.OK);
+	}
+
 	// get all subscription
 	@GetMapping("/")
 	public ResponseEntity<List<SubscriptionDto>> getAllSubscriptions() {
@@ -65,6 +72,13 @@ public class SubscriptionController {
 	@DeleteMapping("/{planId}")
 	public ResponseEntity<ApiResponse> deleteSubscription(@PathVariable Integer planId) {
 		this.subscriptionService.deleteSubscriptionPlan(planId);
+		return new ResponseEntity<ApiResponse>(new ApiResponse("plan deleted successfully.!"), HttpStatus.OK);
+	}
+
+	// delete subscription
+	@DeleteMapping("/log/{planId}")
+	public ResponseEntity<ApiResponse> deleteSubscriptionLog(@PathVariable Integer planId) {
+		this.subscriptionService.deleteSubscriptionPlanLog(planId);
 		return new ResponseEntity<ApiResponse>(new ApiResponse("plan deleted successfully.!"), HttpStatus.OK);
 	}
 }

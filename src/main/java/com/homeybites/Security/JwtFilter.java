@@ -47,33 +47,9 @@ public class JwtFilter extends OncePerRequestFilter {
 			if ((authHeader != null) && (authHeader.startsWith("Bearer "))) {
 
 				token = authHeader.substring(7);
-				System.out.println("Token : " + token);
+//				System.out.println("Token : " + token);
 				
 				username = jwtHelper.extractUsername(token);
-				
-//				try {
-//
-//					username = jwtHelper.extractUsername(token);
-//
-//				} catch (IllegalArgumentException e) {
-//					logger.info("Illegal Argument while fetching the username !!");
-//					// handlerExceptionResolver.resolveException(request, response, null, e);
-//					e.printStackTrace();
-//				} catch (ExpiredJwtException e) {
-//					logger.info("Given jwt token is expired !!");
-//					// handlerExceptionResolver.resolveException(request, response, null, e);
-//					e.printStackTrace();
-//				} catch (MalformedJwtException e) {
-//					logger.info("Some changed has done in token !! Invalid Token");
-//					// handlerExceptionResolver.resolveException(request, response, null, e);
-//					e.printStackTrace();
-//				} catch (SignatureException e) {
-//					logger.info("JWT signature does not match locally computed signature");
-//					// handlerExceptionResolver.resolveException(request, response, null, e);
-//					e.printStackTrace();
-//				} catch (Exception e) {
-//					e.printStackTrace();
-//				}
 			}
 
 			if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {

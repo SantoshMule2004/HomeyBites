@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.homeybites.entities.Log.SubscriptionLog;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -37,6 +39,9 @@ public class TiffinPlan {
 	
 	@OneToMany(mappedBy = "tiffinPlan", cascade = CascadeType.ALL)
 	private List<Subscription> subscription;
+	
+	@OneToMany(mappedBy = "tiffinPlan", cascade = CascadeType.ALL)
+	private List<SubscriptionLog> subscriptionLog;
 	
 	@OneToMany(mappedBy = "tiffinPlan", cascade = CascadeType.ALL)
 	private List<TiffinDays> tiffinDays = new ArrayList<>();
@@ -123,5 +128,13 @@ public class TiffinPlan {
 
 	public void setTiffinDays(List<TiffinDays> tiffinDays) {
 		this.tiffinDays = tiffinDays;
+	}
+
+	public List<SubscriptionLog> getSubscriptionLog() {
+		return subscriptionLog;
+	}
+
+	public void setSubscriptionLog(List<SubscriptionLog> subscriptionLog) {
+		this.subscriptionLog = subscriptionLog;
 	}
 }

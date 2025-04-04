@@ -8,6 +8,9 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.homeybites.entities.Log.SubscriptionLog;
+import com.homeybites.entities.Log.TiffinPlanLog;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -54,7 +57,13 @@ public class User implements UserDetails{
 	private List<Subscription> subscriptions = new ArrayList<>();
 	
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+	private List<SubscriptionLog> subscriptionLog = new ArrayList<>();
+	
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
 	private List<TiffinPlan> tiffinPlans = new ArrayList<>();
+	
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+	private List<TiffinPlanLog> tiffinPlanLog = new ArrayList<>();
 	
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
 	private List<Payment> payments = new ArrayList<>();
@@ -68,11 +77,11 @@ public class User implements UserDetails{
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
 	private List<UserCart> userCart;
 	
+	
 	public User() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
-	
 	
 	public Integer getUserId() {
 		return userId;
@@ -237,7 +246,19 @@ public class User implements UserDetails{
 	public void setUserCart(List<UserCart> userCart) {
 		this.userCart = userCart;
 	}
-
+	public List<TiffinPlanLog> getTiffinPlanLog() {
+		return tiffinPlanLog;
+	}
+	public void setTiffinPlanLog(List<TiffinPlanLog> tiffinPlanLog) {
+		this.tiffinPlanLog = tiffinPlanLog;
+	}
+	public List<SubscriptionLog> getSubscriptionLog() {
+		return subscriptionLog;
+	}
+	public void setSubscriptionLog(List<SubscriptionLog> subscriptionLog) {
+		this.subscriptionLog = subscriptionLog;
+	}
+	
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {

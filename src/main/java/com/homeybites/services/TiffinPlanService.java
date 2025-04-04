@@ -2,6 +2,7 @@ package com.homeybites.services;
 
 import java.util.List;
 import com.homeybites.payloads.TiffinPlanDto;
+import com.homeybites.payloads.UpdateMenuItemDto;
 
 public interface TiffinPlanService {
 
@@ -10,9 +11,9 @@ public interface TiffinPlanService {
 
 	// update tiffin plan
 	TiffinPlanDto updateTiffinPlan(TiffinPlanDto tiffinPlanDto, Integer planId);
-	
+
 	// update menuitems on specific day
-	TiffinPlanDto updateMenuItemOnDay(Integer planId, String day, Integer oldMenuId, Integer newMenuId);
+	TiffinPlanDto updateMenuItemOnDay(Integer planId, String day, UpdateMenuItemDto updateMenuItemDto);
 
 	// get tiffin plan
 	TiffinPlanDto getTiffinPlan(Integer planId);
@@ -25,4 +26,7 @@ public interface TiffinPlanService {
 
 	// delete tiffin plan
 	void deleteTiffinPlan(Integer planId);
+
+	// delete tiffin plan log
+	void deleteTiffinPlanLog(Integer planId);
 }

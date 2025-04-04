@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.homeybites.entities.Log.SubscriptionLog;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -32,6 +34,10 @@ public class OrderInfo {
 	@OneToOne
 	@JoinColumn(name = "subscription_id")
 	private Subscription subscription;
+	
+	@OneToOne
+	@JoinColumn(name = "subscription_log_id")
+	private SubscriptionLog subscriptionLog;
 	
 	@ManyToMany
 	@JoinTable(name = "order_menuitem", joinColumns = @JoinColumn(name = "order_id"), inverseJoinColumns = @JoinColumn(name = "menu_id"))
@@ -105,5 +111,11 @@ public class OrderInfo {
 	}
 	public void setMenuItems(List<MenuItem> menuItems) {
 		this.menuItems = menuItems;
+	}
+	public SubscriptionLog getSubscriptionLog() {
+		return subscriptionLog;
+	}
+	public void setSubscriptionLog(SubscriptionLog subscriptionLog) {
+		this.subscriptionLog = subscriptionLog;
 	}
 }

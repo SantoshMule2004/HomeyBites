@@ -1,5 +1,6 @@
 package com.homeybites.exceptions;
 
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,6 +45,23 @@ public class GlobalExceptionHandler {
 			response.put(fieldName, message);
 		});
 		return new ResponseEntity<Map<String, String>>(response, HttpStatus.BAD_REQUEST);
+	}
+
+	// handler for null pointer exception
+	@ExceptionHandler(NullPointerException.class)
+	public ResponseEntity<ApiException> NullPointerExceptionHandler(NullPointerException ex) {
+		String message = ex.getMessage();
+		ApiException response = new ApiException(message, false);
+		return new ResponseEntity<ApiException>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+
+	// handler for database constraint violation
+	@ExceptionHandler(SQLIntegrityConstraintViolationException.class)
+	public ResponseEntity<ApiException> SQLIntegrityConstraintViolationExceptionHandler(
+			SQLIntegrityConstraintViolationException ex) {
+		String message = ex.getMessage();
+		ApiException response = new ApiException("Database constraint violation: " + message, false);
+		return new ResponseEntity<ApiException>(response, HttpStatus.BAD_REQUEST);
 	}
 
 	// handler for bad request method
@@ -112,12 +130,20 @@ public class GlobalExceptionHandler {
 		ApiException response = new ApiException("Invalid JWT token..!", false);
 		return new ResponseEntity<ApiException>(response, HttpStatusCode.valueOf(498));
 	}
-	
+
 	// handler for email connection timeout
 	@ExceptionHandler(MailConnectException.class)
-	public ResponseEntity<ApiException> MailConnectExceptionHandler(MailConnectException ex){
+	public ResponseEntity<ApiException> MailConnectExceptionHandler(MailConnectException ex) {
 		String message = ex.getMessage();
 		ApiException response = new ApiException(message, false);
 		return new ResponseEntity<ApiException>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+
+	// handles for any exception
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<ApiException> anyExceptionHandler(Exception ex) {
+		String message = ex.getMessage();
+		ApiException response = new ApiException(message, false);
+		return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 }

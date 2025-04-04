@@ -12,11 +12,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.homeybites.payloads.ApiResponse;
 import com.homeybites.payloads.TiffinPlanDto;
+import com.homeybites.payloads.UpdateMenuItemDto;
 import com.homeybites.services.TiffinPlanService;
 
 @RestController
@@ -30,6 +30,8 @@ public class TiffinPlanController {
 	@PostMapping("/tiffin-provider/{providerId}")
 	public ResponseEntity<ApiResponse> addTiffinPlan(@RequestBody TiffinPlanDto planDto,
 			@PathVariable Integer providerId) {
+		
+		System.out.println("provider Id" + providerId);
 		TiffinPlanDto tiffinPlan = this.tiffinPlanService.addTiffinPlan(planDto, providerId);
 		ApiResponse response = new ApiResponse("Tiffin plan added successfully..!", true, tiffinPlan);
 		return new ResponseEntity<ApiResponse>(response, HttpStatus.CREATED);
@@ -47,8 +49,8 @@ public class TiffinPlanController {
 	// update tiffin plan
 	@PutMapping("/{planId}/day/{day}")
 	public ResponseEntity<ApiResponse> updateMenuItems(@PathVariable Integer planId, @PathVariable String day,
-			@RequestParam Integer oldMenuId, @RequestParam Integer newMenuId) {
-		TiffinPlanDto tiffinPlan = this.tiffinPlanService.updateMenuItemOnDay(planId, day, oldMenuId, newMenuId);
+			@RequestBody UpdateMenuItemDto updateMenuItemDto) {
+		TiffinPlanDto tiffinPlan = this.tiffinPlanService.updateMenuItemOnDay(planId, day, updateMenuItemDto);
 		ApiResponse response = new ApiResponse("Menuitems updated successfully..!", true, tiffinPlan);
 		return new ResponseEntity<ApiResponse>(response, HttpStatus.CREATED);
 	}
@@ -79,6 +81,14 @@ public class TiffinPlanController {
 	public ResponseEntity<ApiResponse> deleteTiffinPlan(@PathVariable Integer planId) {
 		this.tiffinPlanService.deleteTiffinPlan(planId);
 		ApiResponse apiResponse = new ApiResponse("Tiffin plan deleted successfully..!", true);
+		return new ResponseEntity<ApiResponse>(apiResponse, HttpStatus.OK);
+	}
+
+	// delete tiffin plan
+	@DeleteMapping("/log/{planId}")
+	public ResponseEntity<ApiResponse> deleteTiffinPlanLog(@PathVariable Integer planId) {
+		this.tiffinPlanService.deleteTiffinPlanLog(planId);
+		ApiResponse apiResponse = new ApiResponse("Tiffin plan log deleted successfully..!", true);
 		return new ResponseEntity<ApiResponse>(apiResponse, HttpStatus.OK);
 	}
 }

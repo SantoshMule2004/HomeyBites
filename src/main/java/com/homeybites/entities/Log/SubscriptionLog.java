@@ -9,11 +9,13 @@ import com.homeybites.entities.User;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 
+@Entity
 public class SubscriptionLog {
 	
 	@Id
@@ -31,12 +33,16 @@ public class SubscriptionLog {
 	@JoinColumn(name = "user_id")
 	private User user;
 
-	@OneToOne(mappedBy = "subscription", cascade = CascadeType.ALL)
+	@OneToOne(mappedBy = "subscriptionLog", cascade = CascadeType.ALL)
 	private OrderInfo order;
 
 	@ManyToOne
-	@JoinColumn(name = "tiffin_id", nullable = false)
+	@JoinColumn(name = "tiffin_id", nullable = true)
 	private TiffinPlan tiffinPlan;
+	
+	@ManyToOne
+	@JoinColumn(name = "tiffin_log_id", nullable = true)
+	private TiffinPlanLog tiffinPlanLog;
 	
 	private boolean monday = false;
 	private boolean tuesday = false;
@@ -101,14 +107,6 @@ public class SubscriptionLog {
 
 	public void setPlanDuration(long planDuration) {
 		this.planDuration = planDuration;
-	}
-
-	public LocalDateTime getCreatedAt() {
-		return archievedAt;
-	}
-
-	public void setCreatedAt(LocalDateTime createdAt) {
-		this.archievedAt = createdAt;
 	}
 
 	public User getUser() {
@@ -213,5 +211,21 @@ public class SubscriptionLog {
 
 	public void setDinner(boolean isDinner) {
 		this.isDinner = isDinner;
+	}
+
+	public LocalDateTime getArchievedAt() {
+		return archievedAt;
+	}
+
+	public void setArchievedAt(LocalDateTime archievedAt) {
+		this.archievedAt = archievedAt;
+	}
+
+	public TiffinPlanLog getTiffinPlanLog() {
+		return tiffinPlanLog;
+	}
+
+	public void setTiffinPlanLog(TiffinPlanLog tiffinPlanLog) {
+		this.tiffinPlanLog = tiffinPlanLog;
 	}
 }

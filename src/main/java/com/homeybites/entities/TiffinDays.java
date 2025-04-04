@@ -2,6 +2,8 @@ package com.homeybites.entities;
 
 import java.util.List;
 
+import com.homeybites.entities.Log.TiffinPlanLog;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -22,8 +24,12 @@ public class TiffinDays {
 	private String weekDay;
 
 	@ManyToOne
-	@JoinColumn(name = "tiffin_plan_id", nullable = false)
+	@JoinColumn(name = "tiffin_plan_id", nullable = true)
 	private TiffinPlan tiffinPlan;
+	
+	@ManyToOne
+	@JoinColumn(name = "tiffin_log_id", nullable = true)
+	private TiffinPlanLog tiffinPlanLog;
 
 	@ManyToMany
 	@JoinTable(name = "tiffin_days_menuitem", joinColumns = @JoinColumn(name = "tiffin_day_id"), inverseJoinColumns = @JoinColumn(name = "menu_id"))
@@ -70,5 +76,13 @@ public class TiffinDays {
 
 	public void setMenuIds(List<Integer> menuIds) {
 		this.menuIds = menuIds;
+	}
+
+	public TiffinPlanLog getTiffinPlanLog() {
+		return tiffinPlanLog;
+	}
+
+	public void setTiffinPlanLog(TiffinPlanLog tiffinPlanLog) {
+		this.tiffinPlanLog = tiffinPlanLog;
 	}
 }

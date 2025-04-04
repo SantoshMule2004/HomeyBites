@@ -3,6 +3,8 @@ package com.homeybites.entities;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import com.homeybites.entities.Log.TiffinPlanLog;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -35,8 +37,12 @@ public class Subscription {
 	private OrderInfo order;
 
 	@ManyToOne
-	@JoinColumn(name = "tiffin_id", nullable = false)
+	@JoinColumn(name = "tiffin_id", nullable = true)
 	private TiffinPlan tiffinPlan;
+	
+	@ManyToOne
+	@JoinColumn(name = "tiffin_log_id", nullable = true)
+	private TiffinPlanLog tiffinPlanLog;
 	
 	private boolean monday = false;
 	private boolean tuesday = false;
@@ -133,6 +139,14 @@ public class Subscription {
 
 	public void setTiffinPlan(TiffinPlan tiffinPlan) {
 		this.tiffinPlan = tiffinPlan;
+	}
+
+	public TiffinPlanLog getTiffinPlanLog() {
+		return tiffinPlanLog;
+	}
+
+	public void setTiffinPlanLog(TiffinPlanLog tiffinPlanLog) {
+		this.tiffinPlanLog = tiffinPlanLog;
 	}
 
 	public boolean isMonday() {
