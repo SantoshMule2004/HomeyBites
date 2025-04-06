@@ -63,7 +63,6 @@ public class UserDto {
 	
 	private String userRole;
 	
-	@JsonIgnore
 	private List<AddressDto> address = new ArrayList<>();
 	
 	@JsonIgnore
@@ -269,5 +268,18 @@ public class UserDto {
 
 	public void setMenuItems(List<MenuItem> menuItems) {
 		this.menuItems = menuItems;
+	}
+
+	@Override
+	public String toString() {
+		return "UserDto [userId=" + userId + ", firstName=" + firstName + ", middleName=" + middleName + ", lastName="
+				+ lastName + ", emailId=" + emailId + ", isVerified=" + isVerified + ", phoneNo=" + phoneNo + ", dob="
+				+ dob + ", password=" + password + ", cPassword=" + cPassword + ", gender=" + gender + ", dietryPref="
+				+ dietryPref + ", universityName=" + universityName + ", course=" + course + ", companyName="
+				+ companyName + ", businessName=" + businessName + ", foodLicenseNo=" + foodLicenseNo + ", GSTIN="
+				+ GSTIN + ", permissions=" + permissions + ", userRole=" + userRole + ", address=" + address
+				+ ", orders=" + orders + ", subscriptions=" + subscriptions + ", tiffinPlans=" + tiffinPlans
+				+ ", payments=" + payments + ", feedbacks=" + feedbacks + ", menuItems=" + menuItems + ", userCart="
+				+ userCart + "]";
 	}
 }

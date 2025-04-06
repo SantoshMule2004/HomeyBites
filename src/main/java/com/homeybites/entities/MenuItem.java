@@ -24,7 +24,7 @@ public class MenuItem {
 	
 	@Column(name = "is_active", nullable = false)
 	private boolean isActive;
-	
+	 
 	private String menuType;
 	private String imagePublicId;
 	private String imageUrl;

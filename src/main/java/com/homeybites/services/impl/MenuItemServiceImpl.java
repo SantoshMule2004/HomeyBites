@@ -46,15 +46,21 @@ public class MenuItemServiceImpl implements MenuItemService {
 	private ImageService imageService;
 
 	@Override
-	public MenuItemDto addMenuItem(MenuItemDto menuItemDto, Integer categoryId, Integer userId) {
+	public MenuItemDto addMenuItem(MenuItemDto menuItemData, MultipartFile file, Integer categoryId, Integer userId) throws IOException {
 
 		Category category = this.categoryRepository.findById(categoryId)
 				.orElseThrow(() -> new ResourceNotFoundException("category", "id", categoryId));
 
 		User user = this.userRepository.findById(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("user", "id", userId));
+		
+		MenuItem menuItem = this.modelMapper.map(menuItemData, MenuItem.class);
+		
+		ImageInfo uploadImage = this.imageService.uploadImage(file);
+		menuItem.setImagePublicId(uploadImage.getPublicId());
+		menuItem.setImageUrl(uploadImage.getSecuredUrl());
+		menuItem.setFormat(uploadImage.getFormat());
 
-		MenuItem menuItem = this.modelMapper.map(menuItemDto, MenuItem.class);
 		menuItem.setCategory(category);
 		menuItem.setUser(user);
 		MenuItem savedMenu = this.menuItemRepository.save(menuItem);

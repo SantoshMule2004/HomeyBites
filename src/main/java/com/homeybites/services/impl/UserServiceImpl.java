@@ -9,9 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.homeybites.entities.Address;
 import com.homeybites.entities.User;
 import com.homeybites.entities.UserCart;
 import com.homeybites.exceptions.ResourceNotFoundException;
+import com.homeybites.payloads.AddressDto;
 import com.homeybites.payloads.OtpDto;
 import com.homeybites.payloads.PasswordDto;
 import com.homeybites.payloads.UserDto;
@@ -25,9 +27,9 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	private UserRepository userRepository;
-	
+
 	@Autowired
-	private CartRepository  cartRepository;
+	private CartRepository cartRepository;
 
 	@Autowired
 	private ModelMapper modelMapper;
@@ -44,7 +46,7 @@ public class UserServiceImpl implements UserService {
 		user.setUserRole("ROLE_NORMAL_USER");
 		user.setPassword(this.passwordEncoder.encode(user.getPassword()));
 		User savedUser = this.userRepository.save(user);
-		
+
 		this.sendOtp(savedUser.getEmailId());
 
 		return this.modelMapper.map(savedUser, UserDto.class);
@@ -52,15 +54,37 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public UserDto registerTiffinProvider(UserDto userDto) {
+
 		User user = this.modelMapper.map(userDto, User.class);
 		user.setUserRole("ROLE_TIFFIN_PROVIDER");
 		user.setPassword(this.passwordEncoder.encode(user.getPassword()));
 		User savedUser = this.userRepository.save(user);
-		// this.sendOtp(savedUser.getEmailId());
+
+		this.sendOtp(savedUser.getEmailId());
 
 		return this.modelMapper.map(savedUser, UserDto.class);
 	}
 	
+	@Override
+	public UserDto addBussinessDetails(Integer providerId, UserDto userDto) {
+		
+		User providerInfo = this.userRepository.findById(providerId)
+				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", providerId));
+		
+		providerInfo.setBusinessName(userDto.getBusinessName());
+		providerInfo.setFoodLicenseNo(userDto.getFoodLicenseNo());
+		providerInfo.setGSTIN(userDto.getGSTIN());
+		
+		for (AddressDto addDto : userDto.getAddress()) {
+			Address address = this.modelMapper.map(addDto, Address.class);
+			address.setUser(providerInfo);
+			providerInfo.getAddress().add(address);
+		}
+		
+		User save = this.userRepository.save(providerInfo);
+		return this.modelMapper.map(save, UserDto.class);
+	}
+
 	@Override
 	public UserDto saveUser(UserDto userDto) {
 
@@ -135,11 +159,11 @@ public class UserServiceImpl implements UserService {
 	public void deleteUser(Integer userId) {
 		User user = this.userRepository.findById(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
-		
+
 		List<UserCart> userCart = this.cartRepository.findByUser(user);
 		userCart.stream().forEach(cart -> cart.setMenuItem(null));
 		this.cartRepository.deleteAll(userCart);
-		
+
 		this.userRepository.delete(user);
 	}
 
@@ -185,7 +209,7 @@ public class UserServiceImpl implements UserService {
 			this.emailService.removeOtp(username);
 			return false;
 		}
-	
+
 		if (enteredOtp.equals(otpDto.getOtp())) {
 			this.emailService.removeOtp(username);
 			return true;
@@ -199,11 +223,11 @@ public class UserServiceImpl implements UserService {
 
 			if (passwordDto.getNewPassword() != null && passwordDto.getcPassword() != null
 					&& passwordDto.getNewPassword().equals(passwordDto.getcPassword())) {
-				
+
 				userDto.setPassword(passwordEncoder.encode(passwordDto.getNewPassword()));
 				User user = this.modelMapper.map(userDto, User.class);
 				this.userRepository.save(user);
-				
+
 				return "Password updated successfully..!";
 			}
 			return "new password and confirm password does not match";
@@ -213,16 +237,16 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public boolean resetPass(PasswordDto passwordDto, UserDto userDto) {
-		
-			if (passwordDto.getNewPassword() != null && passwordDto.getcPassword() != null
-					&& passwordDto.getNewPassword().equals(passwordDto.getcPassword())) {
-				
-				userDto.setPassword(passwordEncoder.encode(passwordDto.getNewPassword()));
-				User user = this.modelMapper.map(userDto, User.class);
-				this.userRepository.save(user);
-				
-				return true;
-			}
-			return false;
+
+		if (passwordDto.getNewPassword() != null && passwordDto.getcPassword() != null
+				&& passwordDto.getNewPassword().equals(passwordDto.getcPassword())) {
+
+			userDto.setPassword(passwordEncoder.encode(passwordDto.getNewPassword()));
+			User user = this.modelMapper.map(userDto, User.class);
+			this.userRepository.save(user);
+
+			return true;
+		}
+		return false;
 	}
 }

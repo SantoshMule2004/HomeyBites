@@ -4,13 +4,12 @@ import java.io.IOException;
 import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
-
 import com.homeybites.payloads.MenuItemDto;
 
 public interface MenuItemService {
 	
 	//add new menu item
-	MenuItemDto addMenuItem(MenuItemDto menuItemDto, Integer categoryId, Integer userId);
+	MenuItemDto addMenuItem(MenuItemDto menuItemData, MultipartFile file, Integer categoryId, Integer userId) throws IOException;
 	
 	// uploading menu image
 	MenuItemDto UploadMenuImage(MultipartFile file, Integer menuId) throws IOException;

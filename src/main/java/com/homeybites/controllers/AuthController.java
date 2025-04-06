@@ -7,7 +7,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -36,7 +38,7 @@ public class AuthController {
 	@Autowired
 	private UserService userService;
 
-	// login
+	// user login
 	@PostMapping("/login")
 	public ResponseEntity<JwtResponse> verifyUser(@Valid @RequestBody JwtRequest jwtRequest) {
 		this.doAuthenticate(jwtRequest.getUsername(), jwtRequest.getPassword());
@@ -46,20 +48,55 @@ public class AuthController {
 		JwtResponse response = new JwtResponse();
 
 		if (userDto.isVerified()) {
-			String token = jwtHelper.generateToken(jwtRequest.getUsername());
-			response.setMessage("User logged in successfully..!");
-			response.setStatus("success");
-			response.setToken(token);
-			response.setUser(userDto);
+			if (userDto.getUserRole().equals("ROLE_NORMAL_USER")) {
+				String token = jwtHelper.generateToken(jwtRequest.getUsername());
+				response.setMessage("User logged in successfully..!");
+				response.setStatus("success");
+				response.setToken(token);
+				response.setUser(userDto);
 
-			return new ResponseEntity<JwtResponse>(response, HttpStatus.OK);
+				return new ResponseEntity<JwtResponse>(response, HttpStatus.OK);
+			} else {
+				response.setMessage("Unable to login, Access denied..!");
+				response.setStatus("error");
+				return new ResponseEntity<JwtResponse>(response, HttpStatus.FORBIDDEN);
+			}
 		} else {
 			response.setMessage("Unable to login, email not verified..!");
 			response.setStatus("error");
 			return new ResponseEntity<JwtResponse>(response, HttpStatus.FORBIDDEN);
 
 		}
+	}
 
+	// login tiffin provider
+	@PostMapping("/tiffin-provider/login")
+	public ResponseEntity<JwtResponse> verifyTiffinProvider(@Valid @RequestBody JwtRequest jwtRequest) {
+		this.doAuthenticate(jwtRequest.getUsername(), jwtRequest.getPassword());
+
+		String username = jwtRequest.getUsername();
+		UserDto userDto = this.userService.getUserByEmail(username);
+		JwtResponse response = new JwtResponse();
+
+		if (userDto.isVerified()) {
+			if (userDto.getUserRole().equals("ROLE_TIFFIN_PROVIDER")) {
+				String token = jwtHelper.generateToken(jwtRequest.getUsername());
+				response.setMessage("User logged in successfully..!");
+				response.setStatus("success");
+				response.setToken(token);
+				response.setUser(userDto);
+
+				return new ResponseEntity<JwtResponse>(response, HttpStatus.OK);
+			} else {
+				response.setMessage("Unable to login, Access denied..!");
+				response.setStatus("error");
+				return new ResponseEntity<JwtResponse>(response, HttpStatus.FORBIDDEN);
+			}
+		} else {
+			response.setMessage("Unable to login, email not verified..!");
+			response.setStatus("error");
+			return new ResponseEntity<JwtResponse>(response, HttpStatus.FORBIDDEN);
+		}
 	}
 
 	private void doAuthenticate(String username, String password) {
@@ -85,9 +122,6 @@ public class AuthController {
 					HttpStatus.CONFLICT);
 		}
 
-		System.out.println("Password" + userDto.getPassword());
-		System.out.println("C Password" + userDto.getCpassword());
-
 		if (userDto.getPassword() != null && userDto.getCpassword() != null
 				&& userDto.getPassword().equals(userDto.getCpassword())) {
 
@@ -104,7 +138,7 @@ public class AuthController {
 	}
 
 	// register tiffin provider
-	@PostMapping("/tiffin-provider")
+	@PostMapping("/tiffin-provider/register")
 	public ResponseEntity<ApiResponse> RegisterTiffinProvider(@RequestBody UserDto userDto) {
 
 		boolean isPresent = this.userService.isUserPresent(userDto.getEmailId());
@@ -113,14 +147,30 @@ public class AuthController {
 			return new ResponseEntity<ApiResponse>(new ApiResponse("Email Id already exists..", false),
 					HttpStatus.CONFLICT);
 		}
+		if (userDto.getPassword() != null && userDto.getCpassword() != null
+				&& userDto.getPassword().equals(userDto.getCpassword())) {
 
-		// session.setAttribute("userDto", userDto);
-		// this.userService.sendOtp(userDto.getEmailId());
+			UserDto registerTiffinProvider = this.userService.registerTiffinProvider(userDto);
 
-		UserDto registerTiffinProvider = this.userService.registerTiffinProvider(userDto);
+			return new ResponseEntity<ApiResponse>(
+					new ApiResponse("email-verification OTP has sent to your email id (valid only for 5 minutes)", true,
+							registerTiffinProvider),
+					HttpStatus.OK);
+		}
 
-		return new ResponseEntity<ApiResponse>(new ApiResponse("registered success", true, registerTiffinProvider),
-				HttpStatus.OK);
+		return new ResponseEntity<ApiResponse>(
+				new ApiResponse("Password and confirm password does not match..!", false), HttpStatus.BAD_REQUEST);
+	}
+
+	// add business details of tiffin provider
+	@PutMapping("/tiffin-provider/{providerId}/business-details")
+	public ResponseEntity<ApiResponse> addBusinnessDetails(@PathVariable Integer providerId,
+			@RequestBody UserDto userDto) {
+
+		UserDto providerInfo = this.userService.addBussinessDetails(providerId, userDto);
+
+		return new ResponseEntity<ApiResponse>(
+				new ApiResponse("Bussiness details added successfully..!", true, providerInfo), HttpStatus.OK);
 	}
 
 	// verifying email through OTP
@@ -200,7 +250,7 @@ public class AuthController {
 	@PostMapping("/reset-pass")
 	public ResponseEntity<ApiResponse> ResetPasswordAfterVerificationHandler(
 			@Valid @RequestBody PasswordDto passwordDto, @RequestParam String emailId) {
-		
+
 		System.out.println("Password" + passwordDto.getNewPassword());
 		System.out.println("C-Password" + passwordDto.getcPassword());
 

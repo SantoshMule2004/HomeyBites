@@ -2,6 +2,8 @@ package com.homeybites.payloads;
 
 import java.util.List;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.validation.constraints.NotBlank;
@@ -27,6 +29,8 @@ public class MenuItemDto {
 	private String imageUrl;
 	
 	private String format;
+	
+	private MultipartFile file;
 	
 	@NotBlank(message = "menu type cannot be empty..!")
 	private String menuType;
@@ -140,5 +144,22 @@ public class MenuItemDto {
 
 	public void setTiffinDays(TiffinDaysDto tiffinDays) {
 		this.tiffinDays = tiffinDays;
+	}
+
+	public MultipartFile getFile() {
+		return file;
+	}
+
+	public void setFile(MultipartFile file) {
+		this.file = file;
+	}
+
+	@Override
+	public String toString() {
+		return "MenuItemDto [menuId=" + menuId + ", menuName=" + menuName + ", price=" + price + ", description="
+				+ description + ", isActive=" + isActive + ", imagePublicId=" + imagePublicId + ", imageUrl=" + imageUrl
+				+ ", format=" + format + ", file=" + file + ", menuType=" + menuType + ", category=" + category
+				+ ", order=" + order + ", userDto=" + userDto + ", userCart=" + userCart + ", tiffinDays=" + tiffinDays
+				+ "]";
 	}
 }

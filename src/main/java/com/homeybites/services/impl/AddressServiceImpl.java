@@ -11,11 +11,10 @@ import com.homeybites.entities.Address;
 import com.homeybites.entities.User;
 import com.homeybites.exceptions.ResourceNotFoundException;
 import com.homeybites.payloads.AddressDto;
-import com.homeybites.payloads.UserDto;
 import com.homeybites.payloads.UserRoles;
 import com.homeybites.repositories.AddressRepository;
+import com.homeybites.repositories.UserRepository;
 import com.homeybites.services.AddressService;
-import com.homeybites.services.UserService;
 
 @Service
 public class AddressServiceImpl implements AddressService {
@@ -24,15 +23,15 @@ public class AddressServiceImpl implements AddressService {
 	private AddressRepository addressRepository;
 
 	@Autowired
-	private UserService userService;
+	private UserRepository userRepository;
 
 	@Autowired
 	private ModelMapper modelMapper;
 
 	@Override
 	public AddressDto addAddress(AddressDto addressDto, Integer userId) {
-		UserDto userDto = this.userService.getUser(userId);
-		User user = this.modelMapper.map(userDto, User.class);
+		User user = this.userRepository.findById(userId)
+				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
 
 		Address address = this.modelMapper.map(addressDto, Address.class);
 		address.setUser(user);
@@ -44,11 +43,11 @@ public class AddressServiceImpl implements AddressService {
 	
 	@Override
 	public AddressDto addTiffinProviderAddress(AddressDto addressDto, Integer providerId) {
-		UserDto userDto = this.userService.getUser(providerId);
-		User user = this.modelMapper.map(userDto, User.class);
+		User providerInfo = this.userRepository.findById(providerId)
+				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", providerId));
 
 		Address address = this.modelMapper.map(addressDto, Address.class);
-		address.setUser(user);
+		address.setUser(providerInfo);
 		address.setUserRoles(UserRoles.TIFFIN_PROVIDER);
 		Address savedAddress = this.addressRepository.save(address);
 
@@ -79,8 +78,9 @@ public class AddressServiceImpl implements AddressService {
 
 	@Override
 	public List<AddressDto> getAllAddress(Integer userId) {
-		UserDto userDto = this.userService.getUser(userId);
-		List<Address> addressOfUser = this.addressRepository.findByUser(this.modelMapper.map(userDto, User.class));
+		User user = this.userRepository.findById(userId)
+				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
+		List<Address> addressOfUser = this.addressRepository.findByUser(user);
 		List<AddressDto> allAddresses = addressOfUser.stream().map(address -> this.modelMapper.map(address, AddressDto.class))
 				.collect(Collectors.toList());
 		return allAddresses;
@@ -115,7 +115,7 @@ public class AddressServiceImpl implements AddressService {
 	public void deleteAddressOfUser(Integer addressId, Integer userId) {
 		this.addressRepository.findById(addressId)
 				.orElseThrow(() -> new ResourceNotFoundException("Address", "Id", addressId));
-		this.userService.getUser(userId);
+
 		this.addressRepository.deleteAddressByUser(userId, addressId);
 		
 	}

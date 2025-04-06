@@ -14,6 +14,9 @@ public interface UserService {
 	//register tiffin provider
 	UserDto registerTiffinProvider(UserDto userDto);
 	
+	// add business details of tiffin provider
+	UserDto addBussinessDetails(Integer providerId, UserDto userDto);
+	
 	// save user
 	UserDto saveUser(UserDto userDto);
 	

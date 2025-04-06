@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,10 +33,11 @@ public class MenuController {
 
 	// add menu item
 	@PostMapping("/user/{userId}/category/{cId}/menuitem/")
-	public ResponseEntity<ApiResponse> addMenuItem(@Valid @RequestBody MenuItemDto menuItemDto,
-			@PathVariable Integer cId, @PathVariable Integer userId) {
-		System.out.println(menuItemDto.isActive());
-		MenuItemDto menuItem = this.menuItemService.addMenuItem(menuItemDto, cId, userId);
+	public ResponseEntity<ApiResponse> addMenuItem(@Valid @RequestPart MenuItemDto menuItemData,
+			@RequestPart MultipartFile file, @PathVariable Integer cId, @PathVariable Integer userId)
+			throws IOException {
+		
+		MenuItemDto menuItem = this.menuItemService.addMenuItem(menuItemData, file, cId, userId);
 		return new ResponseEntity<ApiResponse>(new ApiResponse("MenuItem added successfully..!", true, menuItem),
 				HttpStatus.CREATED);
 	}
