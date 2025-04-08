@@ -7,55 +7,58 @@ import com.homeybites.payloads.PasswordDto;
 import com.homeybites.payloads.UserDto;
 
 public interface UserService {
-	
-	//register new user
+
+	// register new user
 	UserDto registerNewUser(UserDto userDto);
-	
-	//register tiffin provider
+
+	// register tiffin provider
 	UserDto registerTiffinProvider(UserDto userDto);
-	
+
 	// add business details of tiffin provider
 	UserDto addBussinessDetails(Integer providerId, UserDto userDto);
-	
+
 	// save user
 	UserDto saveUser(UserDto userDto);
-	
-	//updates user
+
+	// updates user
 	UserDto updateUser(UserDto userDto, Integer userId);
-	
-	//updating contact details
+
+	// updates business details
+	UserDto updateBusinessDetails(UserDto userDto, Integer userId, Integer addressId);
+
+	// updating contact details
 	UserDto updateContactDetails(UserDto userDto, Integer userId);
-	
-	//get single user 
+
+	// get single user
 	UserDto getUser(Integer userId);
-	
-	//get single user by email id 
+
+	// get single user by email id
 	UserDto getUserByEmail(String emailId);
-	
-	//get single user by email id 
+
+	// get single user by email id
 	boolean isUserPresent(String username);
-	
-	//get all users
+
+	// get all users
 	List<UserDto> getAllUser();
-	
+
 	// get all user with role
 	List<UserDto> getUserByRole(String role);
-	
-	//delete user
+
+	// delete user
 	void deleteUser(Integer userId);
-	
-	//sending otp for verification
+
+	// sending otp for verification
 	OtpDto sendOtp(String username);
-	
-	//verifying email
+
+	// verifying email
 	boolean VerifyOtp(String enteredOtp, String username);
-	
+
 	// reset password
 	String resetPassword(PasswordDto passwordDto, UserDto userDto);
-	
-	//reset pssword after email verification (forget password)
+
+	// reset pssword after email verification (forget password)
 	boolean resetPass(PasswordDto passwordDto, UserDto userDto);
-	
-	//forget password
+
+	// forget password
 	boolean forgetPassword(String username);
 }

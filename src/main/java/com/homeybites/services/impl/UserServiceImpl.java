@@ -17,6 +17,7 @@ import com.homeybites.payloads.AddressDto;
 import com.homeybites.payloads.OtpDto;
 import com.homeybites.payloads.PasswordDto;
 import com.homeybites.payloads.UserDto;
+import com.homeybites.repositories.AddressRepository;
 import com.homeybites.repositories.CartRepository;
 import com.homeybites.repositories.UserRepository;
 import com.homeybites.services.EmailService;
@@ -30,6 +31,9 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	private CartRepository cartRepository;
+	
+	@Autowired
+	private AddressRepository addressRepository;
 
 	@Autowired
 	private ModelMapper modelMapper;
@@ -115,6 +119,33 @@ public class UserServiceImpl implements UserService {
 
 		User updatedUser = this.userRepository.save(existingUser);
 
+		return this.modelMapper.map(updatedUser, UserDto.class);
+	}
+	
+	@Override
+	public UserDto updateBusinessDetails(UserDto userDto, Integer userId, Integer addressId) {
+		User existingUser = this.userRepository.findById(userId)
+				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
+		
+		existingUser.setBusinessName(userDto.getBusinessName());
+		
+		Address address = this.addressRepository.findById(addressId).orElseThrow(() -> new ResourceNotFoundException("Address", "Id", addressId));
+		
+		AddressDto addressDto = userDto.getAddress().getFirst();
+		
+		address.setAddressLine(addressDto.getAddressLine());
+		address.setLandmark(addressDto.getLandmark());
+		address.setCity(addressDto.getCity());
+		address.setState(addressDto.getState());
+		address.setCountry(addressDto.getCountry());
+		address.setLatitude(addressDto.getLatitude());
+		address.setLongitude(addressDto.getLongitude());
+		address.setServiceRadius(addressDto.getServiceRadius());
+		
+		this.addressRepository.save(address);
+		
+		User updatedUser = this.userRepository.save(existingUser);
+		
 		return this.modelMapper.map(updatedUser, UserDto.class);
 	}
 

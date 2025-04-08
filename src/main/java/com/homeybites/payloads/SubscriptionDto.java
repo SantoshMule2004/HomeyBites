@@ -22,6 +22,8 @@ public class SubscriptionDto {
 
 	private TiffinPlanDto tiffinPlan;
 	
+	private TiffinPlanLogDto tiffinPlanLog;
+	
 	private boolean monday;
 	private boolean tuesday;
 	private boolean wednesday;
@@ -109,6 +111,14 @@ public class SubscriptionDto {
 
 	public void setTiffinPlan(TiffinPlanDto tiffinPlan) {
 		this.tiffinPlan = tiffinPlan;
+	}
+
+	public TiffinPlanLogDto getTiffinPlanLog() {
+		return tiffinPlanLog;
+	}
+
+	public void setTiffinPlanLog(TiffinPlanLogDto tiffinPlanLog) {
+		this.tiffinPlanLog = tiffinPlanLog;
 	}
 
 	public boolean isMonday() {

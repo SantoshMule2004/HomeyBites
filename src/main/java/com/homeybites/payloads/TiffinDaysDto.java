@@ -12,6 +12,9 @@ public class TiffinDaysDto {
 
 	@JsonIgnore
 	private TiffinPlanDto tiffinPlan;
+	
+	@JsonIgnore
+	private TiffinPlanLogDto tiffinPlanLog;
 
 	private List<MenuItemDto> menuItem;
 	
@@ -39,6 +42,14 @@ public class TiffinDaysDto {
 
 	public void setTiffinPlan(TiffinPlanDto tiffinPlan) {
 		this.tiffinPlan = tiffinPlan;
+	}
+
+	public TiffinPlanLogDto getTiffinPlanLog() {
+		return tiffinPlanLog;
+	}
+
+	public void setTiffinPlanLog(TiffinPlanLogDto tiffinPlanLog) {
+		this.tiffinPlanLog = tiffinPlanLog;
 	}
 
 	public List<MenuItemDto> getMenuItem() {

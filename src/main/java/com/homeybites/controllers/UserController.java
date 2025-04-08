@@ -32,9 +32,17 @@ public class UserController {
 
 	// update user
 	@PutMapping("/{userId}")
-	public ResponseEntity<ApiResponse> updateUser(@Valid @RequestBody UserDto userDto, @PathVariable Integer userId) {
+	public ResponseEntity<ApiResponse> updateUser(@RequestBody UserDto userDto, @PathVariable Integer userId) {
 		UserDto updateUser = this.userService.updateUser(userDto, userId);
 		return new ResponseEntity<ApiResponse>(new ApiResponse("User updated successfully..!", true, updateUser),
+				HttpStatus.OK);
+	}
+
+	// update business details
+	@PutMapping("/business-details/{userId}/{addressId}")
+	public ResponseEntity<ApiResponse> updateBusinessDetails(@RequestBody UserDto userDto, @PathVariable Integer userId, @PathVariable Integer addressId) {
+		UserDto updateUser = this.userService.updateBusinessDetails(userDto, userId, addressId);
+		return new ResponseEntity<ApiResponse>(new ApiResponse("Business details updated successfully..!", true, updateUser),
 				HttpStatus.OK);
 	}
 

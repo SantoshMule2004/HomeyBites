@@ -5,6 +5,7 @@ import java.util.List;
 import com.homeybites.entities.Log.TiffinPlanLog;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -23,15 +24,15 @@ public class TiffinDays {
 
 	private String weekDay;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "tiffin_plan_id", nullable = true)
 	private TiffinPlan tiffinPlan;
 	
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "tiffin_log_id", nullable = true)
 	private TiffinPlanLog tiffinPlanLog;
 
-	@ManyToMany
+	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(name = "tiffin_days_menuitem", joinColumns = @JoinColumn(name = "tiffin_day_id"), inverseJoinColumns = @JoinColumn(name = "menu_id"))
 	private List<MenuItem> menuItem;
 

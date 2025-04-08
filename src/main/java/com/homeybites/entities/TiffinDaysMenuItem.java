@@ -1,6 +1,7 @@
 package com.homeybites.entities;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -16,11 +17,11 @@ public class TiffinDaysMenuItem {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer tiffinMenuId;
 	
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "tiffin_day_id", nullable = false)
 	private TiffinDays tiffinDays;
 	
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "menu_id", nullable = false)
 	private MenuItem menuItem;
 	

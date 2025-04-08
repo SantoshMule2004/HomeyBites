@@ -4,6 +4,7 @@ import java.util.Date;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -22,11 +23,11 @@ public class Payment {
 	private String paymentStatus;
 	private double amount;
 	
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id")
 	private User user;
 	
-	@OneToOne(mappedBy = "payment", cascade = CascadeType.ALL)
+	@OneToOne(mappedBy = "payment", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private OrderInfo order;
 		
 	public Payment() {

@@ -5,6 +5,7 @@ import java.util.List;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -30,21 +31,21 @@ public class MenuItem {
 	private String imageUrl;
 	private String format;
 	
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "category_id")
 	private Category category;
 	
-	@ManyToMany(mappedBy = "menuItems")
+	@ManyToMany(mappedBy = "menuItems", fetch = FetchType.LAZY)
 	private List<OrderInfo> order = new ArrayList<>();
 	
-	@OneToMany(mappedBy = "menuItem")
+	@OneToMany(mappedBy = "menuItem", fetch = FetchType.LAZY)
 	private List<UserCart> userCart;
 	
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id")
 	private User user;
 	
-	@ManyToMany(mappedBy = "menuItem")
+	@ManyToMany(mappedBy = "menuItem", fetch = FetchType.LAZY)
 	private List<TiffinDays> tiffinDays;
 	
 	public MenuItem() {

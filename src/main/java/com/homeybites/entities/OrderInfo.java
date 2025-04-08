@@ -7,6 +7,7 @@ import java.util.List;
 import com.homeybites.entities.Log.SubscriptionLog;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -27,23 +28,23 @@ public class OrderInfo {
 	private String quantity;
 	private String orderStatus;
 	
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id")
 	private User user;
 	
-	@OneToOne
+	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "subscription_id")
 	private Subscription subscription;
 	
-	@OneToOne
+	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "subscription_log_id")
 	private SubscriptionLog subscriptionLog;
 	
-	@ManyToMany
+	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(name = "order_menuitem", joinColumns = @JoinColumn(name = "order_id"), inverseJoinColumns = @JoinColumn(name = "menu_id"))
 	private List<MenuItem> menuItems = new ArrayList<>();
 	
-	@OneToOne
+	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "payment_id")
 	private Payment payment;
 	

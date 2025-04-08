@@ -15,4 +15,6 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, Inte
 	Optional<Subscription> findByPlanId(Integer planId);
 	
 	List<Subscription> findByTiffinPlan_User(User user);
+	
+	List<Subscription> findByTiffinPlanLog_User(User user);
 }

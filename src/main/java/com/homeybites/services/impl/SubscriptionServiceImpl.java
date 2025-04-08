@@ -2,6 +2,7 @@ package com.homeybites.services.impl;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -89,9 +90,20 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 	public List<SubscriptionDto> getAllSubscriptionOfTiffinProvider(Integer userId) {
 		User user = this.userRepository.findById(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
+		
 		List<Subscription> list = this.subscriptionRepository.findByTiffinPlan_User(user);
-		List<SubscriptionDto> userPlans = list.stream().map(plan -> this.modelMapper.map(plan, SubscriptionDto.class))
-				.collect(Collectors.toList());
+		
+		List<Subscription> list2 = this.subscriptionRepository.findByTiffinPlanLog_User(user);
+
+		List<SubscriptionDto> userPlans = new ArrayList<>();
+		
+		if (!list.isEmpty()) {
+			userPlans = list.stream()
+					.map(plan -> this.modelMapper.map(plan, SubscriptionDto.class)).collect(Collectors.toList());
+		} else {
+			userPlans = list2.stream()
+					.map(plan -> this.modelMapper.map(plan, SubscriptionDto.class)).collect(Collectors.toList());
+		}
 		return userPlans;
 	}
 
@@ -143,7 +155,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 	public void deleteSubscriptionPlanLog(Integer subId) {
 		SubscriptionLog subscriptionLog = this.subscriptionLogRepository.findById(subId)
 				.orElseThrow(() -> new ResourceNotFoundException("Subscription", "Id", subId));
-		
+
 		this.subscriptionLogRepository.delete(subscriptionLog);
 
 	}

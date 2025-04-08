@@ -1,6 +1,7 @@
 package com.homeybites.entities;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -14,11 +15,11 @@ public class UserCart {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer cId;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "menu_id", nullable = true)
 	private MenuItem menuItem;
 	
