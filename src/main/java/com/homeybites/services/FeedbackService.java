@@ -2,27 +2,27 @@ package com.homeybites.services;
 
 import java.util.List;
 
-import com.homeybites.payloads.FeedbackDto;
+import com.homeybites.entities.Feedback;
 
 public interface FeedbackService {
 	
 	// add feedback
-	FeedbackDto addFeedback(FeedbackDto feedbackDto, Integer useId);
+	Feedback addFeedback(Feedback feedback, Integer useId);
 	
 	// get feedback
-	FeedbackDto getFeedback(Integer feedbackId);
+	Feedback getFeedback(Integer feedbackId);
 	
 	// get feedback of user
-	FeedbackDto getFeedbackOfUser(Integer feedbackId, Integer userId);
+	Feedback getFeedbackOfUser(Integer feedbackId, Integer userId);
 	
 	//get all feedbacks of user
-	List<FeedbackDto> getAllFeedbacksOfUser(Integer userId);
+	List<Feedback> getAllFeedbacksOfUser(Integer userId);
 	
 	// get all feedback
-	List<FeedbackDto> getAllFeedback();
+	List<Feedback> getAllFeedback();
 	
 	// update feedback
-	FeedbackDto updateFeedback(FeedbackDto feedbackDto, Integer feedbackId);
+	Feedback updateFeedback(Feedback feedback, Integer feedbackId);
 	
 	// delete feedback
 	void deleteFeedback(Integer feedbackId);

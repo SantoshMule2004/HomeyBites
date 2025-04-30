@@ -1,11 +1,13 @@
 package com.homeybites.payloads;
 
+import com.homeybites.entities.User;
+
 public class JwtResponse {
 	
 	private String status;
 	private String message;
 	private String token;
-	private UserDto user;
+	private User user;
 
 	public JwtResponse() {
 		super();
@@ -37,11 +39,11 @@ public class JwtResponse {
 		this.token = token;
 	}
 
-	public UserDto getUser() {
+	public User getUser() {
 		return user;
 	}
 
-	public void setUser(UserDto user) {
+	public void setUser(User user) {
 		this.user = user;
 	}
 }

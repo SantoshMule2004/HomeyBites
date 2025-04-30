@@ -31,7 +31,7 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<ApiException> resourceNotFoundExceptionHandler(ResourceNotFoundException ex) {
 		String message = ex.getMessage();
 		ApiException response = new ApiException(message, false);
-		return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 
 	// handles data validation exceptions
@@ -78,7 +78,7 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<ApiException> NoResourceFoundExceptionHandler(NoResourceFoundException ex) {
 		String message = ex.getMessage();
 		ApiException response = new ApiException(message, false);
-		return new ResponseEntity<ApiException>(response, HttpStatus.NOT_FOUND);
+		return new ResponseEntity<ApiException>(response, HttpStatus.BAD_REQUEST);
 	}
 
 	// handler for wrong credentials

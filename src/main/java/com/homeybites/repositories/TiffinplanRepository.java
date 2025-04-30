@@ -11,4 +11,7 @@ public interface TiffinplanRepository extends JpaRepository<TiffinPlan, Integer>
 
 	// get all tiffin plans of provider
 	List<TiffinPlan> findByUser(User user);
+
+	// to check if plan exist with this name
+	boolean existsByPlanNameAndUser(String planName, User user);
 }

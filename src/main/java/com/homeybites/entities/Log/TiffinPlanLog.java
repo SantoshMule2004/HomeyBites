@@ -4,6 +4,10 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.homeybites.entities.Subscription;
 import com.homeybites.entities.TiffinDays;
 import com.homeybites.entities.User;
@@ -17,6 +21,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 
 @Entity
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "tiffinPlanId")
 public class TiffinPlanLog {
 	
 	@Id
@@ -37,15 +42,19 @@ public class TiffinPlanLog {
 	
 	@ManyToOne
 	@JoinColumn(name = "user_id")
+//	@JsonBackReference(value = "user-tiffinPlanLog")
 	private User user;
 	
 	@OneToMany(mappedBy = "tiffinPlanLog", cascade = CascadeType.ALL)
+//	@JsonBackReference(value = "subscription-tiffinPlanLog")
 	private List<Subscription> subscription;
 	
 	@OneToMany(mappedBy = "tiffinPlanLog", cascade = CascadeType.ALL)
+//	@JsonBackReference(value = "subscriptionLog-tiffinPlanLog")
 	private List<SubscriptionLog> subscriptionLog;
 	
 	@OneToMany(mappedBy = "tiffinPlanLog", cascade = CascadeType.ALL)
+//	@JsonManagedReference(value = "tiffinPlanLog-tiffinDays")
 	private List<TiffinDays> tiffinDays = new ArrayList<>();
 	
 	

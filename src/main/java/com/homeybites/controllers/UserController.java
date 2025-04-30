@@ -16,9 +16,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.homeybites.entities.User;
 import com.homeybites.payloads.ApiResponse;
 import com.homeybites.payloads.PasswordDto;
-import com.homeybites.payloads.UserDto;
 import com.homeybites.services.UserService;
 
 import jakarta.validation.Valid;
@@ -32,47 +32,77 @@ public class UserController {
 
 	// update user
 	@PutMapping("/{userId}")
-	public ResponseEntity<ApiResponse> updateUser(@RequestBody UserDto userDto, @PathVariable Integer userId) {
-		UserDto updateUser = this.userService.updateUser(userDto, userId);
+	public ResponseEntity<ApiResponse> updateUser(@Valid @RequestBody User user, @PathVariable Integer userId) {
+		User updateUser = this.userService.updateUser(user, userId);
 		return new ResponseEntity<ApiResponse>(new ApiResponse("User updated successfully..!", true, updateUser),
 				HttpStatus.OK);
 	}
 
 	// update business details
 	@PutMapping("/business-details/{userId}/{addressId}")
-	public ResponseEntity<ApiResponse> updateBusinessDetails(@RequestBody UserDto userDto, @PathVariable Integer userId, @PathVariable Integer addressId) {
-		UserDto updateUser = this.userService.updateBusinessDetails(userDto, userId, addressId);
-		return new ResponseEntity<ApiResponse>(new ApiResponse("Business details updated successfully..!", true, updateUser),
-				HttpStatus.OK);
+	public ResponseEntity<ApiResponse> updateBusinessDetails(@Valid @RequestBody User user,
+			@PathVariable Integer userId, @PathVariable Integer addressId) {
+		User updateUser = this.userService.updateBusinessDetails(user, userId, addressId);
+		return new ResponseEntity<ApiResponse>(
+				new ApiResponse("Business details updated successfully..!", true, updateUser), HttpStatus.OK);
+	}
+
+	// update business details
+	@PutMapping("/contact-details/{userId}")
+	public ResponseEntity<ApiResponse> updateContactDetails(@RequestParam String number, @PathVariable Integer userId) {
+		User updateUser = this.userService.updateContactDetails(number, userId);
+		return new ResponseEntity<ApiResponse>(
+				new ApiResponse("Contact details updated successfully..!", true, updateUser), HttpStatus.OK);
 	}
 
 	// getting logged in user
 	@GetMapping("/current-user")
 	public ResponseEntity<ApiResponse> getLoggedInUser(Principal principal) {
 		String name = principal.getName();
-		UserDto userDto = this.userService.getUserByEmail(name);
-		return new ResponseEntity<ApiResponse>(new ApiResponse("current user", true, userDto), HttpStatus.OK);
+		User user = this.userService.getUserByEmail(name);
+		return new ResponseEntity<ApiResponse>(new ApiResponse("current user", true, user), HttpStatus.OK);
 	}
 
 	// get user by id
 	@GetMapping("/{userId}")
 	public ResponseEntity<ApiResponse> getUser(@PathVariable Integer userId) {
-		UserDto user = this.userService.getUser(userId);
+		User user = this.userService.getUser(userId);
 		return new ResponseEntity<ApiResponse>(new ApiResponse("User found..!", true, user), HttpStatus.OK);
+	}
+
+	// get user count
+	@GetMapping("/all/count")
+	public ResponseEntity<Integer> getAllUserCount() {
+		Integer count = this.userService.getAllUserCount();
+		return new ResponseEntity<Integer>(count, HttpStatus.OK);
+	}
+
+	// get user count
+	@GetMapping("/count")
+	public ResponseEntity<Integer> getAllUserCount(@RequestParam String role) {
+		Integer count = this.userService.getUserCountByRole(role);
+		return new ResponseEntity<Integer>(count, HttpStatus.OK);
 	}
 
 	// get user by email id
 	@GetMapping("/email")
 	public ResponseEntity<ApiResponse> getUserByEmail(@RequestParam String emailId) {
-		UserDto user = this.userService.getUserByEmail(emailId);
+		User user = this.userService.getUserByEmail(emailId);
 		return new ResponseEntity<ApiResponse>(new ApiResponse("User found..!", true, user), HttpStatus.OK);
 	}
 
 	// get all users
 	@GetMapping("/")
-	public ResponseEntity<List<UserDto>> getAllUser() {
-		List<UserDto> allUser = this.userService.getAllUser();
-		return new ResponseEntity<List<UserDto>>(allUser, HttpStatus.OK);
+	public ResponseEntity<List<User>> getAllUser() {
+		List<User> allUser = this.userService.getAllUser();
+		return new ResponseEntity<List<User>>(allUser, HttpStatus.OK);
+	}
+
+	// get all users by role
+	@GetMapping("/role")
+	public ResponseEntity<List<User>> getAllUserByRole(@RequestParam String role) {
+		List<User> allUser = this.userService.getUserByRole(role);
+		return new ResponseEntity<List<User>>(allUser, HttpStatus.OK);
 	}
 
 	// delete user
@@ -88,8 +118,8 @@ public class UserController {
 	public ResponseEntity<ApiResponse> ResetPasswordHandler(@Valid @RequestBody PasswordDto passwordDto,
 			Principal principal) {
 		String name = principal.getName();
-		UserDto userDto = this.userService.getUserByEmail(name);
-		String response = this.userService.resetPassword(passwordDto, userDto);
+		User user = this.userService.getUserByEmail(name);
+		String response = this.userService.resetPassword(passwordDto, user);
 		return new ResponseEntity<ApiResponse>(new ApiResponse(response), HttpStatus.OK);
 	}
 }

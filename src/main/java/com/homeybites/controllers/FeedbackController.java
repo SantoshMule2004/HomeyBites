@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.homeybites.entities.Feedback;
 import com.homeybites.payloads.ApiResponse;
-import com.homeybites.payloads.FeedbackDto;
 import com.homeybites.services.FeedbackService;
 
 @RestController
@@ -27,48 +27,48 @@ public class FeedbackController {
 
 	// add feedback
 	@PostMapping("/user/{userId}/feedback")
-	public ResponseEntity<ApiResponse> addFeedback(@RequestBody FeedbackDto feedbackDto, @PathVariable Integer userId) {
-		FeedbackDto feedback = this.feedbackService.addFeedback(feedbackDto, userId);
-		ApiResponse response = new ApiResponse("Feedback added successfully..!", true, feedback);
+	public ResponseEntity<ApiResponse> addFeedback(@RequestBody Feedback feedback, @PathVariable Integer userId) {
+		Feedback savedFeedback = this.feedbackService.addFeedback(feedback, userId);
+		ApiResponse response = new ApiResponse("Feedback added successfully..!", true, savedFeedback);
 		return new ResponseEntity<ApiResponse>(response, HttpStatus.CREATED);
 	}
 
 	// update feedback
 	@PutMapping("/feedback/{feedbackId}")
-	public ResponseEntity<ApiResponse> updateFeedback(@RequestBody FeedbackDto feedbackDto,
+	public ResponseEntity<ApiResponse> updateFeedback(@RequestBody Feedback feedback,
 			@PathVariable Integer feedbackId) {
-		FeedbackDto feedback = this.feedbackService.updateFeedback(feedbackDto, feedbackId);
-		ApiResponse response = new ApiResponse("Feedback updated successfully..!", true, feedback);
+		Feedback updatedFeedback = this.feedbackService.updateFeedback(feedback, feedbackId);
+		ApiResponse response = new ApiResponse("Feedback updated successfully..!", true, updatedFeedback);
 		return new ResponseEntity<ApiResponse>(response, HttpStatus.OK);
 	}
 
 	// get feedback
 	@GetMapping("feedback/{feedbackId}")
-	public ResponseEntity<FeedbackDto> getFeedback(@PathVariable Integer feedbackId) {
-		FeedbackDto feedbacksOfUser = this.feedbackService.getFeedback(feedbackId);
-		return new ResponseEntity<FeedbackDto>(feedbacksOfUser, HttpStatus.OK);
+	public ResponseEntity<Feedback> getFeedback(@PathVariable Integer feedbackId) {
+		Feedback feedbacksOfUser = this.feedbackService.getFeedback(feedbackId);
+		return new ResponseEntity<Feedback>(feedbacksOfUser, HttpStatus.OK);
 	}
 
 	// get feedback of user
 	@GetMapping("/user/{userId}/feedback/{feedbackId}")
-	public ResponseEntity<FeedbackDto> getFeedbackOfUser(@PathVariable Integer userId,
+	public ResponseEntity<Feedback> getFeedbackOfUser(@PathVariable Integer userId,
 			@PathVariable Integer feedbackId) {
-		FeedbackDto feedbacksOfUser = this.feedbackService.getFeedbackOfUser(feedbackId, userId);
-		return new ResponseEntity<FeedbackDto>(feedbacksOfUser, HttpStatus.OK);
+		Feedback feedbacksOfUser = this.feedbackService.getFeedbackOfUser(feedbackId, userId);
+		return new ResponseEntity<Feedback>(feedbacksOfUser, HttpStatus.OK);
 	}
 
 	// get feedbacks of user
 	@GetMapping("/user/{userId}/feedback")
-	public ResponseEntity<List<FeedbackDto>> getFeedbacksOfUser(@PathVariable Integer userId) {
-		List<FeedbackDto> allFeedbacksOfUser = this.feedbackService.getAllFeedbacksOfUser(userId);
-		return new ResponseEntity<List<FeedbackDto>>(allFeedbacksOfUser, HttpStatus.OK);
+	public ResponseEntity<List<Feedback>> getFeedbacksOfUser(@PathVariable Integer userId) {
+		List<Feedback> allFeedbacksOfUser = this.feedbackService.getAllFeedbacksOfUser(userId);
+		return new ResponseEntity<List<Feedback>>(allFeedbacksOfUser, HttpStatus.OK);
 	}
 
 	// get all feedbacks
 	@GetMapping("/feedbacks")
-	public ResponseEntity<List<FeedbackDto>> getFeedbacks() {
-		List<FeedbackDto> allFeedbacksOfUser = this.feedbackService.getAllFeedback();
-		return new ResponseEntity<List<FeedbackDto>>(allFeedbacksOfUser, HttpStatus.OK);
+	public ResponseEntity<List<Feedback>> getFeedbacks() {
+		List<Feedback> allFeedbacksOfUser = this.feedbackService.getAllFeedback();
+		return new ResponseEntity<List<Feedback>>(allFeedbacksOfUser, HttpStatus.OK);
 	}
 
 	// delete feedback of user

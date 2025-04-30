@@ -3,6 +3,10 @@ package com.homeybites.entities.Log;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.homeybites.entities.OrderInfo;
 import com.homeybites.entities.TiffinPlan;
 import com.homeybites.entities.User;
@@ -16,6 +20,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 
 @Entity
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "planId")
 public class SubscriptionLog {
 	
 	@Id
@@ -31,17 +36,21 @@ public class SubscriptionLog {
 
 	@ManyToOne
 	@JoinColumn(name = "user_id")
+//	@JsonBackReference(value = "user-subscriptionLog")
 	private User user;
 
 	@OneToOne(mappedBy = "subscriptionLog", cascade = CascadeType.ALL)
+//	@JsonBackReference(value = "order-subscriptionLog")
 	private OrderInfo order;
 
 	@ManyToOne
 	@JoinColumn(name = "tiffin_id", nullable = true)
+//	@JsonManagedReference(value = "subscriptionLog-tiffinPlan")
 	private TiffinPlan tiffinPlan;
 	
 	@ManyToOne
 	@JoinColumn(name = "tiffin_log_id", nullable = true)
+//	@JsonManagedReference(value = "subscriptionLog-tiffinPlanLog")
 	private TiffinPlanLog tiffinPlanLog;
 	
 	private boolean monday = false;

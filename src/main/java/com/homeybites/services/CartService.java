@@ -2,18 +2,18 @@ package com.homeybites.services;
 
 import java.util.List;
 
-import com.homeybites.payloads.UserCartDto;
+import com.homeybites.entities.UserCart;
 
 public interface CartService {
 
 	// add item to cart
-	UserCartDto addItemsToCart(Integer userId, Integer itemId);
+	UserCart addItemsToCart(Integer userId, Integer itemId);
 
 	// update cart item
 	void updateItemInfo(Integer cartId, Integer quantity);
 
 	// get cart items
-	List<UserCartDto> getCart(Integer userId);
+	List<UserCart> getCart(Integer userId);
 
 	// delete cart item
 	void deleteItemFromCart(Integer cartId);

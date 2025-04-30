@@ -3,6 +3,10 @@ package com.homeybites.entities;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -13,19 +17,29 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "menuId")
 public class MenuItem {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer menuId;
+	
+	@NotBlank(message = "menu name cannot be empty..!")
 	private String menuName;
+	
+	@NotNull(message = "Price cannot be empty..!")
 	private double price;
+	
+	@NotBlank(message = "description cannot be empty")
 	private String description;
 	
 	@Column(name = "is_active", nullable = false)
 	private boolean isActive;
 	 
+	@NotBlank(message = "Select type of menu")
 	private String menuType;
 	private String imagePublicId;
 	private String imageUrl;
@@ -33,19 +47,24 @@ public class MenuItem {
 	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "category_id")
+	@JsonIgnore
 	private Category category;
 	
 	@ManyToMany(mappedBy = "menuItems", fetch = FetchType.LAZY)
+	@JsonIgnore
 	private List<OrderInfo> order = new ArrayList<>();
 	
 	@OneToMany(mappedBy = "menuItem", fetch = FetchType.LAZY)
+	@JsonIgnore
 	private List<UserCart> userCart;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id")
+	@JsonIgnore
 	private User user;
 	
 	@ManyToMany(mappedBy = "menuItem", fetch = FetchType.LAZY)
+	@JsonIgnore
 	private List<TiffinDays> tiffinDays;
 	
 	public MenuItem() {

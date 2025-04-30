@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.homeybites.entities.UserCart;
 import com.homeybites.payloads.ApiResponse;
-import com.homeybites.payloads.UserCartDto;
 import com.homeybites.services.CartService;
 
 @RestController
@@ -26,15 +26,15 @@ public class CartController {
 
 	// get user cart
 	@GetMapping("/{userId}")
-	public ResponseEntity<List<UserCartDto>> getUserCart(@PathVariable Integer userId) {
-		List<UserCartDto> cart = this.cartService.getCart(userId);
-		return new ResponseEntity<List<UserCartDto>>(cart, HttpStatus.OK);
+	public ResponseEntity<List<UserCart>> getUserCart(@PathVariable Integer userId) {
+		List<UserCart> cart = this.cartService.getCart(userId);
+		return new ResponseEntity<List<UserCart>>(cart, HttpStatus.OK);
 	}
 
 	// add item to cart
 	@PostMapping("/{userId}/item/{itemId}")
 	public ResponseEntity<ApiResponse> addItemToCart(@PathVariable Integer userId, @PathVariable Integer itemId) {
-		UserCartDto itemsToCart = this.cartService.addItemsToCart(userId, itemId);
+		UserCart itemsToCart = this.cartService.addItemsToCart(userId, itemId);
 		ApiResponse response = new ApiResponse("Item added successfully..!", true, itemsToCart);
 		return new ResponseEntity<ApiResponse>(response, HttpStatus.OK);
 	}

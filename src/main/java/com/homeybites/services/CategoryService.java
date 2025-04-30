@@ -2,21 +2,21 @@ package com.homeybites.services;
 
 import java.util.List;
 
-import com.homeybites.payloads.CategoryDto;
+import com.homeybites.entities.Category;
 
 public interface CategoryService {
 	
 	//add new category
-	CategoryDto addCategory(CategoryDto categoryDto);
+	Category addCategory(Category category);
 	
 	//get category
-	CategoryDto getCategory(Integer categoryId);
+	Category getCategory(Integer categoryId);
 	
 	//get all category
-	List<CategoryDto> getAllCategory();
+	List<Category> getAllCategory();
 	
 	//update category
-	CategoryDto updateCategory(CategoryDto categoryDto, Integer categoryId);
+	Category updateCategory(Category category, Integer categoryId);
 	
 	//delete category
 	void deleteCategory(Integer categoryId);

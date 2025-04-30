@@ -1,9 +1,6 @@
 package com.homeybites.services.impl;
 
 import java.util.List;
-import java.util.stream.Collectors;
-
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,7 +8,6 @@ import com.homeybites.entities.MenuItem;
 import com.homeybites.entities.User;
 import com.homeybites.entities.UserCart;
 import com.homeybites.exceptions.ResourceNotFoundException;
-import com.homeybites.payloads.UserCartDto;
 import com.homeybites.repositories.CartRepository;
 import com.homeybites.repositories.MenuItemRepository;
 import com.homeybites.repositories.UserRepository;
@@ -29,11 +25,8 @@ public class CartServiceImpl implements CartService {
 	@Autowired
 	private MenuItemRepository menuItemRepository;
 
-	@Autowired
-	private ModelMapper modelMapper;
-
 	@Override
-	public UserCartDto addItemsToCart(Integer userId, Integer itemId) {
+	public UserCart addItemsToCart(Integer userId, Integer itemId) {
 		User user = this.userRepository.findById(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
 
@@ -45,16 +38,14 @@ public class CartServiceImpl implements CartService {
 		if (byMenuItem != null) {
 			byMenuItem.setQuantity(byMenuItem.getQuantity() + 1);
 			byMenuItem.setTotalPrice(byMenuItem.getQuantity() * menuItem.getPrice());
-			this.cartRepository.save(byMenuItem);
-			return this.modelMapper.map(byMenuItem, UserCartDto.class);
+			return this.cartRepository.save(byMenuItem);
 		} else {
 			UserCart cart = new UserCart();
 			cart.setMenuItem(menuItem);
 			cart.setUser(user);
 			cart.setQuantity(1);
 			cart.setTotalPrice(menuItem.getPrice());
-			UserCart userCart = this.cartRepository.save(cart);
-			return this.modelMapper.map(userCart, UserCartDto.class);
+			return this.cartRepository.save(cart);
 		}
 	}
 
@@ -69,14 +60,11 @@ public class CartServiceImpl implements CartService {
 	}
 
 	@Override
-	public List<UserCartDto> getCart(Integer userId) {
+	public List<UserCart> getCart(Integer userId) {
 		User user = this.userRepository.findById(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
 
-		List<UserCart> list = this.cartRepository.findByUser(user);
-		List<UserCartDto> userCarts = list.stream().map(cart -> this.modelMapper.map(cart, UserCartDto.class)).collect(Collectors.toList());
-
-		return userCarts;
+		return this.cartRepository.findByUser(user);
 	}
 
 	@Override

@@ -1,20 +1,17 @@
 package com.homeybites.services.impl;
 
 import java.util.List;
-import java.util.stream.Collectors;
-
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.homeybites.entities.Feedback;
 import com.homeybites.entities.User;
 import com.homeybites.exceptions.ResourceNotFoundException;
-import com.homeybites.payloads.FeedbackDto;
-import com.homeybites.payloads.UserDto;
 import com.homeybites.repositories.FeedBackRepository;
 import com.homeybites.services.FeedbackService;
 import com.homeybites.services.UserService;
+
+
 @Service
 public class FeedbackServiceImpl implements FeedbackService {
 
@@ -24,67 +21,48 @@ public class FeedbackServiceImpl implements FeedbackService {
 	@Autowired
 	private UserService userService;
 
-	@Autowired
-	private ModelMapper modelMapper;
-
 	@Override
-	public FeedbackDto addFeedback(FeedbackDto feedbackDto, Integer userId) {
-		UserDto userDto = this.userService.getUser(userId);
-		User user = this.modelMapper.map(userDto, User.class);
-
-		Feedback feedback = this.modelMapper.map(feedbackDto, Feedback.class);
+	public Feedback addFeedback(Feedback feedback, Integer userId) {
+		User user = this.userService.getUser(userId);
 		feedback.setUser(user);
-		Feedback savedFeedback = this.feedBackRepository.save(feedback);
-
-		return this.modelMapper.map(savedFeedback, FeedbackDto.class);
+		return this.feedBackRepository.save(feedback);
 	}
 
 	@Override
-	public FeedbackDto getFeedback(Integer feedbackId) {
-		Feedback feedback = this.feedBackRepository.findById(feedbackId)
+	public Feedback getFeedback(Integer feedbackId) {
+		return this.feedBackRepository.findById(feedbackId)
 				.orElseThrow(() -> new ResourceNotFoundException("Feedback", "Id", feedbackId));
-		return this.modelMapper.map(feedback, FeedbackDto.class);
 	}
 
 	@Override
-	public FeedbackDto getFeedbackOfUser(Integer feedbackId, Integer userId) {
-		UserDto userDto = this.userService.getUser(userId);
-		User user = this.modelMapper.map(userDto, User.class);
-		
+	public Feedback getFeedbackOfUser(Integer feedbackId, Integer userId) {
+		User user = this.userService.getUser(userId);
+
 		this.feedBackRepository.findById(feedbackId)
-		.orElseThrow(() -> new ResourceNotFoundException("Feedback", "Id", feedbackId));
-		
-		Feedback feedback = this.feedBackRepository.findByUserAndFId(user, feedbackId);
-		return this.modelMapper.map(feedback, FeedbackDto.class);
-	}
-	
-	@Override
-	public List<FeedbackDto> getAllFeedbacksOfUser(Integer userId) {
-		UserDto userDto = this.userService.getUser(userId);
-		User user = this.modelMapper.map(userDto, User.class);
-		List<Feedback> list = this.feedBackRepository.findByUser(user);
-		List<FeedbackDto> allFeedbacks = list.stream().map(feedback -> this.modelMapper.map(feedback, FeedbackDto.class))
-				.collect(Collectors.toList());
-		return allFeedbacks;
-	}
-
-	@Override
-	public List<FeedbackDto> getAllFeedback() {
-		List<Feedback> all = this.feedBackRepository.findAll();
-		List<FeedbackDto> allFeedbacks = all.stream().map(feedback -> this.modelMapper.map(feedback, FeedbackDto.class))
-				.collect(Collectors.toList());
-		return allFeedbacks;
-	}
-
-	@Override
-	public FeedbackDto updateFeedback(FeedbackDto feedbackDto, Integer feedbackId) {
-		Feedback feedback = this.feedBackRepository.findById(feedbackId)
 				.orElseThrow(() -> new ResourceNotFoundException("Feedback", "Id", feedbackId));
-		feedback.setEmailId(feedbackDto.getEmailId());
-		feedback.setDescription(feedbackDto.getDescription());
 
-		Feedback save = this.feedBackRepository.save(feedback);
-		return this.modelMapper.map(save, FeedbackDto.class);
+		return this.feedBackRepository.findByUserAndFId(user, feedbackId);
+	}
+
+	@Override
+	public List<Feedback> getAllFeedbacksOfUser(Integer userId) {
+		User user = this.userService.getUser(userId);
+		return this.feedBackRepository.findByUser(user);
+	}
+
+	@Override
+	public List<Feedback> getAllFeedback() {
+		return this.feedBackRepository.findAll();
+	}
+
+	@Override
+	public Feedback updateFeedback(Feedback feedback, Integer feedbackId) {
+		Feedback eFeedback = this.feedBackRepository.findById(feedbackId)
+				.orElseThrow(() -> new ResourceNotFoundException("Feedback", "Id", feedbackId));
+		eFeedback.setEmailId(feedback.getEmailId());
+		eFeedback.setDescription(feedback.getDescription());
+
+		return this.feedBackRepository.save(eFeedback);
 	}
 
 	@Override

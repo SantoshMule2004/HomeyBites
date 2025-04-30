@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.homeybites.payloads.AddressDto;
+import com.homeybites.entities.Address;
 import com.homeybites.payloads.ApiResponse;
 import com.homeybites.services.AddressService;
 
@@ -27,55 +27,55 @@ public class AddressController {
 
 	// add address of user
 	@PostMapping("/user/{userId}/address")
-	public ResponseEntity<ApiResponse> addAddress(@RequestBody AddressDto addressDto, @PathVariable Integer userId) {
+	public ResponseEntity<ApiResponse> addAddress(@RequestBody Address address, @PathVariable Integer userId) {
 		System.out.println(userId);
-		AddressDto address = this.addressService.addAddress(addressDto, userId);
-		ApiResponse response = new ApiResponse("Address added successfully..!", true, address);
+		Address savedAddress = this.addressService.addAddress(address, userId);
+		ApiResponse response = new ApiResponse("Address added successfully..!", true, savedAddress);
 		return new ResponseEntity<ApiResponse>(response, HttpStatus.CREATED);
 	}
 
 	// add address of tiffin provider
 	@PostMapping("/tiffin/{providerId}/address")
-	public ResponseEntity<ApiResponse> addTiffinProviderAddress(@RequestBody AddressDto addressDto,
+	public ResponseEntity<ApiResponse> addTiffinProviderAddress(@RequestBody Address address,
 			@PathVariable Integer providerId) {
 		System.out.println(providerId);
-		AddressDto address = this.addressService.addTiffinProviderAddress(addressDto, providerId);
-		ApiResponse response = new ApiResponse("Address added successfully..!", true, address);
+		Address savedAddress = this.addressService.addTiffinProviderAddress(address, providerId);
+		ApiResponse response = new ApiResponse("Address added successfully..!", true, savedAddress);
 		return new ResponseEntity<ApiResponse>(response, HttpStatus.CREATED);
 	}
 
 	// get address of specific user
 	@GetMapping("/address/user/{userId}")
-	public ResponseEntity<List<AddressDto>> getAddressesOfUser(@PathVariable Integer userId) {
-		List<AddressDto> allAddress = this.addressService.getAllAddress(userId);
-		return new ResponseEntity<List<AddressDto>>(allAddress, HttpStatus.OK);
+	public ResponseEntity<List<Address>> getAddressesOfUser(@PathVariable Integer userId) {
+		List<Address> allAddress = this.addressService.getAllAddress(userId);
+		return new ResponseEntity<List<Address>>(allAddress, HttpStatus.OK);
 	}
 
 	// get address
 	@GetMapping("/address/{addId}")
-	public ResponseEntity<AddressDto> getAddress(@PathVariable Integer addId) {
-		AddressDto address = this.addressService.getAddress(addId);
-		return new ResponseEntity<AddressDto>(address, HttpStatus.OK);
+	public ResponseEntity<Address> getAddress(@PathVariable Integer addId) {
+		Address address = this.addressService.getAddress(addId);
+		return new ResponseEntity<Address>(address, HttpStatus.OK);
 	}
 
 	// get single address of user
 	@GetMapping("/user/{userId}/address/{addId}")
-	public ResponseEntity<AddressDto> getSingleAddress(@PathVariable Integer userId, @PathVariable Integer addId) {
-		AddressDto addressDto = this.addressService.getSingleAddressOfUser(addId, userId);
-		return new ResponseEntity<AddressDto>(addressDto, HttpStatus.OK);
+	public ResponseEntity<Address> getSingleAddress(@PathVariable Integer userId, @PathVariable Integer addId) {
+		Address address = this.addressService.getSingleAddressOfUser(addId, userId);
+		return new ResponseEntity<Address>(address, HttpStatus.OK);
 	}
 
 	// get all address
 	@GetMapping("/addresses")
-	public ResponseEntity<List<AddressDto>> getAllAddress() {
-		List<AddressDto> allAddresses = this.addressService.getAllAddress();
-		return new ResponseEntity<List<AddressDto>>(allAddresses, HttpStatus.OK);
+	public ResponseEntity<List<Address>> getAllAddress() {
+		List<Address> allAddresses = this.addressService.getAllAddress();
+		return new ResponseEntity<List<Address>>(allAddresses, HttpStatus.OK);
 	}
 
 	// update address
 	@PutMapping("/address/{addId}")
-	public ResponseEntity<ApiResponse> updateAddress(@RequestBody AddressDto addressDto, @PathVariable Integer addId) {
-		AddressDto updateAddress = this.addressService.updateAddress(addressDto, addId);
+	public ResponseEntity<ApiResponse> updateAddress(@RequestBody Address address, @PathVariable Integer addId) {
+		Address updateAddress = this.addressService.updateAddress(address, addId);
 		ApiResponse response = new ApiResponse("Address updated successfully..!", true, updateAddress);
 		return new ResponseEntity<ApiResponse>(response, HttpStatus.OK);
 	}
@@ -84,14 +84,6 @@ public class AddressController {
 	@DeleteMapping("/address/{addId}")
 	public ResponseEntity<ApiResponse> deleteAddress(@PathVariable Integer addId) {
 		this.addressService.deleteAddress(addId);
-		ApiResponse response = new ApiResponse("Address deleted successfully..!", true);
-		return new ResponseEntity<ApiResponse>(response, HttpStatus.OK);
-	}
-
-	// delete address of specific user
-	@DeleteMapping("/user/{userId}/address/{addId}")
-	public ResponseEntity<ApiResponse> deleteAddressOfUser(@PathVariable Integer addId, @PathVariable Integer userId) {
-		this.addressService.deleteAddressOfUser(addId, userId);
 		ApiResponse response = new ApiResponse("Address deleted successfully..!", true);
 		return new ResponseEntity<ApiResponse>(response, HttpStatus.OK);
 	}

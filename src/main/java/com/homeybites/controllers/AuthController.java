@@ -1,4 +1,3 @@
-
 package com.homeybites.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,11 +15,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.homeybites.Security.JwtHelper;
+import com.homeybites.entities.User;
 import com.homeybites.payloads.ApiResponse;
 import com.homeybites.payloads.JwtRequest;
 import com.homeybites.payloads.JwtResponse;
 import com.homeybites.payloads.PasswordDto;
-import com.homeybites.payloads.UserDto;
 import com.homeybites.services.UserService;
 
 import jakarta.validation.Valid;
@@ -44,16 +43,16 @@ public class AuthController {
 		this.doAuthenticate(jwtRequest.getUsername(), jwtRequest.getPassword());
 
 		String username = jwtRequest.getUsername();
-		UserDto userDto = this.userService.getUserByEmail(username);
+		User user = this.userService.getUserByEmail(username);
 		JwtResponse response = new JwtResponse();
 
-		if (userDto.isVerified()) {
-			if (userDto.getUserRole().equals("ROLE_NORMAL_USER")) {
+		if (user.isVerified()) {
+			if (user.getUserRole().equals("ROLE_NORMAL_USER")) {
 				String token = jwtHelper.generateToken(jwtRequest.getUsername());
-				response.setMessage("User logged in successfully..!");
+				response.setMessage("Welocme to HomeyBites..!");
 				response.setStatus("success");
 				response.setToken(token);
-				response.setUser(userDto);
+				response.setUser(user);
 
 				return new ResponseEntity<JwtResponse>(response, HttpStatus.OK);
 			} else {
@@ -75,16 +74,46 @@ public class AuthController {
 		this.doAuthenticate(jwtRequest.getUsername(), jwtRequest.getPassword());
 
 		String username = jwtRequest.getUsername();
-		UserDto userDto = this.userService.getUserByEmail(username);
+		User user = this.userService.getUserByEmail(username);
 		JwtResponse response = new JwtResponse();
 
-		if (userDto.isVerified()) {
-			if (userDto.getUserRole().equals("ROLE_TIFFIN_PROVIDER")) {
+		if (user.isVerified()) {
+			if (user.getUserRole().equals("ROLE_TIFFIN_PROVIDER")) {
 				String token = jwtHelper.generateToken(jwtRequest.getUsername());
-				response.setMessage("User logged in successfully..!");
+				response.setMessage("Welocme to HomeyBites..!");
 				response.setStatus("success");
 				response.setToken(token);
-				response.setUser(userDto);
+				response.setUser(user);
+
+				return new ResponseEntity<JwtResponse>(response, HttpStatus.OK);
+			} else {
+				response.setMessage("Unable to login, Access denied..!");
+				response.setStatus("error");
+				return new ResponseEntity<JwtResponse>(response, HttpStatus.FORBIDDEN);
+			}
+		} else {
+			response.setMessage("Unable to login, email not verified..!");
+			response.setStatus("error");
+			return new ResponseEntity<JwtResponse>(response, HttpStatus.FORBIDDEN);
+		}
+	}
+
+	// login tiffin provider
+	@PostMapping("/admin/login")
+	public ResponseEntity<JwtResponse> verifyAdmin(@Valid @RequestBody JwtRequest jwtRequest) {
+		this.doAuthenticate(jwtRequest.getUsername(), jwtRequest.getPassword());
+
+		String username = jwtRequest.getUsername();
+		User user = this.userService.getUserByEmail(username);
+		JwtResponse response = new JwtResponse();
+
+		if (user.isVerified()) {
+			if (user.getUserRole().equals("ROLE_ADMIN")) {
+				String token = jwtHelper.generateToken(jwtRequest.getUsername());
+				response.setMessage("Welocme to HomeyBites..!");
+				response.setStatus("success");
+				response.setToken(token);
+				response.setUser(user);
 
 				return new ResponseEntity<JwtResponse>(response, HttpStatus.OK);
 			} else {
@@ -114,18 +143,18 @@ public class AuthController {
 
 	// new user register
 	@PostMapping("/register")
-	public ResponseEntity<ApiResponse> registerUser(@Valid @RequestBody UserDto userDto) {
-		boolean isPresent = this.userService.isUserPresent(userDto.getEmailId());
+	public ResponseEntity<ApiResponse> registerUser(@Valid @RequestBody User user) {
+		boolean isPresent = this.userService.isUserPresent(user.getEmailId());
 
 		if (isPresent) {
 			return new ResponseEntity<ApiResponse>(new ApiResponse("User already exists..", false),
 					HttpStatus.CONFLICT);
 		}
 
-		if (userDto.getPassword() != null && userDto.getCpassword() != null
-				&& userDto.getPassword().equals(userDto.getCpassword())) {
+		if (user.getPassword() != null && user.getcPassword() != null
+				&& user.getPassword().equals(user.getcPassword())) {
 
-			UserDto registeredUser = this.userService.registerNewUser(userDto);
+			User registeredUser = this.userService.registerNewUser(user);
 
 			return new ResponseEntity<ApiResponse>(
 					new ApiResponse("email-verification OTP has sent to your email id (valid only for 5 minutes)", true,
@@ -139,18 +168,19 @@ public class AuthController {
 
 	// register tiffin provider
 	@PostMapping("/tiffin-provider/register")
-	public ResponseEntity<ApiResponse> RegisterTiffinProvider(@RequestBody UserDto userDto) {
+	public ResponseEntity<ApiResponse> RegisterTiffinProvider(@Valid @RequestBody User user) {
 
-		boolean isPresent = this.userService.isUserPresent(userDto.getEmailId());
+		boolean isPresent = this.userService.isUserPresent(user.getEmailId());
 
 		if (isPresent) {
 			return new ResponseEntity<ApiResponse>(new ApiResponse("Email Id already exists..", false),
 					HttpStatus.CONFLICT);
 		}
-		if (userDto.getPassword() != null && userDto.getCpassword() != null
-				&& userDto.getPassword().equals(userDto.getCpassword())) {
 
-			UserDto registerTiffinProvider = this.userService.registerTiffinProvider(userDto);
+		if (user.getPassword() != null && user.getcPassword() != null
+				&& user.getPassword().equals(user.getcPassword())) {
+
+			User registerTiffinProvider = this.userService.registerTiffinProvider(user);
 
 			return new ResponseEntity<ApiResponse>(
 					new ApiResponse("email-verification OTP has sent to your email id (valid only for 5 minutes)", true,
@@ -164,10 +194,9 @@ public class AuthController {
 
 	// add business details of tiffin provider
 	@PutMapping("/tiffin-provider/{providerId}/business-details")
-	public ResponseEntity<ApiResponse> addBusinnessDetails(@PathVariable Integer providerId,
-			@RequestBody UserDto userDto) {
+	public ResponseEntity<ApiResponse> addBusinnessDetails(@PathVariable Integer providerId, @RequestBody User user) {
 
-		UserDto providerInfo = this.userService.addBussinessDetails(providerId, userDto);
+		User providerInfo = this.userService.addBussinessDetails(providerId, user);
 
 		return new ResponseEntity<ApiResponse>(
 				new ApiResponse("Bussiness details added successfully..!", true, providerInfo), HttpStatus.OK);
@@ -177,7 +206,7 @@ public class AuthController {
 	@PostMapping("/verify-email")
 	public ResponseEntity<ApiResponse> verifyEmail(@RequestParam String otp, @RequestParam String username) {
 
-		UserDto userDto = this.userService.getUserByEmail(username);
+		User user = this.userService.getUserByEmail(username);
 
 		if (otp.isEmpty())
 			return new ResponseEntity<ApiResponse>(
@@ -186,8 +215,8 @@ public class AuthController {
 		boolean verifiedOtp = this.userService.VerifyOtp(otp, username);
 
 		if (verifiedOtp) {
-			userDto.setVerified(true);
-			UserDto savedUser = this.userService.saveUser(userDto);
+			user.setVerified(true);
+			User savedUser = this.userService.saveUser(user);
 			return new ResponseEntity<ApiResponse>(new ApiResponse("Registeration successfully..!", true, savedUser),
 					HttpStatus.CREATED);
 		}
@@ -199,13 +228,22 @@ public class AuthController {
 	@PostMapping("/resend-otp")
 	public ResponseEntity<ApiResponse> resendOtp(@RequestParam String username) {
 
-		UserDto userDto = this.userService.getUserByEmail(username);
-		if (userDto.isVerified())
+		User user = this.userService.getUserByEmail(username);
+		if (user.isVerified())
 			return new ResponseEntity<ApiResponse>(new ApiResponse("Email already verified..!", true),
 					HttpStatus.CONFLICT);
 
 		this.userService.sendOtp(username);
 
+		return new ResponseEntity<ApiResponse>(
+				new ApiResponse("OTP sent to your email-id successfully..! (validte for only 5 minutes.)", true),
+				HttpStatus.OK);
+	}
+
+	// Re-sending OTP
+	@PostMapping("/update/resend-otp")
+	public ResponseEntity<ApiResponse> resendOtpForUpdate(@RequestParam String username) {
+		this.userService.sendOtp(username);
 		return new ResponseEntity<ApiResponse>(
 				new ApiResponse("OTP sent to your email-id successfully..! (validte for only 5 minutes.)", true),
 				HttpStatus.OK);
@@ -254,9 +292,9 @@ public class AuthController {
 		System.out.println("Password" + passwordDto.getNewPassword());
 		System.out.println("C-Password" + passwordDto.getcPassword());
 
-		UserDto userDto = this.userService.getUserByEmail(emailId);
+		User user = this.userService.getUserByEmail(emailId);
 
-		boolean response = this.userService.resetPass(passwordDto, userDto);
+		boolean response = this.userService.resetPass(passwordDto, user);
 		if (response)
 			return new ResponseEntity<ApiResponse>(new ApiResponse("Password updated successfully..!"), HttpStatus.OK);
 		else

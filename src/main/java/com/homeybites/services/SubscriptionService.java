@@ -2,28 +2,39 @@ package com.homeybites.services;
 
 import java.util.List;
 
-import com.homeybites.payloads.SubscriptionDto;
+import com.homeybites.entities.Subscription;
+import com.homeybites.entities.Log.SubscriptionLog;
 
 public interface SubscriptionService {
 
 	// add subscription plan of user
-	SubscriptionDto addSubscriptionPlan(SubscriptionDto subscriptionDto, Integer userId, Integer planId);
+	Subscription addSubscriptionPlan(Subscription subscription, Integer userId, Integer planId);
 
 	// get subscription plan
-	SubscriptionDto getSubscription(Integer subId);
+	Subscription getSubscription(Integer subId);
 
 	// get subscription plans of user
-	List<SubscriptionDto> getAllSubscriptionOfUser(Integer userId);
+	List<Subscription> getAllSubscriptionOfUser(Integer userId);
+
+	// get subscription plans of user
+	List<SubscriptionLog> getAllSubscriptionHistoryOfUser(Integer userId);
 
 	// get subscription plans of user who subscribed to a tiffin provider
-	List<SubscriptionDto> getAllSubscriptionOfTiffinProvider(Integer userId);
+	List<Subscription> getAllSubscriptionOfTiffinProvider(Integer userId);
 
 	// get all subscription plans
-	List<SubscriptionDto> getAllSubscriptions();
+	List<Subscription> getAllSubscriptions();
+	
+	Integer getSubscriptionCount(Integer providerId);
+	
+	Integer getAllSubscriptionCount();
 
 	// delete subscription plan
 	void deleteSubscriptionPlan(Integer subId);
 
 	// delete subscription plan log
 	void deleteSubscriptionPlanLog(Integer subId);
+
+	// deleting expired plans
+	void deleteExpiredPlans();
 }

@@ -8,6 +8,9 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.homeybites.entities.Log.SubscriptionLog;
 import com.homeybites.entities.Log.TiffinPlanLog;
 
@@ -19,22 +22,37 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Transient;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 @Entity
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "userId")
 public class User implements UserDetails{
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer userId;
+	
+	@NotBlank(message = "first name cannot be empty..!")
 	private String firstName;
 	private String middleName;
+	
+	@NotBlank(message = "last name cannot be empty..!")
 	private String lastName;
 	
 	@Column(nullable = false)
+	@Email(regexp = ".*?@?[^@]*\\.+.*")
 	private String emailId;
 	
 	private boolean isVerified = false;
+	
+	@NotBlank(message = "Phone number cannot be empty..!")
+	@Size(min = 10, max = 10, message = "phone number should be of 10 numbers..!")
 	private String phoneNo;
+	
+	@NotBlank
 	private String dob;
 	private String password;
 	private String gender;
@@ -48,34 +66,46 @@ public class User implements UserDetails{
 	private List<String> permissions;
 	private String userRole;
 	
+	@Transient
+	private String cPassword;
+	
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private List<Address> address = new ArrayList<>();
 	
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JsonIgnore
 	private List<OrderInfo> orders = new ArrayList<>();
 	
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JsonIgnore
 	private List<Subscription> subscriptions = new ArrayList<>();
 	
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JsonIgnore
 	private List<SubscriptionLog> subscriptionLog = new ArrayList<>();
 	
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JsonIgnore
 	private List<TiffinPlan> tiffinPlans = new ArrayList<>();
 	
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JsonIgnore
 	private List<TiffinPlanLog> tiffinPlanLog = new ArrayList<>();
 	
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JsonIgnore
 	private List<Payment> payments = new ArrayList<>();
 	
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JsonIgnore
 	private List<Feedback> feedbacks = new ArrayList<>();
 	
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JsonIgnore
 	private List<MenuItem> menuItems = new ArrayList<>();
 	
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JsonIgnore
 	private List<UserCart> userCart;
 	
 	
@@ -140,6 +170,12 @@ public class User implements UserDetails{
 	}
 	public String getGender() {
 		return gender;
+	}
+	public String getcPassword() {
+		return cPassword;
+	}
+	public void setcPassword(String cPassword) {
+		this.cPassword = cPassword;
 	}
 	public void setGender(String gender) {
 		this.gender = gender;

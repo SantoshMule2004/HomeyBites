@@ -3,6 +3,9 @@ package com.homeybites.entities;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.homeybites.entities.Log.TiffinPlanLog;
 
 import jakarta.persistence.CascadeType;
@@ -15,36 +18,43 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "planId")
 public class Subscription {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer planId;
+	
+	@NotNull(message = "Please enter the start date")
 	private LocalDate startDate;
+	
+	@NotNull(message = "Please enter the end date")
 	private LocalDate endDate;
 	private double totalPrice;
 	private String status;
 	private long planDuration;
-	
+
 	@Column(nullable = false, updatable = false)
 	private LocalDateTime createdAt;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "user_id")
 	private User user;
 
 	@OneToOne(mappedBy = "subscription", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JsonIgnore
 	private OrderInfo order;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "tiffin_id", nullable = true)
 	private TiffinPlan tiffinPlan;
-	
-	@ManyToOne(fetch = FetchType.LAZY)
+
+	@ManyToOne
 	@JoinColumn(name = "tiffin_log_id", nullable = true)
 	private TiffinPlanLog tiffinPlanLog;
-	
+
 	private boolean monday = false;
 	private boolean tuesday = false;
 	private boolean wednesday = false;
@@ -52,7 +62,7 @@ public class Subscription {
 	private boolean friday = false;
 	private boolean saturday = false;
 	private boolean sunday = false;
-	
+
 	private boolean isBreakFast = false;
 	private boolean isLunch = false;
 	private boolean isDinner = false;

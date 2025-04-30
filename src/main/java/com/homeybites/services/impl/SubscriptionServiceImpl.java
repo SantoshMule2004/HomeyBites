@@ -1,13 +1,11 @@
 package com.homeybites.services.impl;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.homeybites.entities.Subscription;
@@ -15,7 +13,6 @@ import com.homeybites.entities.TiffinPlan;
 import com.homeybites.entities.User;
 import com.homeybites.entities.Log.SubscriptionLog;
 import com.homeybites.exceptions.ResourceNotFoundException;
-import com.homeybites.payloads.SubscriptionDto;
 import com.homeybites.repositories.SubscriptionLogRepository;
 import com.homeybites.repositories.SubscriptionRepository;
 import com.homeybites.repositories.TiffinplanRepository;
@@ -37,11 +34,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 	@Autowired
 	private UserRepository userRepository;
 
-	@Autowired
-	private ModelMapper modelMapper;
-
 	@Override
-	public SubscriptionDto addSubscriptionPlan(SubscriptionDto subscriptionDto, Integer userId, Integer planId) {
+	public Subscription addSubscriptionPlan(Subscription subscription, Integer userId, Integer planId) {
 
 		User user = this.userRepository.findById(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
@@ -52,67 +46,59 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 		List<Subscription> list = this.subscriptionRepository.findByUser(user);
 
 		if (list.size() < 3) {
-			Subscription subscription = this.modelMapper.map(subscriptionDto, Subscription.class);
 			subscription.setUser(user);
 			subscription.setTiffinPlan(tiffinPlan);
 			subscription.setCreatedAt(LocalDateTime.now());
 			subscription
 					.setPlanDuration(ChronoUnit.DAYS.between(subscription.getStartDate(), subscription.getEndDate()));
-			subscription.setTotalPrice(subscription.getTiffinPlan().getPrice() * subscription.getPlanDuration());
+			subscription.setTotalPrice(subscription.getTiffinPlan().getPrice());
 
-			Subscription save = this.subscriptionRepository.save(subscription);
-			return this.modelMapper.map(save, SubscriptionDto.class);
+			return this.subscriptionRepository.save(subscription);
 		} else {
 			return null;
 		}
 	}
 
 	@Override
-	public SubscriptionDto getSubscription(Integer subId) {
-		Subscription subscription = this.subscriptionRepository.findByPlanId(subId)
+	public Subscription getSubscription(Integer subId) {
+		return this.subscriptionRepository.findByPlanId(subId)
 				.orElseThrow(() -> new ResourceNotFoundException("Subscription", "Id", subId));
-		return this.modelMapper.map(subscription, SubscriptionDto.class);
 	}
 
 	@Override
-	public List<SubscriptionDto> getAllSubscriptionOfUser(Integer userId) {
+	public List<Subscription> getAllSubscriptionOfUser(Integer userId) {
 		User user = this.userRepository.findById(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
 
-		List<Subscription> list = this.subscriptionRepository.findByUser(user);
-
-		List<SubscriptionDto> userPlans = list.stream().map(plan -> this.modelMapper.map(plan, SubscriptionDto.class))
-				.collect(Collectors.toList());
-		return userPlans;
+		return this.subscriptionRepository.findByUser(user);
 	}
 
 	@Override
-	public List<SubscriptionDto> getAllSubscriptionOfTiffinProvider(Integer userId) {
+	public List<SubscriptionLog> getAllSubscriptionHistoryOfUser(Integer userId) {
 		User user = this.userRepository.findById(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
-		
+
+		return this.subscriptionLogRepository.findByUser(user);
+	}
+
+	@Override
+	public List<Subscription> getAllSubscriptionOfTiffinProvider(Integer userId) {
+		User user = this.userRepository.findById(userId)
+				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
+
 		List<Subscription> list = this.subscriptionRepository.findByTiffinPlan_User(user);
-		
+
 		List<Subscription> list2 = this.subscriptionRepository.findByTiffinPlanLog_User(user);
 
-		List<SubscriptionDto> userPlans = new ArrayList<>();
-		
-		if (!list.isEmpty()) {
-			userPlans = list.stream()
-					.map(plan -> this.modelMapper.map(plan, SubscriptionDto.class)).collect(Collectors.toList());
-		} else {
-			userPlans = list2.stream()
-					.map(plan -> this.modelMapper.map(plan, SubscriptionDto.class)).collect(Collectors.toList());
-		}
-		return userPlans;
+		if (!list.isEmpty())
+			return list;
+		else
+			return list2;
 	}
 
 	@Override
-	public List<SubscriptionDto> getAllSubscriptions() {
-		List<Subscription> all = this.subscriptionRepository.findAll();
-		List<SubscriptionDto> allPlans = all.stream().map(sub -> this.modelMapper.map(sub, SubscriptionDto.class))
-				.collect(Collectors.toList());
-		return allPlans;
+	public List<Subscription> getAllSubscriptions() {
+		return this.subscriptionRepository.findAll();
 	}
 
 	@Override
@@ -157,6 +143,28 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 				.orElseThrow(() -> new ResourceNotFoundException("Subscription", "Id", subId));
 
 		this.subscriptionLogRepository.delete(subscriptionLog);
+	}
 
+	// A cron expression consists of 6 fields: second, minute, hour, day-of-month,
+	// month, day-of-week
+	@Override
+	@Scheduled(cron = "0 0 0 * * ?")
+	public void deleteExpiredPlans() {
+		List<Subscription> all = this.subscriptionRepository.findAll();
+		for (Subscription sub : all) {
+			if (sub.getEndDate().isBefore(LocalDate.now()))
+				deleteSubscriptionPlan(sub.getPlanId());
+		}
+
+	}
+
+	@Override
+	public Integer getSubscriptionCount(Integer providerId) {
+		return this.subscriptionRepository.getSubscriptionCountByProvider(providerId);
+	}
+
+	@Override
+	public Integer getAllSubscriptionCount() {
+		return this.subscriptionRepository.getSubscriptionCount();
 	}
 }

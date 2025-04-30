@@ -1,5 +1,8 @@
 package com.homeybites.entities;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -11,6 +14,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "tiffin_days_menuitem")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "tiffinMenuId")
 public class TiffinDaysMenuItem {
 
 	@Id

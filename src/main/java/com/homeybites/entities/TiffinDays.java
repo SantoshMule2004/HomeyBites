@@ -2,6 +2,9 @@ package com.homeybites.entities;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.homeybites.entities.Log.TiffinPlanLog;
 
 import jakarta.persistence.Entity;
@@ -16,6 +19,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Transient;
 
 @Entity
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "tiffinDayId")
 public class TiffinDays {
 
 	@Id
@@ -26,13 +30,15 @@ public class TiffinDays {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "tiffin_plan_id", nullable = true)
+	@JsonIgnore
 	private TiffinPlan tiffinPlan;
-	
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "tiffin_log_id", nullable = true)
+	@JsonIgnore
 	private TiffinPlanLog tiffinPlanLog;
 
-	@ManyToMany(fetch = FetchType.LAZY)
+	@ManyToMany
 	@JoinTable(name = "tiffin_days_menuitem", joinColumns = @JoinColumn(name = "tiffin_day_id"), inverseJoinColumns = @JoinColumn(name = "menu_id"))
 	private List<MenuItem> menuItem;
 

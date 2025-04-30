@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.homeybites.entities.MenuItem;
 import com.homeybites.payloads.ApiResponse;
-import com.homeybites.payloads.MenuItemDto;
 import com.homeybites.services.MenuItemService;
 
 import jakarta.validation.Valid;
@@ -33,11 +33,11 @@ public class MenuController {
 
 	// add menu item
 	@PostMapping("/user/{userId}/category/{cId}/menuitem/")
-	public ResponseEntity<ApiResponse> addMenuItem(@Valid @RequestPart MenuItemDto menuItemData,
+	public ResponseEntity<ApiResponse> addMenuItem(@Valid @RequestPart MenuItem menuItemData,
 			@RequestPart MultipartFile file, @PathVariable Integer cId, @PathVariable Integer userId)
 			throws IOException {
-		
-		MenuItemDto menuItem = this.menuItemService.addMenuItem(menuItemData, file, cId, userId);
+
+		MenuItem menuItem = this.menuItemService.addMenuItem(menuItemData, file, cId, userId);
 		return new ResponseEntity<ApiResponse>(new ApiResponse("MenuItem added successfully..!", true, menuItem),
 				HttpStatus.CREATED);
 	}
@@ -46,57 +46,57 @@ public class MenuController {
 	@PostMapping("/menuitem/upload/{menuId}")
 	public ResponseEntity<?> uploadMenuImage(@RequestParam MultipartFile file, @PathVariable Integer menuId)
 			throws IOException {
-		MenuItemDto menuItemDto = this.menuItemService.UploadMenuImage(file, menuId);
-		return new ResponseEntity<>("Image uploaded successfully..! " + menuItemDto.getImageUrl(), HttpStatus.OK);
+		this.menuItemService.UploadMenuImage(file, menuId);
+		return new ResponseEntity<>("Image uploaded successfully..! ", HttpStatus.OK);
 	}
 
 	// get menu item by id
 	@GetMapping("/menuitem/{menuId}")
-	public ResponseEntity<MenuItemDto> getMenuItem(@PathVariable Integer menuId) {
-		MenuItemDto menuItem = this.menuItemService.getMenuItem(menuId);
-		return new ResponseEntity<MenuItemDto>(menuItem, HttpStatus.OK);
+	public ResponseEntity<MenuItem> getMenuItem(@PathVariable Integer menuId) {
+		MenuItem menuItem = this.menuItemService.getMenuItem(menuId);
+		return new ResponseEntity<MenuItem>(menuItem, HttpStatus.OK);
 	}
 
 	// get all menu items
 	@GetMapping("/menuitems")
-	public ResponseEntity<List<MenuItemDto>> getAllMenuItems() {
-		List<MenuItemDto> allMenuItem = this.menuItemService.getAllMenuItem();
-		return new ResponseEntity<List<MenuItemDto>>(allMenuItem, HttpStatus.OK);
+	public ResponseEntity<List<MenuItem>> getAllMenuItems() {
+		List<MenuItem> allMenuItem = this.menuItemService.getAllMenuItem();
+		return new ResponseEntity<List<MenuItem>>(allMenuItem, HttpStatus.OK);
 	}
 
 	// get all menu items
 	@GetMapping("/menuitems/type")
-	public ResponseEntity<List<MenuItemDto>> getAllMenuItemsByType(@RequestParam String menuType) {
-		List<MenuItemDto> allMenuItem = this.menuItemService.getAllMenuItemByType(menuType);
-		return new ResponseEntity<List<MenuItemDto>>(allMenuItem, HttpStatus.OK);
+	public ResponseEntity<List<MenuItem>> getAllMenuItemsByType(@RequestParam String menuType) {
+		List<MenuItem> allMenuItem = this.menuItemService.getAllMenuItemByType(menuType);
+		return new ResponseEntity<List<MenuItem>>(allMenuItem, HttpStatus.OK);
 	}
 
 	// get all menu items of a category
 	@GetMapping("/category/{cId}/menuitems")
-	public ResponseEntity<List<MenuItemDto>> getMenuItemByCategory(@PathVariable Integer cId) {
-		List<MenuItemDto> menuItems = this.menuItemService.getMenuItemByCategory(cId);
-		return new ResponseEntity<List<MenuItemDto>>(menuItems, HttpStatus.OK);
+	public ResponseEntity<List<MenuItem>> getMenuItemByCategory(@PathVariable Integer cId) {
+		List<MenuItem> menuItems = this.menuItemService.getMenuItemByCategory(cId);
+		return new ResponseEntity<List<MenuItem>>(menuItems, HttpStatus.OK);
 	}
 
 	// get all menu items of a tiffin provider
 	@GetMapping("/tiffin-provider/{userId}/menuitems")
-	public ResponseEntity<List<MenuItemDto>> getMenuItemByTiffinProvider(@PathVariable Integer userId) {
-		List<MenuItemDto> menuItems = this.menuItemService.getMenuItemByTiffinProvider(userId);
-		return new ResponseEntity<List<MenuItemDto>>(menuItems, HttpStatus.OK);
+	public ResponseEntity<List<MenuItem>> getMenuItemByTiffinProvider(@PathVariable Integer userId) {
+		List<MenuItem> menuItems = this.menuItemService.getMenuItemByTiffinProvider(userId);
+		return new ResponseEntity<List<MenuItem>>(menuItems, HttpStatus.OK);
 	}
 
 	// get all nearby menu items
 	@GetMapping("/nearby-menuitems")
-	public ResponseEntity<List<MenuItemDto>> getNearbyMenuItem(@RequestParam double lat, @RequestParam double lon) {
-		List<MenuItemDto> menuItems = this.menuItemService.getAllNearbyMenuItem(lat, lon);
-		return new ResponseEntity<List<MenuItemDto>>(menuItems, HttpStatus.OK);
+	public ResponseEntity<List<MenuItem>> getNearbyMenuItem(@RequestParam double lat, @RequestParam double lon) {
+		List<MenuItem> menuItems = this.menuItemService.getAllNearbyMenuItem(lat, lon);
+		return new ResponseEntity<List<MenuItem>>(menuItems, HttpStatus.OK);
 	}
 
 	// Update menu item
 	@PutMapping("/menuitem/{menuId}")
-	public ResponseEntity<ApiResponse> updateMenuItem(@Valid @RequestBody MenuItemDto menuItemDto,
+	public ResponseEntity<ApiResponse> updateMenuItem(@Valid @RequestBody MenuItem menuItem,
 			@PathVariable Integer menuId) {
-		MenuItemDto updatedMenuItem = this.menuItemService.updateMenuItem(menuItemDto, menuId);
+		MenuItem updatedMenuItem = this.menuItemService.updateMenuItem(menuItem, menuId);
 		return new ResponseEntity<ApiResponse>(
 				new ApiResponse("menuitem updated successfully.>!", true, updatedMenuItem), HttpStatus.OK);
 	}

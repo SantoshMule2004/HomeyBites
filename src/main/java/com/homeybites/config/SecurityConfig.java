@@ -30,7 +30,7 @@ import com.homeybites.Security.JwtFilter;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-	
+
 	@Autowired
 	private HandlerExceptionResolver handlerExceptionResolver;
 
@@ -38,7 +38,7 @@ public class SecurityConfig {
 	protected JwtFilter jwtFilter() {
 		return new JwtFilter(handlerExceptionResolver);
 	}
-	
+
 	@Autowired
 	private JwtAuthenticationEntryPoint point;
 
@@ -49,17 +49,13 @@ public class SecurityConfig {
 
 	@Bean
 	protected SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-		return http
-				.csrf(customizer->customizer.disable())
-				.cors(ccustomizer->ccustomizer.configurationSource(corsConfigurationSource()))
-				.authorizeHttpRequests(request->request.requestMatchers("/api/v1/auth/**").permitAll()
-				.requestMatchers(HttpMethod.GET).permitAll()
-				.anyRequest().authenticated())
-				.exceptionHandling(ex->ex.authenticationEntryPoint(point))
-				.httpBasic(Customizer.withDefaults())
-				.sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-				.addFilterBefore(this.jwtFilter(), UsernamePasswordAuthenticationFilter.class)
-				.build();
+		return http.csrf(customizer -> customizer.disable())
+				.cors(ccustomizer -> ccustomizer.configurationSource(corsConfigurationSource()))
+				.authorizeHttpRequests(request -> request.requestMatchers("/api/v1/auth/**").permitAll()
+						.requestMatchers(HttpMethod.GET).permitAll().anyRequest().authenticated())
+				.exceptionHandling(ex -> ex.authenticationEntryPoint(point)).httpBasic(Customizer.withDefaults())
+				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+				.addFilterBefore(this.jwtFilter(), UsernamePasswordAuthenticationFilter.class).build();
 	}
 
 	@Bean
@@ -76,19 +72,19 @@ public class SecurityConfig {
 	}
 
 	@Bean
-	protected CorsConfigurationSource corsConfigurationSource()
-	{
+	protected CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration corsConfiguration = new CorsConfiguration();
-		
+
 		corsConfiguration.setAllowCredentials(true);
-		corsConfiguration.setAllowedOrigins(Arrays.asList("http://localhost:5173","https://homey-bites.netlify.app/","https://homeybites-tiffin-dashboard.netlify.app/"));
+		corsConfiguration.setAllowedOrigins(Arrays.asList("http://localhost:5173", "https://homey-bites.netlify.app/",
+				"https://homeybites-tiffin-dashboard.netlify.app/"));
 		corsConfiguration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept"));
 		corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 		corsConfiguration.setMaxAge(3600L);
-		
+
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		source.registerCorsConfiguration("/**", corsConfiguration);
-		
+
 		return source;
 	}
 }

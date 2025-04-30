@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.homeybites.entities.Category;
 import com.homeybites.payloads.ApiResponse;
-import com.homeybites.payloads.CategoryDto;
 import com.homeybites.services.CategoryService;
 
 import jakarta.validation.Valid;
@@ -28,28 +28,27 @@ public class CategoryController {
 	private CategoryService categoryService;
 
 	@PostMapping("/")
-	public ResponseEntity<ApiResponse> addCategory(@Valid @RequestBody CategoryDto categoryDto) {
-		System.out.println(categoryDto.getCategoryName() + categoryDto.isActive());
-		CategoryDto category = this.categoryService.addCategory(categoryDto);
-		return new ResponseEntity<ApiResponse>(new ApiResponse("Category added successfully..!", true, category),
+	public ResponseEntity<ApiResponse> addCategory(@Valid @RequestBody Category category) {
+		Category savedategory = this.categoryService.addCategory(category);
+		return new ResponseEntity<ApiResponse>(new ApiResponse("Category added successfully..!", true, savedategory),
 				HttpStatus.CREATED);
 	}
 
 	@GetMapping("/{cId}")
-	public ResponseEntity<CategoryDto> getCategory(@PathVariable Integer cId) {
-		CategoryDto category = this.categoryService.getCategory(cId);
-		return new ResponseEntity<CategoryDto>(category, HttpStatus.OK);
+	public ResponseEntity<Category> getCategory(@PathVariable Integer cId) {
+		Category category = this.categoryService.getCategory(cId);
+		return new ResponseEntity<Category>(category, HttpStatus.OK);
 	}
 
 	@GetMapping("/")
-	public ResponseEntity<List<CategoryDto>> getAllCategory() {
-		List<CategoryDto> allCategory = this.categoryService.getAllCategory();
-		return new ResponseEntity<List<CategoryDto>>(allCategory, HttpStatus.OK);
+	public ResponseEntity<List<Category>> getAllCategory() {
+		List<Category> allCategory = this.categoryService.getAllCategory();
+		return new ResponseEntity<List<Category>>(allCategory, HttpStatus.OK);
 	}
 
 	@PutMapping("/{cId}")
-	public ResponseEntity<ApiResponse> updateCategory(@Valid @RequestBody CategoryDto categoryDto, @PathVariable Integer cId) {
-		CategoryDto updateCategory = this.categoryService.updateCategory(categoryDto, cId);
+	public ResponseEntity<ApiResponse> updateCategory(@Valid @RequestBody Category category, @PathVariable Integer cId) {
+		Category updateCategory = this.categoryService.updateCategory(category, cId);
 		return new ResponseEntity<ApiResponse>(
 				new ApiResponse("Category updated successfully..!", true, updateCategory), HttpStatus.OK);
 	}

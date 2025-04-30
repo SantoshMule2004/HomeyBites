@@ -1,28 +1,40 @@
 package com.homeybites.services;
 
 import java.util.List;
-import com.homeybites.payloads.TiffinPlanDto;
+
+import com.homeybites.entities.TiffinDays;
+import com.homeybites.entities.TiffinPlan;
+import com.homeybites.entities.Log.TiffinPlanLog;
 import com.homeybites.payloads.UpdateMenuItemDto;
 
 public interface TiffinPlanService {
 
+	// to check if plan is present by given name
+	boolean isPlanPresent(String planName, Integer userId);
+
 	// add tiffin plan
-	TiffinPlanDto addTiffinPlan(TiffinPlanDto tiffinPlanDto, Integer providerId);
+	TiffinPlan addTiffinPlan(TiffinPlan tiffinPlan, Integer providerId);
 
 	// update tiffin plan
-	TiffinPlanDto updateTiffinPlan(TiffinPlanDto tiffinPlanDto, Integer planId);
+	TiffinPlan updateTiffinPlan(TiffinPlan tiffinPlan, Integer planId);
 
 	// update menuitems on specific day
-	TiffinPlanDto updateMenuItemOnDay(Integer planId, String day, UpdateMenuItemDto updateMenuItemDto);
+	TiffinPlan updateMenuItemOnDay(Integer planId, String day, UpdateMenuItemDto updateMenuItemDto);
 
 	// get tiffin plan
-	TiffinPlanDto getTiffinPlan(Integer planId);
+	TiffinPlan getTiffinPlan(Integer planId);
+
+	// get tiffin plan log
+	TiffinPlanLog getTiffinPlanLog(Integer planId);
 
 	// get all tiffin plans of a provider
-	List<TiffinPlanDto> getAllTiffinPlansOfProvider(Integer providerId);
+	List<TiffinPlan> getAllTiffinPlansOfProvider(Integer providerId);
 
 	// get all tiffin plans
-	List<TiffinPlanDto> getAllTiffinPlans();
+	List<TiffinPlan> getAllTiffinPlans();
+
+	// get all tiffin Days
+	List<TiffinDays> getAllTiffinDaysByMenuItem(Integer menuId);
 
 	// delete tiffin plan
 	void deleteTiffinPlan(Integer planId);

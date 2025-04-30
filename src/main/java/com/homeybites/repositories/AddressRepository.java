@@ -19,10 +19,6 @@ public interface AddressRepository extends JpaRepository<Address, Integer>{
 	@Query(value = "select * from address where user_id = ? and add_id = ?", nativeQuery = true)
 	Optional<Address> getAddress(Integer userId, Integer addId);
 	
-	//delete address of specific user
-	@Query(value = "delete from address where user_id = ? and add_id = ?", nativeQuery = true)
-	void deleteAddressByUser(Integer userId, Integer addId);
-	
 	// find address by user role
 	List<Address> findByUserRoles(UserRoles userRoles);
 }

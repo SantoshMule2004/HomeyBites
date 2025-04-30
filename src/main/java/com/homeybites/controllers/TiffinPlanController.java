@@ -14,10 +14,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.homeybites.entities.TiffinDays;
+import com.homeybites.entities.TiffinPlan;
+import com.homeybites.entities.Log.TiffinPlanLog;
 import com.homeybites.payloads.ApiResponse;
-import com.homeybites.payloads.TiffinPlanDto;
 import com.homeybites.payloads.UpdateMenuItemDto;
 import com.homeybites.services.TiffinPlanService;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/v1/tiffinplan")
@@ -28,20 +32,29 @@ public class TiffinPlanController {
 
 	// add tiffin plan
 	@PostMapping("/tiffin-provider/{providerId}")
-	public ResponseEntity<ApiResponse> addTiffinPlan(@RequestBody TiffinPlanDto planDto,
+	public ResponseEntity<ApiResponse> addTiffinPlan(@Valid @RequestBody TiffinPlan plan,
 			@PathVariable Integer providerId) {
-		
-		System.out.println("provider Id" + providerId);
-		TiffinPlanDto tiffinPlan = this.tiffinPlanService.addTiffinPlan(planDto, providerId);
-		ApiResponse response = new ApiResponse("Tiffin plan added successfully..!", true, tiffinPlan);
+
+		boolean planPresent = this.tiffinPlanService.isPlanPresent(plan.getPlanName(), providerId);
+		ApiResponse response = new ApiResponse();
+
+		if (planPresent) {
+			response.setMessage("Tiffin plan already exists with the name '" + plan.getPlanName() + "'");
+			response.setSuccess(false);
+			return new ResponseEntity<ApiResponse>(response, HttpStatus.CONFLICT);
+		}
+		TiffinPlan tiffinPlan = this.tiffinPlanService.addTiffinPlan(plan, providerId);
+		response.setClassObj(tiffinPlan);
+		response.setMessage("Tiffin plan created successfully..!");
+		response.setSuccess(true);
 		return new ResponseEntity<ApiResponse>(response, HttpStatus.CREATED);
 	}
 
 	// update tiffin plan
 	@PutMapping("/{planId}")
-	public ResponseEntity<ApiResponse> updateTiffinPlan(@RequestBody TiffinPlanDto planDto,
+	public ResponseEntity<ApiResponse> updateTiffinPlan(@Valid @RequestBody TiffinPlan plan,
 			@PathVariable Integer planId) {
-		TiffinPlanDto tiffinPlan = this.tiffinPlanService.updateTiffinPlan(planDto, planId);
+		TiffinPlan tiffinPlan = this.tiffinPlanService.updateTiffinPlan(plan, planId);
 		ApiResponse response = new ApiResponse("Tiffin plan updated successfully..!", true, tiffinPlan);
 		return new ResponseEntity<ApiResponse>(response, HttpStatus.CREATED);
 	}
@@ -50,30 +63,44 @@ public class TiffinPlanController {
 	@PutMapping("/{planId}/day/{day}")
 	public ResponseEntity<ApiResponse> updateMenuItems(@PathVariable Integer planId, @PathVariable String day,
 			@RequestBody UpdateMenuItemDto updateMenuItemDto) {
-		TiffinPlanDto tiffinPlan = this.tiffinPlanService.updateMenuItemOnDay(planId, day, updateMenuItemDto);
+		TiffinPlan tiffinPlan = this.tiffinPlanService.updateMenuItemOnDay(planId, day, updateMenuItemDto);
 		ApiResponse response = new ApiResponse("Menuitems updated successfully..!", true, tiffinPlan);
 		return new ResponseEntity<ApiResponse>(response, HttpStatus.CREATED);
 	}
 
 	// get tiffin plan
 	@GetMapping("/{planId}")
-	public ResponseEntity<TiffinPlanDto> getTiffinPlan(@PathVariable Integer planId) {
-		TiffinPlanDto tiffinPlan = this.tiffinPlanService.getTiffinPlan(planId);
-		return new ResponseEntity<TiffinPlanDto>(tiffinPlan, HttpStatus.OK);
+	public ResponseEntity<TiffinPlan> getTiffinPlan(@PathVariable Integer planId) {
+		TiffinPlan tiffinPlan = this.tiffinPlanService.getTiffinPlan(planId);
+		return new ResponseEntity<TiffinPlan>(tiffinPlan, HttpStatus.OK);
+	}
+
+	// get tiffin plan
+	@GetMapping("/log/{planId}")
+	public ResponseEntity<TiffinPlanLog> getTiffinPlanLog(@PathVariable Integer planId) {
+		TiffinPlanLog tiffinPlan = this.tiffinPlanService.getTiffinPlanLog(planId);
+		return new ResponseEntity<TiffinPlanLog>(tiffinPlan, HttpStatus.OK);
 	}
 
 	// get all tiffin plan of a provider
 	@GetMapping("/tiffin-provider/{providerId}")
-	public ResponseEntity<List<TiffinPlanDto>> getAllTiffinPlanOfProvider(@PathVariable Integer providerId) {
-		List<TiffinPlanDto> allTiffinPlans = this.tiffinPlanService.getAllTiffinPlansOfProvider(providerId);
-		return new ResponseEntity<List<TiffinPlanDto>>(allTiffinPlans, HttpStatus.OK);
+	public ResponseEntity<List<TiffinPlan>> getAllTiffinPlanOfProvider(@PathVariable Integer providerId) {
+		List<TiffinPlan> allTiffinPlans = this.tiffinPlanService.getAllTiffinPlansOfProvider(providerId);
+		return new ResponseEntity<List<TiffinPlan>>(allTiffinPlans, HttpStatus.OK);
 	}
 
 	// get all tiffin plan
 	@GetMapping("/")
-	public ResponseEntity<List<TiffinPlanDto>> getAllTiffinPlan() {
-		List<TiffinPlanDto> allTiffinPlans = this.tiffinPlanService.getAllTiffinPlans();
-		return new ResponseEntity<List<TiffinPlanDto>>(allTiffinPlans, HttpStatus.OK);
+	public ResponseEntity<List<TiffinPlan>> getAllTiffinPlan() {
+		List<TiffinPlan> allTiffinPlans = this.tiffinPlanService.getAllTiffinPlans();
+		return new ResponseEntity<List<TiffinPlan>>(allTiffinPlans, HttpStatus.OK);
+	}
+
+	// get all tiffin plan
+	@GetMapping("/tiffinDays/{menuId}")
+	public ResponseEntity<List<TiffinDays>> getAllTiffinDays(@PathVariable Integer menuId) {
+		List<TiffinDays> list = this.tiffinPlanService.getAllTiffinDaysByMenuItem(menuId);
+		return new ResponseEntity<List<TiffinDays>>(list, HttpStatus.OK);
 	}
 
 	// delete tiffin plan

@@ -2,9 +2,6 @@ package com.homeybites.services.impl;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
-
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -13,10 +10,8 @@ import com.homeybites.entities.Address;
 import com.homeybites.entities.User;
 import com.homeybites.entities.UserCart;
 import com.homeybites.exceptions.ResourceNotFoundException;
-import com.homeybites.payloads.AddressDto;
 import com.homeybites.payloads.OtpDto;
 import com.homeybites.payloads.PasswordDto;
-import com.homeybites.payloads.UserDto;
 import com.homeybites.repositories.AddressRepository;
 import com.homeybites.repositories.CartRepository;
 import com.homeybites.repositories.UserRepository;
@@ -31,12 +26,9 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	private CartRepository cartRepository;
-	
-	@Autowired
-	private AddressRepository addressRepository;
 
 	@Autowired
-	private ModelMapper modelMapper;
+	private AddressRepository addressRepository;
 
 	@Autowired
 	private EmailService emailService;
@@ -44,62 +36,52 @@ public class UserServiceImpl implements UserService {
 	private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(12);
 
 	@Override
-	public UserDto registerNewUser(UserDto userDto) {
-
-		User user = this.modelMapper.map(userDto, User.class);
+	public User registerNewUser(User user) {
 		user.setUserRole("ROLE_NORMAL_USER");
 		user.setPassword(this.passwordEncoder.encode(user.getPassword()));
 		User savedUser = this.userRepository.save(user);
 
 		this.sendOtp(savedUser.getEmailId());
 
-		return this.modelMapper.map(savedUser, UserDto.class);
+		return savedUser;
 	}
 
 	@Override
-	public UserDto registerTiffinProvider(UserDto userDto) {
-
-		User user = this.modelMapper.map(userDto, User.class);
+	public User registerTiffinProvider(User user) {
 		user.setUserRole("ROLE_TIFFIN_PROVIDER");
 		user.setPassword(this.passwordEncoder.encode(user.getPassword()));
 		User savedUser = this.userRepository.save(user);
 
 		this.sendOtp(savedUser.getEmailId());
 
-		return this.modelMapper.map(savedUser, UserDto.class);
+		return savedUser;
 	}
-	
+
 	@Override
-	public UserDto addBussinessDetails(Integer providerId, UserDto userDto) {
-		
+	public User addBussinessDetails(Integer providerId, User user) {
+
 		User providerInfo = this.userRepository.findById(providerId)
 				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", providerId));
-		
-		providerInfo.setBusinessName(userDto.getBusinessName());
-		providerInfo.setFoodLicenseNo(userDto.getFoodLicenseNo());
-		providerInfo.setGSTIN(userDto.getGSTIN());
-		
-		for (AddressDto addDto : userDto.getAddress()) {
-			Address address = this.modelMapper.map(addDto, Address.class);
+
+		providerInfo.setBusinessName(user.getBusinessName());
+		providerInfo.setFoodLicenseNo(user.getFoodLicenseNo());
+		providerInfo.setGSTIN(user.getGSTIN());
+
+		for (Address address : user.getAddress()) {
 			address.setUser(providerInfo);
 			providerInfo.getAddress().add(address);
 		}
-		
-		User save = this.userRepository.save(providerInfo);
-		return this.modelMapper.map(save, UserDto.class);
+
+		return this.userRepository.save(providerInfo);
 	}
 
 	@Override
-	public UserDto saveUser(UserDto userDto) {
-
-		User user = this.modelMapper.map(userDto, User.class);
-		User save = this.userRepository.save(user);
-
-		return this.modelMapper.map(save, UserDto.class);
+	public User saveUser(User user) {
+		return this.userRepository.save(user);
 	}
 
 	@Override
-	public UserDto updateUser(UserDto user, Integer userId) {
+	public User updateUser(User user, Integer userId) {
 
 		User existingUser = this.userRepository.findById(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
@@ -117,73 +99,60 @@ public class UserServiceImpl implements UserService {
 		existingUser.setCompanyName(user.getCompanyName());
 		existingUser.setCourse(user.getCourse());
 
-		User updatedUser = this.userRepository.save(existingUser);
-
-		return this.modelMapper.map(updatedUser, UserDto.class);
+		return this.userRepository.save(existingUser);
 	}
-	
+
 	@Override
-	public UserDto updateBusinessDetails(UserDto userDto, Integer userId, Integer addressId) {
+	public User updateBusinessDetails(User user, Integer userId, Integer addressId) {
 		User existingUser = this.userRepository.findById(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
-		
-		existingUser.setBusinessName(userDto.getBusinessName());
-		
-		Address address = this.addressRepository.findById(addressId).orElseThrow(() -> new ResourceNotFoundException("Address", "Id", addressId));
-		
-		AddressDto addressDto = userDto.getAddress().getFirst();
-		
-		address.setAddressLine(addressDto.getAddressLine());
-		address.setLandmark(addressDto.getLandmark());
-		address.setCity(addressDto.getCity());
-		address.setState(addressDto.getState());
-		address.setCountry(addressDto.getCountry());
-		address.setLatitude(addressDto.getLatitude());
-		address.setLongitude(addressDto.getLongitude());
-		address.setServiceRadius(addressDto.getServiceRadius());
-		
+
+		existingUser.setBusinessName(user.getBusinessName());
+
+		Address address = this.addressRepository.findById(addressId)
+				.orElseThrow(() -> new ResourceNotFoundException("Address", "Id", addressId));
+
+		Address newAddress = user.getAddress().getFirst();
+
+		address.setAddressLine(newAddress.getAddressLine());
+		address.setLandmark(newAddress.getLandmark());
+		address.setCity(newAddress.getCity());
+		address.setState(newAddress.getState());
+		address.setCountry(newAddress.getCountry());
+		address.setLatitude(newAddress.getLatitude());
+		address.setLongitude(newAddress.getLongitude());
+		address.setServiceRadius(newAddress.getServiceRadius());
+
 		this.addressRepository.save(address);
-		
-		User updatedUser = this.userRepository.save(existingUser);
-		
-		return this.modelMapper.map(updatedUser, UserDto.class);
+
+		return this.userRepository.save(existingUser);
 	}
 
 	@Override
-	public UserDto getUser(Integer userId) {
-		User user = this.userRepository.findById(userId)
+	public User getUser(Integer userId) {
+		return this.userRepository.findById(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
-
-		return this.modelMapper.map(user, UserDto.class);
 	}
 
 	@Override
-	public UserDto getUserByEmail(String emailId) {
-		User user = this.userRepository.findByEmailId(emailId)
+	public User getUserByEmail(String emailId) {
+		return this.userRepository.findByEmailId(emailId)
 				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", emailId));
-		return this.modelMapper.map(user, UserDto.class);
 	}
 
 	@Override
 	public boolean isUserPresent(String username) {
-		boolean existsByEmailId = this.userRepository.existsByEmailId(username);
-		return existsByEmailId;
+		return this.userRepository.existsByEmailId(username);
 	}
 
 	@Override
-	public List<UserDto> getAllUser() {
-		List<User> allUsers = this.userRepository.findAll();
-		List<UserDto> all = allUsers.stream().map(user -> this.modelMapper.map(user, UserDto.class))
-				.collect(Collectors.toList());
-		return all;
+	public List<User> getAllUser() {
+		return this.userRepository.findAll();
 	}
 
 	@Override
-	public List<UserDto> getUserByRole(String role) {
-		List<User> all = this.userRepository.findByUserRole(role);
-		List<UserDto> users = all.stream().map(user -> this.modelMapper.map(user, UserDto.class))
-				.collect(Collectors.toList());
-		return users;
+	public List<User> getUserByRole(String role) {
+		return this.userRepository.findByUserRole(role);
 	}
 
 	@Override
@@ -199,9 +168,12 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public UserDto updateContactDetails(UserDto userDto, Integer userId) {
+	public User updateContactDetails(String number, Integer userId) {
+		User user = this.userRepository.findById(userId)
+				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
 
-		return null;
+		user.setPhoneNo(number);
+		return this.userRepository.save(user);
 	}
 
 	@Override
@@ -249,14 +221,13 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public String resetPassword(PasswordDto passwordDto, UserDto userDto) {
-		if (passwordEncoder.matches(passwordDto.getOldPassword(), userDto.getPassword())) {
+	public String resetPassword(PasswordDto passwordDto, User user) {
+		if (passwordEncoder.matches(passwordDto.getOldPassword(), user.getPassword())) {
 
 			if (passwordDto.getNewPassword() != null && passwordDto.getcPassword() != null
 					&& passwordDto.getNewPassword().equals(passwordDto.getcPassword())) {
 
-				userDto.setPassword(passwordEncoder.encode(passwordDto.getNewPassword()));
-				User user = this.modelMapper.map(userDto, User.class);
+				user.setPassword(passwordEncoder.encode(passwordDto.getNewPassword()));
 				this.userRepository.save(user);
 
 				return "Password updated successfully..!";
@@ -267,17 +238,26 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public boolean resetPass(PasswordDto passwordDto, UserDto userDto) {
+	public boolean resetPass(PasswordDto passwordDto, User user) {
 
 		if (passwordDto.getNewPassword() != null && passwordDto.getcPassword() != null
 				&& passwordDto.getNewPassword().equals(passwordDto.getcPassword())) {
 
-			userDto.setPassword(passwordEncoder.encode(passwordDto.getNewPassword()));
-			User user = this.modelMapper.map(userDto, User.class);
+			user.setPassword(passwordEncoder.encode(passwordDto.getNewPassword()));
 			this.userRepository.save(user);
 
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public Integer getAllUserCount() {
+		return this.userRepository.getAllUserCount("ROLE_ADMIN");
+	}
+
+	@Override
+	public Integer getUserCountByRole(String role) {
+		return this.userRepository.getUserCount(role);
 	}
 }

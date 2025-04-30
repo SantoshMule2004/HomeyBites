@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -12,14 +11,15 @@ import org.springframework.web.multipart.MultipartFile;
 import com.homeybites.entities.Address;
 import com.homeybites.entities.Category;
 import com.homeybites.entities.MenuItem;
+import com.homeybites.entities.TiffinDays;
 import com.homeybites.entities.User;
 import com.homeybites.exceptions.ResourceNotFoundException;
 import com.homeybites.payloads.ImageInfo;
-import com.homeybites.payloads.MenuItemDto;
 import com.homeybites.payloads.UserRoles;
 import com.homeybites.repositories.AddressRepository;
 import com.homeybites.repositories.CategoryRepository;
 import com.homeybites.repositories.MenuItemRepository;
+import com.homeybites.repositories.TiffindaysRepository;
 import com.homeybites.repositories.UserRepository;
 import com.homeybites.services.ImageService;
 import com.homeybites.services.MenuItemService;
@@ -31,6 +31,9 @@ public class MenuItemServiceImpl implements MenuItemService {
 	private MenuItemRepository menuItemRepository;
 
 	@Autowired
+	private TiffindaysRepository tiffindaysRepository;
+
+	@Autowired
 	private CategoryRepository categoryRepository;
 
 	@Autowired
@@ -40,36 +43,32 @@ public class MenuItemServiceImpl implements MenuItemService {
 	private UserRepository userRepository;
 
 	@Autowired
-	private ModelMapper modelMapper;
-
-	@Autowired
 	private ImageService imageService;
 
 	@Override
-	public MenuItemDto addMenuItem(MenuItemDto menuItemData, MultipartFile file, Integer categoryId, Integer userId) throws IOException {
+	public MenuItem addMenuItem(MenuItem menuItemData, MultipartFile file, Integer categoryId, Integer userId)
+			throws IOException {
 
 		Category category = this.categoryRepository.findById(categoryId)
 				.orElseThrow(() -> new ResourceNotFoundException("category", "id", categoryId));
 
 		User user = this.userRepository.findById(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("user", "id", userId));
-		
-		MenuItem menuItem = this.modelMapper.map(menuItemData, MenuItem.class);
-		
+
 		ImageInfo uploadImage = this.imageService.uploadImage(file);
-		menuItem.setImagePublicId(uploadImage.getPublicId());
-		menuItem.setImageUrl(uploadImage.getSecuredUrl());
-		menuItem.setFormat(uploadImage.getFormat());
+		menuItemData.setImagePublicId(uploadImage.getPublicId());
+		menuItemData.setImageUrl(uploadImage.getSecuredUrl());
+		menuItemData.setFormat(uploadImage.getFormat());
 
-		menuItem.setCategory(category);
-		menuItem.setUser(user);
-		MenuItem savedMenu = this.menuItemRepository.save(menuItem);
+		menuItemData.setCategory(category);
+		menuItemData.setUser(user);
+		MenuItem savedMenu = this.menuItemRepository.save(menuItemData);
 
-		return this.modelMapper.map(savedMenu, MenuItemDto.class);
+		return savedMenu;
 	}
 
 	@Override
-	public MenuItemDto UploadMenuImage(MultipartFile file, Integer menuId) throws IOException {
+	public MenuItem UploadMenuImage(MultipartFile file, Integer menuId) throws IOException {
 		MenuItem menuItem = this.menuItemRepository.findById(menuId)
 				.orElseThrow(() -> new ResourceNotFoundException("Menu item", "id", menuId));
 
@@ -78,52 +77,36 @@ public class MenuItemServiceImpl implements MenuItemService {
 		menuItem.setImageUrl(uploadImage.getSecuredUrl());
 		menuItem.setFormat(uploadImage.getFormat());
 
-		MenuItem save = this.menuItemRepository.save(menuItem);
-
-		return this.modelMapper.map(save, MenuItemDto.class);
+		return this.menuItemRepository.save(menuItem);
 	}
 
 	@Override
-	public MenuItemDto getMenuItem(Integer menuId) {
-		MenuItem menuItem = this.menuItemRepository.findById(menuId)
+	public MenuItem getMenuItem(Integer menuId) {
+		return this.menuItemRepository.findById(menuId)
 				.orElseThrow(() -> new ResourceNotFoundException("Menu item", "id", menuId));
-		return this.modelMapper.map(menuItem, MenuItemDto.class);
 	}
 
 	@Override
-	public List<MenuItemDto> getMenuItemByCategory(Integer cId) {
+	public List<MenuItem> getMenuItemByCategory(Integer cId) {
 		Category category = this.categoryRepository.findById(cId)
 				.orElseThrow(() -> new ResourceNotFoundException("category", "id", cId));
 
-		List<MenuItem> findByCategory = this.menuItemRepository.findByCategory(category);
-		List<MenuItemDto> allMenuItems = findByCategory.stream()
-				.map(menuItem -> this.modelMapper.map(menuItem, MenuItemDto.class)).collect(Collectors.toList());
-
-		return allMenuItems;
+		return this.menuItemRepository.findByCategory(category);
 	}
 
 	@Override
-	public List<MenuItemDto> getAllMenuItem() {
-		List<MenuItem> allMenus = this.menuItemRepository.findAll();
-
-		List<MenuItemDto> allMenuItems = allMenus.stream()
-				.map(menuItem -> this.modelMapper.map(menuItem, MenuItemDto.class)).collect(Collectors.toList());
-		return allMenuItems;
+	public List<MenuItem> getAllMenuItem() {
+		return this.menuItemRepository.findAll();
 	}
 
 	@Override
-	public List<MenuItemDto> getMenuItemByTiffinProvider(Integer userId) {
-		User user = this.userRepository.findById(userId)
-				.orElseThrow(() -> new ResourceNotFoundException("user", "id", userId));
-
-		List<MenuItem> byUser = this.menuItemRepository.findByUser(user);
-		List<MenuItemDto> allMenuItems = byUser.stream()
-				.map(menuItem -> this.modelMapper.map(menuItem, MenuItemDto.class)).collect(Collectors.toList());
-		return allMenuItems;
+	public List<MenuItem> getMenuItemByTiffinProvider(Integer userId) {
+		this.userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("user", "id", userId));
+		return this.menuItemRepository.getMenuItemByuserAndActive(userId);
 	}
 
 	@Override
-	public List<MenuItemDto> getAllNearbyMenuItem(double latitude, double longitude) {
+	public List<MenuItem> getAllNearbyMenuItem(double latitude, double longitude) {
 		// getting address of tiffin providers
 		List<Address> all = this.addressRepository.findByUserRoles(UserRoles.TIFFIN_PROVIDER);
 
@@ -135,28 +118,48 @@ public class MenuItemServiceImpl implements MenuItemService {
 		List<User> users = this.userRepository.findByAddressIn(nearbyProviders);
 
 		// finding nearby menu item
-		List<MenuItem> nearbyMenuItems = this.menuItemRepository.findByUserIn(users);
-
-		List<MenuItemDto> collect = nearbyMenuItems.stream()
-				.map(menuItem -> this.modelMapper.map(menuItem, MenuItemDto.class)).collect(Collectors.toList());
-
-		return collect;
+		return this.menuItemRepository.findByUserIn(users);
 	}
 
 	@Override
-	public MenuItemDto updateMenuItem(MenuItemDto menuItemDto, Integer menuId) {
+	public MenuItem updateMenuItem(MenuItem menuItemDto, Integer menuId) {
 		MenuItem menuItem = this.menuItemRepository.findById(menuId)
 				.orElseThrow(() -> new ResourceNotFoundException("Menu item", "id", menuId));
 
-		menuItem.setMenuName(menuItemDto.getMenuName());
-		menuItem.setPrice(menuItemDto.getPrice());
-		menuItem.setDescription(menuItemDto.getDescription());
-		menuItem.setActive(menuItemDto.isActive());
-		menuItem.setMenuName(menuItemDto.getMenuName());
+		// creating new menu item after updating previous one
+		MenuItem menuItemLog = new MenuItem();
+		menuItemLog.setMenuName(menuItemDto.getMenuName());
+		menuItemLog.setMenuType(menuItem.getMenuType());
+		menuItemLog.setActive(menuItemDto.isActive());
+		menuItemLog.setDescription(menuItemDto.getDescription());
+		menuItemLog.setImageUrl(menuItem.getImageUrl());
+		System.out.println("Image Url" + menuItem.getImageUrl());
+		menuItemLog.setImagePublicId(menuItem.getImagePublicId());
+		System.out.println("Image Id" + menuItem.getImagePublicId());
+		menuItemLog.setFormat(menuItem.getFormat());
+		System.out.println("Image Format" + menuItem.getFormat());
+		menuItemLog.setPrice(menuItemDto.getPrice());
+		menuItemLog.setUser(menuItem.getUser());
+		menuItemLog.setCategory(menuItem.getCategory());
 
-		MenuItem updatedMenu = this.menuItemRepository.save(menuItem);
+		// saving new menu item
+		MenuItem savedItem = this.menuItemRepository.save(menuItemLog);
 
-		return this.modelMapper.map(updatedMenu, MenuItemDto.class);
+		// updating tiffin days with new menu item
+		List<TiffinDays> tiffinDays = menuItem.getTiffinDays();
+
+		for (TiffinDays day : tiffinDays) {
+			day.getMenuItem().remove(menuItem);
+			day.getMenuItem().add(menuItemLog);
+		}
+
+		// saving tiffin days
+		this.tiffindaysRepository.saveAll(tiffinDays);
+
+		// deleting menu item
+		deleteMenuItem(menuItem);
+
+		return savedItem;
 	}
 
 	@Override
@@ -164,8 +167,9 @@ public class MenuItemServiceImpl implements MenuItemService {
 		MenuItem menuItem = this.menuItemRepository.findById(menuId)
 				.orElseThrow(() -> new ResourceNotFoundException("Menu item", "id", menuId));
 
-		this.menuItemRepository.delete(menuItem);
-
+		menuItem.setActive(false);
+		this.menuItemRepository.save(menuItem);
+//		this.menuItemRepository.delete(menuItem);
 	}
 
 	@Override
@@ -184,10 +188,13 @@ public class MenuItemServiceImpl implements MenuItemService {
 	}
 
 	@Override
-	public List<MenuItemDto> getAllMenuItemByType(String menuType) {
-		List<MenuItem> byMenuType = this.menuItemRepository.findByMenuType(menuType);
-		List<MenuItemDto> collect = byMenuType.stream()
-				.map(menuItem -> this.modelMapper.map(menuItem, MenuItemDto.class)).collect(Collectors.toList());
-		return collect;
+	public List<MenuItem> getAllMenuItemByType(String menuType) {
+		return this.menuItemRepository.findByMenuType(menuType);
+	}
+
+	@Override
+	public MenuItem deleteMenuItem(MenuItem menuItem) {
+		menuItem.setActive(false);
+		return this.menuItemRepository.save(menuItem);
 	}
 }

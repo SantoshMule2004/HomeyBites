@@ -2,34 +2,31 @@ package com.homeybites.services;
 
 import java.util.List;
 
-import com.homeybites.payloads.AddressDto;
+import com.homeybites.entities.Address;
 
 public interface AddressService {
 
 	// add address of user
-	AddressDto addAddress(AddressDto addressDto, Integer userId);
+	Address addAddress(Address address, Integer userId);
 
 	// add address of tiffin provider
-	AddressDto addTiffinProviderAddress(AddressDto addressDto, Integer providerId);
+	Address addTiffinProviderAddress(Address address, Integer providerId);
 
 	// get address
-	AddressDto getAddress(Integer addressId);
+	Address getAddress(Integer addressId);
 
 	// get single address of a user
-	AddressDto getSingleAddressOfUser(Integer addressId, Integer userId);
+	Address getSingleAddressOfUser(Integer addressId, Integer userId);
 
 	// get all addresses
-	List<AddressDto> getAllAddress();
+	List<Address> getAllAddress();
 
 	// get all addresses of a specific user
-	List<AddressDto> getAllAddress(Integer userId);
+	List<Address> getAllAddress(Integer userId);
 
 	// update address
-	AddressDto updateAddress(AddressDto addressDto, Integer addressId);
+	Address updateAddress(Address address, Integer addressId);
 
 	// delete address
 	void deleteAddress(Integer addressId);
-
-	// delete address of specific user
-	void deleteAddressOfUser(Integer addressId, Integer userId);
 }

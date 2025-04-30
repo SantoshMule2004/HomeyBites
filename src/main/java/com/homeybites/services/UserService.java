@@ -2,47 +2,51 @@ package com.homeybites.services;
 
 import java.util.List;
 
+import com.homeybites.entities.User;
 import com.homeybites.payloads.OtpDto;
 import com.homeybites.payloads.PasswordDto;
-import com.homeybites.payloads.UserDto;
 
 public interface UserService {
 
 	// register new user
-	UserDto registerNewUser(UserDto userDto);
+	User registerNewUser(User user);
 
 	// register tiffin provider
-	UserDto registerTiffinProvider(UserDto userDto);
+	User registerTiffinProvider(User user);
+	
+	Integer getAllUserCount();
+	
+	Integer getUserCountByRole(String role);
 
 	// add business details of tiffin provider
-	UserDto addBussinessDetails(Integer providerId, UserDto userDto);
+	User addBussinessDetails(Integer providerId, User user);
 
 	// save user
-	UserDto saveUser(UserDto userDto);
+	User saveUser(User user);
 
 	// updates user
-	UserDto updateUser(UserDto userDto, Integer userId);
+	User updateUser(User user, Integer userId);
 
 	// updates business details
-	UserDto updateBusinessDetails(UserDto userDto, Integer userId, Integer addressId);
+	User updateBusinessDetails(User user, Integer userId, Integer addressId);
 
 	// updating contact details
-	UserDto updateContactDetails(UserDto userDto, Integer userId);
+	User updateContactDetails(String number, Integer userId);
 
 	// get single user
-	UserDto getUser(Integer userId);
+	User getUser(Integer userId);
 
 	// get single user by email id
-	UserDto getUserByEmail(String emailId);
+	User getUserByEmail(String emailId);
 
 	// get single user by email id
 	boolean isUserPresent(String username);
 
 	// get all users
-	List<UserDto> getAllUser();
+	List<User> getAllUser();
 
 	// get all user with role
-	List<UserDto> getUserByRole(String role);
+	List<User> getUserByRole(String role);
 
 	// delete user
 	void deleteUser(Integer userId);
@@ -54,10 +58,10 @@ public interface UserService {
 	boolean VerifyOtp(String enteredOtp, String username);
 
 	// reset password
-	String resetPassword(PasswordDto passwordDto, UserDto userDto);
+	String resetPassword(PasswordDto passwordDto, User user);
 
 	// reset pssword after email verification (forget password)
-	boolean resetPass(PasswordDto passwordDto, UserDto userDto);
+	boolean resetPass(PasswordDto passwordDto, User user);
 
 	// forget password
 	boolean forgetPassword(String username);
