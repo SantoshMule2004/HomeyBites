@@ -77,7 +77,7 @@ public class SecurityConfig {
 
 		corsConfiguration.setAllowCredentials(true);
 		corsConfiguration.setAllowedOrigins(Arrays.asList("http://localhost:5173", "https://homey-bites.netlify.app/",
-				"https://homeybites-tiffin-dashboard.netlify.app/"));
+				"https://homeybitesdashboard.netlify.app/"));
 		corsConfiguration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept"));
 		corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 		corsConfiguration.setMaxAge(3600L);

@@ -13,9 +13,12 @@ public interface UserService {
 
 	// register tiffin provider
 	User registerTiffinProvider(User user);
-	
+
+	// register admin
+	User registerAdmin(User user);
+
 	Integer getAllUserCount();
-	
+
 	Integer getUserCountByRole(String role);
 
 	// add business details of tiffin provider

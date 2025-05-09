@@ -98,7 +98,7 @@ public class AuthController {
 		}
 	}
 
-	// login tiffin provider
+	// login admin
 	@PostMapping("/admin/login")
 	public ResponseEntity<JwtResponse> verifyAdmin(@Valid @RequestBody JwtRequest jwtRequest) {
 		this.doAuthenticate(jwtRequest.getUsername(), jwtRequest.getPassword());
@@ -186,6 +186,29 @@ public class AuthController {
 					new ApiResponse("email-verification OTP has sent to your email id (valid only for 5 minutes)", true,
 							registerTiffinProvider),
 					HttpStatus.OK);
+		}
+
+		return new ResponseEntity<ApiResponse>(
+				new ApiResponse("Password and confirm password does not match..!", false), HttpStatus.BAD_REQUEST);
+	}
+
+	// new admin register
+	@PostMapping("/register/admin")
+	public ResponseEntity<ApiResponse> registerAdmin(@Valid @RequestBody User user) {
+		boolean isPresent = this.userService.isUserPresent(user.getEmailId());
+
+		if (isPresent) {
+			return new ResponseEntity<ApiResponse>(new ApiResponse("User already exists..", false),
+					HttpStatus.CONFLICT);
+		}
+
+		if (user.getPassword() != null && user.getcPassword() != null
+				&& user.getPassword().equals(user.getcPassword())) {
+
+			User registeredUser = this.userService.registerAdmin(user);
+
+			return new ResponseEntity<ApiResponse>(
+					new ApiResponse("Admin registered successfully..!", true, registeredUser), HttpStatus.CREATED);
 		}
 
 		return new ResponseEntity<ApiResponse>(

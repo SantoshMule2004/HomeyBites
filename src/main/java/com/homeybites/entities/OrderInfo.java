@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.homeybites.entities.Log.SubscriptionLog;
 
@@ -56,6 +57,7 @@ public class OrderInfo {
 
 	@OneToOne
 	@JoinColumn(name = "payment_id")
+	@JsonIgnore
 	private Payment payment;
 
 	public OrderInfo() {

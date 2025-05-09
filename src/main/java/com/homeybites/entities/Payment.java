@@ -1,6 +1,6 @@
 package com.homeybites.entities;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -24,16 +24,16 @@ public class Payment {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer paymentId;
 	private String paymentMethod;
-	private Date paymentDate;
+	private LocalDate paymentDate;
 	private String paymentStatus;
 	private double amount;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id")
-	@JsonIgnore
 	private User user;
 
 	@OneToOne(mappedBy = "payment", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JsonIgnore
 	private OrderInfo order;
 
 	public Payment() {
@@ -57,11 +57,11 @@ public class Payment {
 		this.paymentMethod = paymentMethod;
 	}
 
-	public Date getPaymentDate() {
+	public LocalDate getPaymentDate() {
 		return paymentDate;
 	}
 
-	public void setPaymentDate(Date paymentDate) {
+	public void setPaymentDate(LocalDate paymentDate) {
 		this.paymentDate = paymentDate;
 	}
 

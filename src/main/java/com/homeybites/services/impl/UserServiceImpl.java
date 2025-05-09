@@ -260,4 +260,13 @@ public class UserServiceImpl implements UserService {
 	public Integer getUserCountByRole(String role) {
 		return this.userRepository.getUserCount(role);
 	}
+
+	@Override
+	public User registerAdmin(User user) {
+		user.setUserRole("ROLE_ADMIN");
+		user.setVerified(true);
+		user.setPassword(this.passwordEncoder.encode(user.getPassword()));
+		User savedUser = this.userRepository.save(user);
+		return savedUser;
+	}
 }
