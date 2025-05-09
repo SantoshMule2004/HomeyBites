@@ -20,7 +20,9 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, Inte
 
 	List<Subscription> findByTiffinPlanLog_User(User user);
 
-	@Query("SELECT COUNT(s) FROM Subscription s WHERE s.tiffinPlan.user.userId = :providerId OR s.tiffinPlanLog.user.userId = :providerId")
+	@Query("SELECT COUNT(s) " + "FROM Subscription s " + "LEFT JOIN s.tiffinPlan tp "
+			+ "LEFT JOIN s.tiffinPlanLog tpl "
+			+ "WHERE tp.user.userId = :providerId OR tpl.user.userId = :providerId")
 	int getSubscriptionCountByProvider(@Param("providerId") Integer providerId);
 
 	@Query("SELECT COUNT(s) FROM Subscription s")
