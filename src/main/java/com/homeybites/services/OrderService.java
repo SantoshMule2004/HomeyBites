@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.homeybites.entities.OrderInfo;
+import com.homeybites.payloads.OrderResponse;
 
 public interface OrderService {
 
@@ -19,7 +20,7 @@ public interface OrderService {
 	Optional<OrderInfo> getOrderById(Integer id);
 
 	// get all orders
-	List<OrderInfo> getAllOrders();
+	OrderResponse getAllOrders(Integer pageNumber, Integer pageSize, String sortBy, String sortIn);
 
 	// get orders by status
 	List<OrderInfo> getOrderByStatus(String status);

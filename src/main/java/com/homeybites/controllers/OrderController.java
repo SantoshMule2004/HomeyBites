@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.homeybites.entities.OrderInfo;
+import com.homeybites.payloads.OrderResponse;
 import com.homeybites.services.OrderService;
 
 @RestController
@@ -56,8 +57,12 @@ public class OrderController {
 
 	// API to get all order
 	@GetMapping("/all")
-	public ResponseEntity<List<OrderInfo>> getAllOrders() {
-		return ResponseEntity.ok(orderService.getAllOrders());
+	public ResponseEntity<OrderResponse> getAllOrders(
+			@RequestParam(defaultValue = "10", required = false) Integer pageSize,
+			@RequestParam(defaultValue = "0", required = false) Integer pageNumber,
+			@RequestParam(defaultValue = "orderId", required = false) String sortBy,
+			@RequestParam(defaultValue = "ASC", required = false) String sortIn) {
+		return ResponseEntity.ok(orderService.getAllOrders(pageNumber, pageSize, sortBy, sortIn));
 	}
 
 	// API to get todays orders

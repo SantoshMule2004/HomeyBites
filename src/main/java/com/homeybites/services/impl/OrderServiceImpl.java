@@ -8,6 +8,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.homeybites.entities.MenuItem;
@@ -15,6 +18,7 @@ import com.homeybites.entities.OrderInfo;
 import com.homeybites.entities.Subscription;
 import com.homeybites.entities.User;
 import com.homeybites.exceptions.ResourceNotFoundException;
+import com.homeybites.payloads.OrderResponse;
 import com.homeybites.repositories.MenuItemRepository;
 import com.homeybites.repositories.OrderRepository;
 import com.homeybites.repositories.SubscriptionRepository;
@@ -70,8 +74,16 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	@Override
-	public List<OrderInfo> getAllOrders() {
-		return orderRepository.findAll();
+	public OrderResponse getAllOrders(Integer pageNumber, Integer pageSize, String sortBy, String sortIn) {
+		
+		Sort sort = (sortIn.equalsIgnoreCase("asc")) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+		
+		PageRequest page = PageRequest.of(pageNumber, pageSize, sort);
+		Page<OrderInfo> all = this.orderRepository.findAll(page);
+
+		OrderResponse orderResponse = new OrderResponse(all.getContent(), all.getNumber(), all.getSize(),
+				all.getTotalElements(), all.getTotalPages(), all.isLast());
+		return orderResponse;
 	}
 
 	@Override
