@@ -1,57 +1,56 @@
-package com.homeybites.entities;
-
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-
-@Entity
-@Table(name = "tiffin_days_menuitem")
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "tiffinMenuId")
-public class TiffinDaysMenuItem {
-
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer tiffinMenuId;
-	
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "tiffin_day_id", nullable = false)
-	private TiffinDays tiffinDays;
-	
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "menu_id", nullable = false)
-	private MenuItem menuItem;
-	
-	
-
-	public Integer getTiffinMenuId() {
-		return tiffinMenuId;
-	}
-
-	public void setTiffinMenuId(Integer tiffinMenuId) {
-		this.tiffinMenuId = tiffinMenuId;
-	}
-
-	public TiffinDays getTiffinDays() {
-		return tiffinDays;
-	}
-
-	public void setTiffinDays(TiffinDays tiffinDays) {
-		this.tiffinDays = tiffinDays;
-	}
-
-	public MenuItem getMenuItem() {
-		return menuItem;
-	}
-
-	public void setMenuItem(MenuItem menuItem) {
-		this.menuItem = menuItem;
-	}
-}
+//package com.homeybites.entities;
+//
+//import jakarta.persistence.Column;
+//import jakarta.persistence.Entity;
+//import jakarta.persistence.GeneratedValue;
+//import jakarta.persistence.GenerationType;
+//import jakarta.persistence.Id;
+//
+//@Entity
+//public class TiffinDaysMenuItem {
+//
+//	@Id
+//	@GeneratedValue(strategy = GenerationType.IDENTITY)
+//	private Long tiffinMenuId;
+//	
+//	@Column(name = "tiffin_day_id", nullable = false)
+//	private Long tiffinDayId;
+//	
+//	@Column(name = "menu_id", nullable = false)
+//	private Long menuItemId;
+//	
+//	private String menuType;
+//	
+//
+//	public Long getTiffinMenuId() {
+//		return tiffinMenuId;
+//	}
+//
+//	public void setTiffinMenuId(Long tiffinMenuId) {
+//		this.tiffinMenuId = tiffinMenuId;
+//	}
+//
+//	public Long getTiffinDayId() {
+//		return tiffinDayId;
+//	}
+//
+//	public void setTiffinDayId(Long tiffinDayId) {
+//		this.tiffinDayId = tiffinDayId;
+//	}
+//
+//	public Long getMenuItemId() {
+//		return menuItemId;
+//	}
+//
+//	public void setMenuItemId(Long menuItemId) {
+//		this.menuItemId = menuItemId;
+//	}
+//
+//	public String getMenuType() {
+//		return menuType;
+//	}
+//
+//	public void setMenuType(String menuType) {
+//		this.menuType = menuType;
+//	}
+//}

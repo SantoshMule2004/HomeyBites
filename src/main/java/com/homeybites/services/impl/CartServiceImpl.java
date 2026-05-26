@@ -1,16 +1,18 @@
 package com.homeybites.services.impl;
 
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.homeybites.entities.CartItem;
 import com.homeybites.entities.MenuItem;
-import com.homeybites.entities.User;
 import com.homeybites.entities.UserCart;
 import com.homeybites.exceptions.ResourceNotFoundException;
+import com.homeybites.repositories.CartItemRepository;
 import com.homeybites.repositories.CartRepository;
 import com.homeybites.repositories.MenuItemRepository;
-import com.homeybites.repositories.UserRepository;
 import com.homeybites.services.CartService;
 
 @Service
@@ -20,67 +22,71 @@ public class CartServiceImpl implements CartService {
 	private CartRepository cartRepository;
 
 	@Autowired
-	private UserRepository userRepository;
+	private CartItemRepository cartItemRepository;
 
 	@Autowired
 	private MenuItemRepository menuItemRepository;
 
 	@Override
-	public UserCart addItemsToCart(Integer userId, Integer itemId) {
-		User user = this.userRepository.findById(userId)
-				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
+	public void addItemsToCart(Long userId, Long itemId) {
+		UserCart usercart = this.cartRepository.findByUserIdAndIsActive(userId, true)
+				.orElseGet(() -> createNewCart(userId));
 
-		MenuItem menuItem = this.menuItemRepository.findById(itemId)
-				.orElseThrow(() -> new ResourceNotFoundException("Menu item", "id", itemId));
+		Optional<CartItem> existingCartItem = this.cartItemRepository.findByCartIdAndMenuItemId(usercart.getCartId(),
+				itemId);
 
-		UserCart byMenuItem = this.cartRepository.findByUserAndMenuItem(user, menuItem);
-
-		if (byMenuItem != null) {
-			byMenuItem.setQuantity(byMenuItem.getQuantity() + 1);
-			byMenuItem.setTotalPrice(byMenuItem.getQuantity() * menuItem.getPrice());
-			return this.cartRepository.save(byMenuItem);
+		if (existingCartItem.isPresent()) {
+			CartItem cartItem = existingCartItem.get();
+			cartItem.setQuantity(cartItem.getQuantity() + 1);
+			this.cartItemRepository.save(cartItem);
 		} else {
-			UserCart cart = new UserCart();
-			cart.setMenuItem(menuItem);
-			cart.setUser(user);
-			cart.setQuantity(1);
-			cart.setTotalPrice(menuItem.getPrice());
-			return this.cartRepository.save(cart);
+			MenuItem menuItem = this.menuItemRepository.findById(itemId)
+					.orElseThrow(() -> new ResourceNotFoundException("Menu item", "id", itemId));
+
+			CartItem cartItem = new CartItem();
+			cartItem.setMenuItemId(itemId);
+			cartItem.setPriceWhenAdded(menuItem.getPrice());
+			cartItem.setCartId(usercart.getCartId());
+			cartItem.setCurrentPrice(menuItem.getPrice());
+			cartItem.setPriceChanged(false);
+			cartItem.setQuantity(1);
+
+			this.cartItemRepository.save(cartItem);
 		}
 	}
 
 	@Override
-	public void updateItemInfo(Integer cartId, Integer quantity) {
-		UserCart cart = this.cartRepository.findById(cartId)
-				.orElseThrow(() -> new ResourceNotFoundException("cart", "Id", cartId));
+	public void updateCartItem(Long cartItemId, Integer quantity) {
+		CartItem cartItem = this.cartItemRepository.findById(cartItemId)
+				.orElseThrow(() -> new ResourceNotFoundException("CartItem", "Id", cartItemId));
 
-		cart.setQuantity(quantity);
-		cart.setTotalPrice(quantity * (cart.getMenuItem().getPrice()));
-		this.cartRepository.save(cart);
+		cartItem.setQuantity(quantity);
+		this.cartItemRepository.save(cartItem);
 	}
 
 	@Override
-	public List<UserCart> getCart(Integer userId) {
-		User user = this.userRepository.findById(userId)
-				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
+	public List<CartItem> getCart(Long userId) {
+		UserCart usercart = this.cartRepository.findByUserIdAndIsActive(userId, true)
+				.orElseGet(() -> createNewCart(userId));
 
-		return this.cartRepository.findByUser(user);
+		return this.cartItemRepository.findByCartId(usercart.getCartId());
 	}
 
 	@Override
-	public void deleteItemFromCart(Integer cartId) {
-		UserCart cart = this.cartRepository.findById(cartId)
-				.orElseThrow(() -> new ResourceNotFoundException("cart", "Id", cartId));
-
-		this.cartRepository.delete(cart);
+	public void deleteItemFromCart(Long cartItemId) {
+		CartItem cartItem = this.cartItemRepository.findById(cartItemId)
+				.orElseThrow(() -> new ResourceNotFoundException("CartItem", "Id", cartItemId));
+		this.cartItemRepository.delete(cartItem);
 	}
 
 	@Override
-	public void deleteAllItems(Integer userId) {
-		User user = this.userRepository.findById(userId)
-				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
+	public void deleteCart(Long cartId) {
+		List<CartItem> cartItems = this.cartItemRepository.findByCartId(cartId);
+		this.cartItemRepository.deleteAll(cartItems);
 
-		List<UserCart> list = this.cartRepository.findByUser(user);
-		this.cartRepository.deleteAll(list);
+	}
+
+	public UserCart createNewCart(Long userId) {
+		return this.cartRepository.save(new UserCart(userId, true));
 	}
 }

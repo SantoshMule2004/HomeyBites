@@ -1,18 +1,12 @@
 package com.homeybites.repositories;
 
-import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.homeybites.entities.MenuItem;
-import com.homeybites.entities.User;
 import com.homeybites.entities.UserCart;
 
-public interface CartRepository extends JpaRepository<UserCart, Integer> {
-
-	List<UserCart> findByUser(User user);
-	
-	UserCart findByUserAndMenuItem(User user, MenuItem menuItem);
-	
-	UserCart findByMenuItem(MenuItem menuItem);
+public interface CartRepository extends JpaRepository<UserCart, Long> {
+	Optional<UserCart> findByUserIdAndIsActive(Long userId, Boolean isActive);
 }
+

@@ -35,7 +35,7 @@ public class CategoryController {
 	}
 
 	@GetMapping("/{cId}")
-	public ResponseEntity<Category> getCategory(@PathVariable Integer cId) {
+	public ResponseEntity<Category> getCategory(@PathVariable Long cId) {
 		Category category = this.categoryService.getCategory(cId);
 		return new ResponseEntity<Category>(category, HttpStatus.OK);
 	}
@@ -47,14 +47,14 @@ public class CategoryController {
 	}
 
 	@PutMapping("/{cId}")
-	public ResponseEntity<ApiResponse> updateCategory(@Valid @RequestBody Category category, @PathVariable Integer cId) {
+	public ResponseEntity<ApiResponse> updateCategory(@Valid @RequestBody Category category, @PathVariable Long cId) {
 		Category updateCategory = this.categoryService.updateCategory(category, cId);
 		return new ResponseEntity<ApiResponse>(
 				new ApiResponse("Category updated successfully..!", true, updateCategory), HttpStatus.OK);
 	}
 
 	@DeleteMapping("/{cId}")
-	public ResponseEntity<ApiResponse> deleteCategory(@PathVariable Integer cId) {
+	public ResponseEntity<ApiResponse> deleteCategory(@PathVariable Long cId) {
 		this.categoryService.deleteCategory(cId);
 		return new ResponseEntity<ApiResponse>(new ApiResponse("Category deleted successfully..!", true),
 				HttpStatus.NO_CONTENT);

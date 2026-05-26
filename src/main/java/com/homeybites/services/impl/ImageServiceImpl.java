@@ -27,7 +27,6 @@ public class ImageServiceImpl implements ImageService {
 				uploadMap.get("secure_url").toString(), uploadMap.get("format").toString());
 
 		return imageInfo;
-
 	}
 
 	@Override

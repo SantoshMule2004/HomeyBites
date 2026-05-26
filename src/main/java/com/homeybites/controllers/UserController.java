@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.homeybites.entities.User;
 import com.homeybites.payloads.ApiResponse;
 import com.homeybites.payloads.PasswordDto;
+import com.homeybites.payloads.UserInfo;
 import com.homeybites.services.UserService;
 
 import jakarta.validation.Valid;
@@ -33,40 +34,31 @@ public class UserController {
 	// update user
 	@PutMapping("/{userId}")
 	public ResponseEntity<ApiResponse> updateUser(@Valid @RequestBody User user, @PathVariable Integer userId) {
-		User updateUser = this.userService.updateUser(user, userId);
-		return new ResponseEntity<ApiResponse>(new ApiResponse("User updated successfully..!", true, updateUser),
+		this.userService.updateUser(user, userId);
+		return new ResponseEntity<ApiResponse>(new ApiResponse("User updated successfully..!", true, null),
 				HttpStatus.OK);
 	}
 
-	// update business details
-	@PutMapping("/business-details/{userId}/{addressId}")
-	public ResponseEntity<ApiResponse> updateBusinessDetails(@Valid @RequestBody User user,
-			@PathVariable Integer userId, @PathVariable Integer addressId) {
-		User updateUser = this.userService.updateBusinessDetails(user, userId, addressId);
-		return new ResponseEntity<ApiResponse>(
-				new ApiResponse("Business details updated successfully..!", true, updateUser), HttpStatus.OK);
-	}
-
-	// update business details
+	// update business contact details
 	@PutMapping("/contact-details/{userId}")
 	public ResponseEntity<ApiResponse> updateContactDetails(@RequestParam String number, @PathVariable Integer userId) {
-		User updateUser = this.userService.updateContactDetails(number, userId);
-		return new ResponseEntity<ApiResponse>(
-				new ApiResponse("Contact details updated successfully..!", true, updateUser), HttpStatus.OK);
+		this.userService.updateContactDetails(number, userId);
+		return new ResponseEntity<ApiResponse>(new ApiResponse("Contact details updated successfully..!", true, null),
+				HttpStatus.OK);
 	}
 
 	// getting logged in user
 	@GetMapping("/current-user")
 	public ResponseEntity<ApiResponse> getLoggedInUser(Principal principal) {
 		String name = principal.getName();
-		User user = this.userService.getUserByEmail(name);
+		UserInfo user = this.userService.getLoggedInUser(name);
 		return new ResponseEntity<ApiResponse>(new ApiResponse("current user", true, user), HttpStatus.OK);
 	}
 
 	// get user by id
 	@GetMapping("/{userId}")
 	public ResponseEntity<ApiResponse> getUser(@PathVariable Integer userId) {
-		User user = this.userService.getUser(userId);
+		UserInfo user = this.userService.getUser(userId);
 		return new ResponseEntity<ApiResponse>(new ApiResponse("User found..!", true, user), HttpStatus.OK);
 	}
 
@@ -87,7 +79,7 @@ public class UserController {
 	// get user by email id
 	@GetMapping("/email")
 	public ResponseEntity<ApiResponse> getUserByEmail(@RequestParam String emailId) {
-		User user = this.userService.getUserByEmail(emailId);
+		UserInfo user = this.userService.getUserInfoByEmail(emailId);
 		return new ResponseEntity<ApiResponse>(new ApiResponse("User found..!", true, user), HttpStatus.OK);
 	}
 
@@ -100,9 +92,9 @@ public class UserController {
 
 	// get all users by role
 	@GetMapping("/role")
-	public ResponseEntity<List<User>> getAllUserByRole(@RequestParam String role) {
-		List<User> allUser = this.userService.getUserByRole(role);
-		return new ResponseEntity<List<User>>(allUser, HttpStatus.OK);
+	public ResponseEntity<List<UserInfo>> getAllUserByRole(@RequestParam String role) {
+		List<UserInfo> allUser = this.userService.getUserByRole(role);
+		return new ResponseEntity<List<UserInfo>>(allUser, HttpStatus.OK);
 	}
 
 	// delete user
@@ -118,8 +110,7 @@ public class UserController {
 	public ResponseEntity<ApiResponse> ResetPasswordHandler(@Valid @RequestBody PasswordDto passwordDto,
 			Principal principal) {
 		String name = principal.getName();
-		User user = this.userService.getUserByEmail(name);
-		String response = this.userService.resetPassword(passwordDto, user);
+		String response = this.userService.resetPassword(passwordDto, name);
 		return new ResponseEntity<ApiResponse>(new ApiResponse(response), HttpStatus.OK);
 	}
 }

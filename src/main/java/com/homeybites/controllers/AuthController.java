@@ -17,9 +17,12 @@ import org.springframework.web.bind.annotation.RestController;
 import com.homeybites.Security.JwtHelper;
 import com.homeybites.entities.User;
 import com.homeybites.payloads.ApiResponse;
+import com.homeybites.payloads.BusinessDetaisRequest;
 import com.homeybites.payloads.JwtRequest;
 import com.homeybites.payloads.JwtResponse;
 import com.homeybites.payloads.PasswordDto;
+import com.homeybites.payloads.RegisterUserRequest;
+import com.homeybites.payloads.UserInfo;
 import com.homeybites.services.UserService;
 
 import jakarta.validation.Valid;
@@ -43,86 +46,19 @@ public class AuthController {
 		this.doAuthenticate(jwtRequest.getUsername(), jwtRequest.getPassword());
 
 		String username = jwtRequest.getUsername();
-		User user = this.userService.getUserByEmail(username);
+		UserInfo user = this.userService.getLoggedInUser(username);
 		JwtResponse response = new JwtResponse();
 
-		if (user.isVerified()) {
-			if (user.getUserRole().equals("ROLE_NORMAL_USER")) {
-				String token = jwtHelper.generateToken(jwtRequest.getUsername());
-				response.setMessage("Welocme to HomeyBites..!");
-				response.setStatus("success");
-				response.setToken(token);
-				response.setUser(user);
+		if (user.getUserRole().equals("ROLE_NORMAL_USER")) {
+			String token = jwtHelper.generateToken(jwtRequest.getUsername());
+			response.setMessage("Welocme to HomeyBites..!");
+			response.setStatus("success");
+			response.setToken(token);
+			response.setUser(user);
 
-				return new ResponseEntity<JwtResponse>(response, HttpStatus.OK);
-			} else {
-				response.setMessage("Unable to login, Access denied..!");
-				response.setStatus("error");
-				return new ResponseEntity<JwtResponse>(response, HttpStatus.FORBIDDEN);
-			}
+			return new ResponseEntity<JwtResponse>(response, HttpStatus.OK);
 		} else {
-			response.setMessage("Unable to login, email not verified..!");
-			response.setStatus("error");
-			return new ResponseEntity<JwtResponse>(response, HttpStatus.FORBIDDEN);
-
-		}
-	}
-
-	// login tiffin provider
-	@PostMapping("/tiffin-provider/login")
-	public ResponseEntity<JwtResponse> verifyTiffinProvider(@Valid @RequestBody JwtRequest jwtRequest) {
-		this.doAuthenticate(jwtRequest.getUsername(), jwtRequest.getPassword());
-
-		String username = jwtRequest.getUsername();
-		User user = this.userService.getUserByEmail(username);
-		JwtResponse response = new JwtResponse();
-
-		if (user.isVerified()) {
-			if (user.getUserRole().equals("ROLE_TIFFIN_PROVIDER")) {
-				String token = jwtHelper.generateToken(jwtRequest.getUsername());
-				response.setMessage("Welocme to HomeyBites..!");
-				response.setStatus("success");
-				response.setToken(token);
-				response.setUser(user);
-
-				return new ResponseEntity<JwtResponse>(response, HttpStatus.OK);
-			} else {
-				response.setMessage("Unable to login, Access denied..!");
-				response.setStatus("error");
-				return new ResponseEntity<JwtResponse>(response, HttpStatus.FORBIDDEN);
-			}
-		} else {
-			response.setMessage("Unable to login, email not verified..!");
-			response.setStatus("error");
-			return new ResponseEntity<JwtResponse>(response, HttpStatus.FORBIDDEN);
-		}
-	}
-
-	// login admin
-	@PostMapping("/admin/login")
-	public ResponseEntity<JwtResponse> verifyAdmin(@Valid @RequestBody JwtRequest jwtRequest) {
-		this.doAuthenticate(jwtRequest.getUsername(), jwtRequest.getPassword());
-
-		String username = jwtRequest.getUsername();
-		User user = this.userService.getUserByEmail(username);
-		JwtResponse response = new JwtResponse();
-
-		if (user.isVerified()) {
-			if (user.getUserRole().equals("ROLE_ADMIN")) {
-				String token = jwtHelper.generateToken(jwtRequest.getUsername());
-				response.setMessage("Welocme to HomeyBites..!");
-				response.setStatus("success");
-				response.setToken(token);
-				response.setUser(user);
-
-				return new ResponseEntity<JwtResponse>(response, HttpStatus.OK);
-			} else {
-				response.setMessage("Unable to login, Access denied..!");
-				response.setStatus("error");
-				return new ResponseEntity<JwtResponse>(response, HttpStatus.FORBIDDEN);
-			}
-		} else {
-			response.setMessage("Unable to login, email not verified..!");
+			response.setMessage("Unable to login, Access denied..!");
 			response.setStatus("error");
 			return new ResponseEntity<JwtResponse>(response, HttpStatus.FORBIDDEN);
 		}
@@ -143,7 +79,7 @@ public class AuthController {
 
 	// new user register
 	@PostMapping("/register")
-	public ResponseEntity<ApiResponse> registerUser(@Valid @RequestBody User user) {
+	public ResponseEntity<ApiResponse> registerUser(@Valid @RequestBody RegisterUserRequest user) {
 		boolean isPresent = this.userService.isUserPresent(user.getEmailId());
 
 		if (isPresent) {
@@ -154,106 +90,24 @@ public class AuthController {
 		if (user.getPassword() != null && user.getcPassword() != null
 				&& user.getPassword().equals(user.getcPassword())) {
 
-			User registeredUser = this.userService.registerNewUser(user);
+			this.userService.registerNewUser(user, "ROLE_NORMAL_USER");
 
-			return new ResponseEntity<ApiResponse>(
-					new ApiResponse("email-verification OTP has sent to your email id (valid only for 5 minutes)", true,
-							registeredUser),
-					HttpStatus.OK);
-		}
-
-		return new ResponseEntity<ApiResponse>(
-				new ApiResponse("Password and confirm password does not match..!", false), HttpStatus.BAD_REQUEST);
-	}
-
-	// register tiffin provider
-	@PostMapping("/tiffin-provider/register")
-	public ResponseEntity<ApiResponse> RegisterTiffinProvider(@Valid @RequestBody User user) {
-
-		boolean isPresent = this.userService.isUserPresent(user.getEmailId());
-
-		if (isPresent) {
-			return new ResponseEntity<ApiResponse>(new ApiResponse("Email Id already exists..", false),
-					HttpStatus.CONFLICT);
-		}
-
-		if (user.getPassword() != null && user.getcPassword() != null
-				&& user.getPassword().equals(user.getcPassword())) {
-
-			User registerTiffinProvider = this.userService.registerTiffinProvider(user);
-
-			return new ResponseEntity<ApiResponse>(
-					new ApiResponse("email-verification OTP has sent to your email id (valid only for 5 minutes)", true,
-							registerTiffinProvider),
-					HttpStatus.OK);
-		}
-
-		return new ResponseEntity<ApiResponse>(
-				new ApiResponse("Password and confirm password does not match..!", false), HttpStatus.BAD_REQUEST);
-	}
-
-	// new admin register
-	@PostMapping("/register/admin")
-	public ResponseEntity<ApiResponse> registerAdmin(@Valid @RequestBody User user) {
-		boolean isPresent = this.userService.isUserPresent(user.getEmailId());
-
-		if (isPresent) {
-			return new ResponseEntity<ApiResponse>(new ApiResponse("User already exists..", false),
-					HttpStatus.CONFLICT);
-		}
-
-		if (user.getPassword() != null && user.getcPassword() != null
-				&& user.getPassword().equals(user.getcPassword())) {
-
-			User registeredUser = this.userService.registerAdmin(user);
-
-			return new ResponseEntity<ApiResponse>(
-					new ApiResponse("Admin registered successfully..!", true, registeredUser), HttpStatus.CREATED);
-		}
-
-		return new ResponseEntity<ApiResponse>(
-				new ApiResponse("Password and confirm password does not match..!", false), HttpStatus.BAD_REQUEST);
-	}
-
-	// add business details of tiffin provider
-	@PutMapping("/tiffin-provider/{providerId}/business-details")
-	public ResponseEntity<ApiResponse> addBusinnessDetails(@PathVariable Integer providerId, @RequestBody User user) {
-
-		User providerInfo = this.userService.addBussinessDetails(providerId, user);
-
-		return new ResponseEntity<ApiResponse>(
-				new ApiResponse("Bussiness details added successfully..!", true, providerInfo), HttpStatus.OK);
-	}
-
-	// verifying email through OTP
-	@PostMapping("/verify-email")
-	public ResponseEntity<ApiResponse> verifyEmail(@RequestParam String otp, @RequestParam String username) {
-
-		User user = this.userService.getUserByEmail(username);
-
-		if (otp.isEmpty())
-			return new ResponseEntity<ApiResponse>(
-					new ApiResponse("Please, enter the otp sent to your email Id", false), HttpStatus.BAD_REQUEST);
-
-		boolean verifiedOtp = this.userService.VerifyOtp(otp, username);
-
-		if (verifiedOtp) {
-			user.setVerified(true);
-			User savedUser = this.userService.saveUser(user);
-			return new ResponseEntity<ApiResponse>(new ApiResponse("Registeration successfully..!", true, savedUser),
+			return new ResponseEntity<ApiResponse>(new ApiResponse("Registeration successfully..!", true, null),
 					HttpStatus.CREATED);
 		}
 
-		return new ResponseEntity<ApiResponse>(new ApiResponse("OTP does not match..!", false), HttpStatus.BAD_REQUEST);
+		return new ResponseEntity<ApiResponse>(
+				new ApiResponse("Password and confirm password does not match..!", false), HttpStatus.BAD_REQUEST);
 	}
 
-	// Re-sending OTP
-	@PostMapping("/resend-otp")
-	public ResponseEntity<ApiResponse> resendOtp(@RequestParam String username) {
+	// sending OTP
+	@PostMapping("/send-otp")
+	public ResponseEntity<ApiResponse> sendOtp(@RequestParam String username) {
 
-		User user = this.userService.getUserByEmail(username);
-		if (user.isVerified())
-			return new ResponseEntity<ApiResponse>(new ApiResponse("Email already verified..!", true),
+		boolean isPresent = this.userService.isUserPresent(username);
+
+		if (isPresent)
+			return new ResponseEntity<ApiResponse>(new ApiResponse("Email already exists..!", false),
 					HttpStatus.CONFLICT);
 
 		this.userService.sendOtp(username);
@@ -263,16 +117,7 @@ public class AuthController {
 				HttpStatus.OK);
 	}
 
-	// Re-sending OTP
-	@PostMapping("/update/resend-otp")
-	public ResponseEntity<ApiResponse> resendOtpForUpdate(@RequestParam String username) {
-		this.userService.sendOtp(username);
-		return new ResponseEntity<ApiResponse>(
-				new ApiResponse("OTP sent to your email-id successfully..! (validte for only 5 minutes.)", true),
-				HttpStatus.OK);
-	}
-
-	// verifying OTP
+	// verifying OTP - at the time of registration
 	@PostMapping("/verify-otp")
 	public ResponseEntity<ApiResponse> verifyOtp(@RequestParam String otp, @RequestParam String username) {
 
@@ -284,27 +129,19 @@ public class AuthController {
 
 		if (verifiedOtp) {
 			return new ResponseEntity<ApiResponse>(new ApiResponse("OTP verified successfully..!", true),
-					HttpStatus.CREATED);
+					HttpStatus.OK);
 		}
 
 		return new ResponseEntity<ApiResponse>(new ApiResponse("OTP does not match..!", false), HttpStatus.BAD_REQUEST);
 	}
 
-	// forget-password
-	@PostMapping("/forget-password")
-	public ResponseEntity<ApiResponse> forgetPassword(@RequestParam String username) {
-
-		System.out.println(username);
-		boolean userPresent = this.userService.isUserPresent(username);
-
-		if (!userPresent)
-			return new ResponseEntity<ApiResponse>(
-					new ApiResponse("User does not exists with email id: " + username, false), HttpStatus.NOT_FOUND);
-
+	// sending OTP - when required updates when user is logged in
+	@PostMapping("/update/send-otp")
+	public ResponseEntity<ApiResponse> sendOtpForUpdate(@RequestParam String username) {
 		this.userService.sendOtp(username);
-		ApiResponse response = new ApiResponse("OTP sent to your email id (validate for 5 minutes)", true);
-
-		return new ResponseEntity<ApiResponse>(response, HttpStatus.OK);
+		return new ResponseEntity<ApiResponse>(
+				new ApiResponse("OTP sent to your email-id successfully..! (validte for only 5 minutes.)", true),
+				HttpStatus.OK);
 	}
 
 	// reset password after forget
@@ -315,13 +152,115 @@ public class AuthController {
 		System.out.println("Password" + passwordDto.getNewPassword());
 		System.out.println("C-Password" + passwordDto.getcPassword());
 
-		User user = this.userService.getUserByEmail(emailId);
-
-		boolean response = this.userService.resetPass(passwordDto, user);
+		boolean response = this.userService.resetPass(passwordDto, emailId);
 		if (response)
 			return new ResponseEntity<ApiResponse>(new ApiResponse("Password updated successfully..!"), HttpStatus.OK);
 		else
-			return new ResponseEntity<ApiResponse>(new ApiResponse("Password and confirm password does nto match.."),
+			return new ResponseEntity<ApiResponse>(new ApiResponse("Password and confirm password does not match.."),
 					HttpStatus.BAD_REQUEST);
+	}
+
+	// login tiffin provider
+	@PostMapping("/tiffin-provider/login")
+	public ResponseEntity<JwtResponse> verifyTiffinProvider(@Valid @RequestBody JwtRequest jwtRequest) {
+		this.doAuthenticate(jwtRequest.getUsername(), jwtRequest.getPassword());
+
+		String username = jwtRequest.getUsername();
+		UserInfo user = this.userService.getLoggedInProvider(username);
+		JwtResponse response = new JwtResponse();
+
+		if (user.getUserRole().equals("ROLE_TIFFIN_PROVIDER")) {
+			String token = jwtHelper.generateToken(jwtRequest.getUsername());
+			response.setMessage("Welocme to HomeyBites..!");
+			response.setStatus("success");
+			response.setToken(token);
+			response.setUser(user);
+
+			return new ResponseEntity<JwtResponse>(response, HttpStatus.OK);
+		} else {
+			response.setMessage("Unable to login, Access denied..!");
+			response.setStatus("error");
+			return new ResponseEntity<JwtResponse>(response, HttpStatus.FORBIDDEN);
+		}
+	}
+
+	// register tiffin provider
+	@PostMapping("/tiffin-provider/register")
+	public ResponseEntity<ApiResponse> RegisterTiffinProvider(@Valid @RequestBody RegisterUserRequest user) {
+
+		boolean isPresent = this.userService.isUserPresent(user.getEmailId());
+
+		if (isPresent) {
+			return new ResponseEntity<ApiResponse>(new ApiResponse("Email Id already exists..", false),
+					HttpStatus.CONFLICT);
+		}
+
+		if (user.getPassword() != null && user.getcPassword() != null
+				&& user.getPassword().equals(user.getcPassword())) {
+
+			this.userService.registerNewUser(user, "ROLE_TIFFIN_PROVIDER");
+
+			return new ResponseEntity<ApiResponse>(new ApiResponse("Registeration successfully..!", true, null),
+					HttpStatus.CREATED);
+		}
+
+		return new ResponseEntity<ApiResponse>(
+				new ApiResponse("Password and confirm password does not match..!", false), HttpStatus.BAD_REQUEST);
+	}
+
+	// add business details of tiffin provider
+	@PutMapping("/tiffin-provider/{providerId}/business-details")
+	public ResponseEntity<ApiResponse> addBusinnessDetails(@PathVariable Integer providerId,
+			@RequestBody BusinessDetaisRequest bdRequest) {
+		this.userService.addBussinessDetails(providerId, bdRequest);
+		return new ResponseEntity<ApiResponse>(new ApiResponse("Bussiness details added successfully..!", true, null),
+				HttpStatus.OK);
+	}
+
+	// login admin
+	@PostMapping("/admin/login")
+	public ResponseEntity<JwtResponse> verifyAdmin(@Valid @RequestBody JwtRequest jwtRequest) {
+		this.doAuthenticate(jwtRequest.getUsername(), jwtRequest.getPassword());
+
+		String username = jwtRequest.getUsername();
+		UserInfo user = this.userService.getLoggedInAdmin(username);
+		JwtResponse response = new JwtResponse();
+
+		if (user.getUserRole().equals("ROLE_ADMIN")) {
+			String token = jwtHelper.generateToken(jwtRequest.getUsername());
+			response.setMessage("Welocme to HomeyBites..!");
+			response.setStatus("success");
+			response.setToken(token);
+			response.setUser(user);
+
+			return new ResponseEntity<JwtResponse>(response, HttpStatus.OK);
+		} else {
+			response.setMessage("Unable to login, Access denied..!");
+			response.setStatus("error");
+			return new ResponseEntity<JwtResponse>(response, HttpStatus.FORBIDDEN);
+		}
+	}
+
+	// new admin register
+	@PostMapping("/register/admin")
+	public ResponseEntity<ApiResponse> registerAdmin(@Valid @RequestBody RegisterUserRequest user) {
+		boolean isPresent = this.userService.isUserPresent(user.getEmailId());
+
+		if (isPresent) {
+			return new ResponseEntity<ApiResponse>(new ApiResponse("User already exists..", false),
+					HttpStatus.CONFLICT);
+		}
+
+		if (user.getPassword() != null && user.getcPassword() != null
+				&& user.getPassword().equals(user.getcPassword())) {
+
+			User registeredUser = this.userService.registerNewUser(user, "ROLE_ADMIN");
+
+			return new ResponseEntity<ApiResponse>(
+					new ApiResponse("Admin registered successfully..!", true, registeredUser), HttpStatus.CREATED);
+		}
+
+		return new ResponseEntity<ApiResponse>(
+				new ApiResponse("Password and confirm password does not match..!", false), HttpStatus.BAD_REQUEST);
 	}
 }

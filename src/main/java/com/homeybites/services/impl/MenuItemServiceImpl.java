@@ -2,26 +2,18 @@ package com.homeybites.services.impl;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.homeybites.entities.Address;
-import com.homeybites.entities.Category;
 import com.homeybites.entities.MenuItem;
-import com.homeybites.entities.TiffinDays;
-import com.homeybites.entities.User;
 import com.homeybites.exceptions.ResourceNotFoundException;
 import com.homeybites.payloads.ImageInfo;
-import com.homeybites.payloads.UserRoles;
-import com.homeybites.repositories.AddressRepository;
-import com.homeybites.repositories.CategoryRepository;
 import com.homeybites.repositories.MenuItemRepository;
-import com.homeybites.repositories.TiffindaysRepository;
 import com.homeybites.repositories.UserRepository;
 import com.homeybites.services.ImageService;
+//import com.homeybites.services.ImageService;
 import com.homeybites.services.MenuItemService;
 
 @Service
@@ -31,44 +23,29 @@ public class MenuItemServiceImpl implements MenuItemService {
 	private MenuItemRepository menuItemRepository;
 
 	@Autowired
-	private TiffindaysRepository tiffindaysRepository;
-
-	@Autowired
-	private CategoryRepository categoryRepository;
-
-	@Autowired
-	private AddressRepository addressRepository;
-
-	@Autowired
 	private UserRepository userRepository;
 
 	@Autowired
 	private ImageService imageService;
 
 	@Override
-	public MenuItem addMenuItem(MenuItem menuItemData, MultipartFile file, Integer categoryId, Integer userId)
+	public MenuItem addMenuItem(MenuItem menuItemData, MultipartFile file, Long categoryId, Long providerId)
 			throws IOException {
-
-		Category category = this.categoryRepository.findById(categoryId)
-				.orElseThrow(() -> new ResourceNotFoundException("category", "id", categoryId));
-
-		User user = this.userRepository.findById(userId)
-				.orElseThrow(() -> new ResourceNotFoundException("user", "id", userId));
 
 		ImageInfo uploadImage = this.imageService.uploadImage(file);
 		menuItemData.setImagePublicId(uploadImage.getPublicId());
 		menuItemData.setImageUrl(uploadImage.getSecuredUrl());
 		menuItemData.setFormat(uploadImage.getFormat());
 
-		menuItemData.setCategory(category);
-		menuItemData.setUser(user);
+		menuItemData.setCategoryId(categoryId);
+		menuItemData.setProviderId(providerId);
 		MenuItem savedMenu = this.menuItemRepository.save(menuItemData);
 
 		return savedMenu;
 	}
 
 	@Override
-	public MenuItem UploadMenuImage(MultipartFile file, Integer menuId) throws IOException {
+	public MenuItem UploadMenuImage(MultipartFile file, Long menuId) throws IOException {
 		MenuItem menuItem = this.menuItemRepository.findById(menuId)
 				.orElseThrow(() -> new ResourceNotFoundException("Menu item", "id", menuId));
 
@@ -81,17 +58,14 @@ public class MenuItemServiceImpl implements MenuItemService {
 	}
 
 	@Override
-	public MenuItem getMenuItem(Integer menuId) {
+	public MenuItem getMenuItem(Long menuId) {
 		return this.menuItemRepository.findById(menuId)
 				.orElseThrow(() -> new ResourceNotFoundException("Menu item", "id", menuId));
 	}
 
 	@Override
-	public List<MenuItem> getMenuItemByCategory(Integer cId) {
-		Category category = this.categoryRepository.findById(cId)
-				.orElseThrow(() -> new ResourceNotFoundException("category", "id", cId));
-
-		return this.menuItemRepository.findByCategory(category);
+	public List<MenuItem> getMenuItemByCategory(Long cId) {
+		return this.menuItemRepository.findByCategoryId(cId);
 	}
 
 	@Override
@@ -100,29 +74,21 @@ public class MenuItemServiceImpl implements MenuItemService {
 	}
 
 	@Override
-	public List<MenuItem> getMenuItemByTiffinProvider(Integer userId) {
-		this.userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("user", "id", userId));
+	public List<MenuItem> getMenuItemByTiffinProvider(Long userId) {
 		return this.menuItemRepository.getMenuItemByuserAndActive(userId);
 	}
 
 	@Override
 	public List<MenuItem> getAllNearbyMenuItem(double latitude, double longitude) {
-		// getting address of tiffin providers
-		List<Address> all = this.addressRepository.findByUserRoles(UserRoles.TIFFIN_PROVIDER);
-
-		// filtering out nearby address
-		List<Address> nearbyProviders = all.stream().filter(address -> this.calculateDistance(latitude, longitude,
-				address.getLatitude(), address.getLongitude()) <= 10).collect(Collectors.toList());
-
 		// collecting nearby tiffin providers
-		List<User> users = this.userRepository.findByAddressIn(nearbyProviders);
+		List<Integer> providers = this.userRepository.findProvidersDeliveringToLocation(latitude, longitude);
 
 		// finding nearby menu item
-		return this.menuItemRepository.findByUserIn(users);
+		return this.menuItemRepository.findByProviderIdInAndIsActiveTrue(providers);
 	}
 
 	@Override
-	public MenuItem updateMenuItem(MenuItem menuItemDto, Integer menuId) {
+	public MenuItem updateMenuItem(MenuItem menuItemDto, Long menuId) {
 		MenuItem menuItem = this.menuItemRepository.findById(menuId)
 				.orElseThrow(() -> new ResourceNotFoundException("Menu item", "id", menuId));
 
@@ -139,22 +105,11 @@ public class MenuItemServiceImpl implements MenuItemService {
 		menuItemLog.setFormat(menuItem.getFormat());
 		System.out.println("Image Format" + menuItem.getFormat());
 		menuItemLog.setPrice(menuItemDto.getPrice());
-		menuItemLog.setUser(menuItem.getUser());
-		menuItemLog.setCategory(menuItem.getCategory());
+		menuItemLog.setProviderId(menuItem.getProviderId());
+		menuItemLog.setCategoryId(menuItem.getCategoryId());
 
 		// saving new menu item
 		MenuItem savedItem = this.menuItemRepository.save(menuItemLog);
-
-		// updating tiffin days with new menu item
-		List<TiffinDays> tiffinDays = menuItem.getTiffinDays();
-
-		for (TiffinDays day : tiffinDays) {
-			day.getMenuItem().remove(menuItem);
-			day.getMenuItem().add(menuItemLog);
-		}
-
-		// saving tiffin days
-		this.tiffindaysRepository.saveAll(tiffinDays);
 
 		// deleting menu item
 		deleteMenuItem(menuItem);
@@ -163,28 +118,13 @@ public class MenuItemServiceImpl implements MenuItemService {
 	}
 
 	@Override
-	public void deleteMenuItem(Integer menuId) {
+	public void deleteMenuItem(Long menuId) {
 		MenuItem menuItem = this.menuItemRepository.findById(menuId)
 				.orElseThrow(() -> new ResourceNotFoundException("Menu item", "id", menuId));
 
 		menuItem.setActive(false);
 		this.menuItemRepository.save(menuItem);
 //		this.menuItemRepository.delete(menuItem);
-	}
-
-	@Override
-	public double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
-		double dLat = Math.toRadians(lat2 - lat1);
-		double dLon = Math.toRadians(lon2 - lon1);
-
-		lat1 = Math.toRadians(lat1);
-		lat2 = Math.toRadians(lat2);
-
-		double a = Math.pow(Math.sin(dLat / 2), 2) + Math.pow(Math.sin(dLon / 2), 2) * Math.cos(lat1) * Math.cos(lat2);
-		double radius = 6371;
-		double c = 2 * Math.asin(Math.sqrt(a));
-
-		return radius * c;
 	}
 
 	@Override

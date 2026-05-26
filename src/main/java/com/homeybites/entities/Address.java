@@ -1,56 +1,38 @@
 package com.homeybites.entities;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.homeybites.payloads.UserRoles;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 
 @Entity
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "addId")
 public class Address {
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer addId;
+	private Long addId;
 	private String addressLine;
 	private String landmark;
 	private String city;
 	private String state;
 	private String country;
-	private double latitude;
-	private double longitude;
-	private String serviceRadius;
 
-	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id")
-	@JsonIgnore
-	private User user;
-
-	@Enumerated(EnumType.STRING)
-	@Column(name = "address_of")
-	private UserRoles userRoles;
+	@Column(name = "user_id")
+	private Long userId;
 
 	public Address() {
 		super();
 	}
 
-	public Integer getAddId() {
+	public Long getAddId() {
 		return addId;
 	}
 
-	public void setAddId(Integer addId) {
+	public void setAddId(Long addId) {
 		this.addId = addId;
 	}
 
@@ -94,43 +76,11 @@ public class Address {
 		this.country = country;
 	}
 
-	public double getLatitude() {
-		return latitude;
+	public Long getUserId() {
+		return userId;
 	}
 
-	public void setLatitude(double latitude) {
-		this.latitude = latitude;
-	}
-
-	public double getLongitude() {
-		return longitude;
-	}
-
-	public void setLongitude(double longitude) {
-		this.longitude = longitude;
-	}
-
-	public String getServiceRadius() {
-		return serviceRadius;
-	}
-
-	public void setServiceRadius(String serviceRadius) {
-		this.serviceRadius = serviceRadius;
-	}
-
-	public User getUser() {
-		return user;
-	}
-
-	public void setUser(User user) {
-		this.user = user;
-	}
-
-	public UserRoles getUserRoles() {
-		return userRoles;
-	}
-
-	public void setUserRoles(UserRoles userRoles) {
-		this.userRoles = userRoles;
+	public void setUserId(Long userId) {
+		this.userId = userId;
 	}
 }

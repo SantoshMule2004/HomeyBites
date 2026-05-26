@@ -34,7 +34,7 @@ public class MenuController {
 	// add menu item
 	@PostMapping("/user/{userId}/category/{cId}/menuitem/")
 	public ResponseEntity<ApiResponse> addMenuItem(@Valid @RequestPart MenuItem menuItemData,
-			@RequestPart MultipartFile file, @PathVariable Integer cId, @PathVariable Integer userId)
+			@RequestPart MultipartFile file, @PathVariable Long cId, @PathVariable Long userId)
 			throws IOException {
 
 		MenuItem menuItem = this.menuItemService.addMenuItem(menuItemData, file, cId, userId);
@@ -44,7 +44,7 @@ public class MenuController {
 
 	// upload menu item image
 	@PostMapping("/menuitem/upload/{menuId}")
-	public ResponseEntity<?> uploadMenuImage(@RequestParam MultipartFile file, @PathVariable Integer menuId)
+	public ResponseEntity<?> uploadMenuImage(@RequestParam MultipartFile file, @PathVariable Long menuId)
 			throws IOException {
 		this.menuItemService.UploadMenuImage(file, menuId);
 		return new ResponseEntity<>("Image uploaded successfully..! ", HttpStatus.OK);
@@ -52,7 +52,7 @@ public class MenuController {
 
 	// get menu item by id
 	@GetMapping("/menuitem/{menuId}")
-	public ResponseEntity<MenuItem> getMenuItem(@PathVariable Integer menuId) {
+	public ResponseEntity<MenuItem> getMenuItem(@PathVariable Long menuId) {
 		MenuItem menuItem = this.menuItemService.getMenuItem(menuId);
 		return new ResponseEntity<MenuItem>(menuItem, HttpStatus.OK);
 	}
@@ -64,7 +64,7 @@ public class MenuController {
 		return new ResponseEntity<List<MenuItem>>(allMenuItem, HttpStatus.OK);
 	}
 
-	// get all menu items
+	// get all menu items by type
 	@GetMapping("/menuitems/type")
 	public ResponseEntity<List<MenuItem>> getAllMenuItemsByType(@RequestParam String menuType) {
 		List<MenuItem> allMenuItem = this.menuItemService.getAllMenuItemByType(menuType);
@@ -73,14 +73,14 @@ public class MenuController {
 
 	// get all menu items of a category
 	@GetMapping("/category/{cId}/menuitems")
-	public ResponseEntity<List<MenuItem>> getMenuItemByCategory(@PathVariable Integer cId) {
+	public ResponseEntity<List<MenuItem>> getMenuItemByCategory(@PathVariable Long cId) {
 		List<MenuItem> menuItems = this.menuItemService.getMenuItemByCategory(cId);
 		return new ResponseEntity<List<MenuItem>>(menuItems, HttpStatus.OK);
 	}
 
 	// get all menu items of a tiffin provider
 	@GetMapping("/tiffin-provider/{userId}/menuitems")
-	public ResponseEntity<List<MenuItem>> getMenuItemByTiffinProvider(@PathVariable Integer userId) {
+	public ResponseEntity<List<MenuItem>> getMenuItemByTiffinProvider(@PathVariable Long userId) {
 		List<MenuItem> menuItems = this.menuItemService.getMenuItemByTiffinProvider(userId);
 		return new ResponseEntity<List<MenuItem>>(menuItems, HttpStatus.OK);
 	}
@@ -95,7 +95,7 @@ public class MenuController {
 	// Update menu item
 	@PutMapping("/menuitem/{menuId}")
 	public ResponseEntity<ApiResponse> updateMenuItem(@Valid @RequestBody MenuItem menuItem,
-			@PathVariable Integer menuId) {
+			@PathVariable Long menuId) {
 		MenuItem updatedMenuItem = this.menuItemService.updateMenuItem(menuItem, menuId);
 		return new ResponseEntity<ApiResponse>(
 				new ApiResponse("menuitem updated successfully.>!", true, updatedMenuItem), HttpStatus.OK);
@@ -103,7 +103,7 @@ public class MenuController {
 
 	// delete menu item
 	@DeleteMapping("/menuitem/{menuId}")
-	public ResponseEntity<ApiResponse> deleteMenuItem(@PathVariable Integer menuId) {
+	public ResponseEntity<ApiResponse> deleteMenuItem(@PathVariable Long menuId) {
 		this.menuItemService.deleteMenuItem(menuId);
 		return new ResponseEntity<ApiResponse>(new ApiResponse("menuitem deleted successfully..!", true),
 				HttpStatus.NO_CONTENT);

@@ -27,19 +27,9 @@ public class AddressController {
 
 	// add address of user
 	@PostMapping("/user/{userId}/address")
-	public ResponseEntity<ApiResponse> addAddress(@RequestBody Address address, @PathVariable Integer userId) {
+	public ResponseEntity<ApiResponse> addAddress(@RequestBody Address address, @PathVariable Long userId) {
 		System.out.println(userId);
 		Address savedAddress = this.addressService.addAddress(address, userId);
-		ApiResponse response = new ApiResponse("Address added successfully..!", true, savedAddress);
-		return new ResponseEntity<ApiResponse>(response, HttpStatus.CREATED);
-	}
-
-	// add address of tiffin provider
-	@PostMapping("/tiffin/{providerId}/address")
-	public ResponseEntity<ApiResponse> addTiffinProviderAddress(@RequestBody Address address,
-			@PathVariable Integer providerId) {
-		System.out.println(providerId);
-		Address savedAddress = this.addressService.addTiffinProviderAddress(address, providerId);
 		ApiResponse response = new ApiResponse("Address added successfully..!", true, savedAddress);
 		return new ResponseEntity<ApiResponse>(response, HttpStatus.CREATED);
 	}
@@ -51,30 +41,16 @@ public class AddressController {
 		return new ResponseEntity<List<Address>>(allAddress, HttpStatus.OK);
 	}
 
-	// get address
-	@GetMapping("/address/{addId}")
-	public ResponseEntity<Address> getAddress(@PathVariable Integer addId) {
-		Address address = this.addressService.getAddress(addId);
-		return new ResponseEntity<Address>(address, HttpStatus.OK);
-	}
-
 	// get single address of user
 	@GetMapping("/user/{userId}/address/{addId}")
-	public ResponseEntity<Address> getSingleAddress(@PathVariable Integer userId, @PathVariable Integer addId) {
+	public ResponseEntity<Address> getSingleAddress(@PathVariable Integer userId, @PathVariable Long addId) {
 		Address address = this.addressService.getSingleAddressOfUser(addId, userId);
 		return new ResponseEntity<Address>(address, HttpStatus.OK);
 	}
 
-	// get all address
-	@GetMapping("/addresses")
-	public ResponseEntity<List<Address>> getAllAddress() {
-		List<Address> allAddresses = this.addressService.getAllAddress();
-		return new ResponseEntity<List<Address>>(allAddresses, HttpStatus.OK);
-	}
-
 	// update address
 	@PutMapping("/address/{addId}")
-	public ResponseEntity<ApiResponse> updateAddress(@RequestBody Address address, @PathVariable Integer addId) {
+	public ResponseEntity<ApiResponse> updateAddress(@RequestBody Address address, @PathVariable Long addId) {
 		Address updateAddress = this.addressService.updateAddress(address, addId);
 		ApiResponse response = new ApiResponse("Address updated successfully..!", true, updateAddress);
 		return new ResponseEntity<ApiResponse>(response, HttpStatus.OK);
@@ -82,7 +58,7 @@ public class AddressController {
 
 	// delete address
 	@DeleteMapping("/address/{addId}")
-	public ResponseEntity<ApiResponse> deleteAddress(@PathVariable Integer addId) {
+	public ResponseEntity<ApiResponse> deleteAddress(@PathVariable Long addId) {
 		this.addressService.deleteAddress(addId);
 		ApiResponse response = new ApiResponse("Address deleted successfully..!", true);
 		return new ResponseEntity<ApiResponse>(response, HttpStatus.OK);

@@ -1,19 +1,30 @@
 package com.homeybites.payloads;
 
-import com.homeybites.entities.User;
-
 public class JwtResponse {
 	
 	private String status;
 	private String message;
 	private String token;
-	private User user;
+	private UserInfo user;
 
 	public JwtResponse() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
-	
+	public JwtResponse(String status, String message) {
+		super();
+		this.status = status;
+		this.message = message;
+	}
+	public JwtResponse(String status, String message, String token, UserInfo user) {
+		super();
+		this.status = status;
+		this.message = message;
+		this.token = token;
+		this.user = user;
+	}
+
+
 	public String getStatus() {
 		return status;
 	}
@@ -39,11 +50,11 @@ public class JwtResponse {
 		this.token = token;
 	}
 
-	public User getUser() {
+	public UserInfo getUser() {
 		return user;
 	}
 
-	public void setUser(User user) {
+	public void setUser(UserInfo user) {
 		this.user = user;
 	}
 }

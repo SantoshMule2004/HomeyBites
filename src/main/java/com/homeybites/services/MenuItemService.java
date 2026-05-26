@@ -10,20 +10,20 @@ import com.homeybites.entities.MenuItem;
 public interface MenuItemService {
 
 	// add new menu item
-	MenuItem addMenuItem(MenuItem menuItemData, MultipartFile file, Integer categoryId, Integer userId)
+	MenuItem addMenuItem(MenuItem menuItemData, MultipartFile file, Long categoryId, Long providerId)
 			throws IOException;
 
 	// uploading menu image
-	MenuItem UploadMenuImage(MultipartFile file, Integer menuId) throws IOException;
+	MenuItem UploadMenuImage(MultipartFile file, Long menuId) throws IOException;
 
 	// get menu item
-	MenuItem getMenuItem(Integer menuId);
+	MenuItem getMenuItem(Long menuId);
 
 	// get menu items by category
-	List<MenuItem> getMenuItemByCategory(Integer cId);
+	List<MenuItem> getMenuItemByCategory(Long cId);
 
 	// get menu items of tiffin provider
-	List<MenuItem> getMenuItemByTiffinProvider(Integer userId);
+	List<MenuItem> getMenuItemByTiffinProvider(Long userId);
 
 	// get all menu items
 	List<MenuItem> getAllMenuItem();
@@ -35,14 +35,11 @@ public interface MenuItemService {
 	List<MenuItem> getAllNearbyMenuItem(double latitude, double longitude);
 
 	// update menu item
-	MenuItem updateMenuItem(MenuItem menuItem, Integer menuId);
+	MenuItem updateMenuItem(MenuItem menuItem, Long menuId);
 
 	// delete menu item
-	void deleteMenuItem(Integer menuId);
+	void deleteMenuItem(Long menuId);
 
 	// delete menu item
 	MenuItem deleteMenuItem(MenuItem menuItem);
-
-	// calculate distance between tiffin provider and user
-	double calculateDistance(double lat1, double lon1, double lat2, double lon2);
 }

@@ -1,95 +1,43 @@
-package com.homeybites.entities;
-
-import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import com.homeybites.entities.Log.TiffinPlanLog;
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Transient;
-
-@Entity
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "tiffinDayId")
-public class TiffinDays {
-
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer tiffinDayId;
-
-	private String weekDay;
-
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "tiffin_plan_id", nullable = true)
-	@JsonIgnore
-	private TiffinPlan tiffinPlan;
-
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "tiffin_log_id", nullable = true)
-	@JsonIgnore
-	private TiffinPlanLog tiffinPlanLog;
-
-	@ManyToMany
-	@JoinTable(name = "tiffin_days_menuitem", joinColumns = @JoinColumn(name = "tiffin_day_id"), inverseJoinColumns = @JoinColumn(name = "menu_id"))
-	private List<MenuItem> menuItem;
-
-	@Transient
-	private List<Integer> menuIds;
-
-	public Integer getTiffinDayId() {
-		return tiffinDayId;
-	}
-
-	public void setTiffinDayId(Integer tiffinDayId) {
-		this.tiffinDayId = tiffinDayId;
-	}
-
-	public String getWeekDay() {
-		return weekDay;
-	}
-
-	public void setWeekDay(String weekDay) {
-		this.weekDay = weekDay;
-	}
-
-	public TiffinPlan getTiffinPlan() {
-		return tiffinPlan;
-	}
-
-	public void setTiffinPlan(TiffinPlan tiffinPlan) {
-		this.tiffinPlan = tiffinPlan;
-	}
-
-	public List<MenuItem> getMenuItem() {
-		return menuItem;
-	}
-
-	public void setMenuItem(List<MenuItem> menuItem) {
-		this.menuItem = menuItem;
-	}
-
-	public List<Integer> getMenuIds() {
-		return menuIds;
-	}
-
-	public void setMenuIds(List<Integer> menuIds) {
-		this.menuIds = menuIds;
-	}
-
-	public TiffinPlanLog getTiffinPlanLog() {
-		return tiffinPlanLog;
-	}
-
-	public void setTiffinPlanLog(TiffinPlanLog tiffinPlanLog) {
-		this.tiffinPlanLog = tiffinPlanLog;
-	}
-}
+//package com.homeybites.entities;
+//
+//import jakarta.persistence.Column;
+//import jakarta.persistence.Entity;
+//import jakarta.persistence.GeneratedValue;
+//import jakarta.persistence.GenerationType;
+//import jakarta.persistence.Id;
+//
+//@Entity
+//public class TiffinDays {
+//	@Id
+//	@GeneratedValue(strategy = GenerationType.IDENTITY)
+//	private Long tiffinDayId;
+//
+//	private Integer dayNumber;
+//
+//	@Column(name = "tiffin_plan_id", nullable = true)
+//	private Long tiffinPlanId;
+//
+//	public Long getTiffinDayId() {
+//		return tiffinDayId;
+//	}
+//
+//	public void setTiffinDayId(Long tiffinDayId) {
+//		this.tiffinDayId = tiffinDayId;
+//	}
+//
+//	public Integer getDayNumber() {
+//		return dayNumber;
+//	}
+//
+//	public void setDayNumber(Integer dayNumber) {
+//		this.dayNumber = dayNumber;
+//	}
+//
+//	public Long getTiffinPlanId() {
+//		return tiffinPlanId;
+//	}
+//
+//	public void setTiffinPlanId(Long tiffinPlanId) {
+//		this.tiffinPlanId = tiffinPlanId;
+//	}
+//}

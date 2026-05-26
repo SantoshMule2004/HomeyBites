@@ -1,74 +1,48 @@
 package com.homeybites.entities;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 
 @Entity
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "cId")
 public class UserCart {
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer cId;
+	private Long cartId;
 
-	@ManyToOne
-	@JoinColumn(name = "user_id", nullable = false)
-	@JsonIgnore
-	private User user;
+	@Column(name = "user_id", nullable = false)
+	private Long userId;
+	
+	private Boolean isActive = false;
 
-	@ManyToOne
-	@JoinColumn(name = "menu_id", nullable = true)
-	private MenuItem menuItem;
-
-	private Integer quantity;
-
-	private double totalPrice;
-
-	public Integer getcId() {
-		return cId;
+	public UserCart() {
+		super();
+		// TODO Auto-generated constructor stub
 	}
-
-	public void setcId(Integer cId) {
-		this.cId = cId;
+	public UserCart(Long userId, Boolean isActive) {
+		super();
+		this.userId = userId;
+		this.isActive = isActive;
 	}
-
-	public User getUser() {
-		return user;
+	
+	public Long getUserId() {
+		return userId;
 	}
-
-	public void setUser(User user) {
-		this.user = user;
+	public void setUserId(Long userId) {
+		this.userId = userId;
 	}
-
-	public MenuItem getMenuItem() {
-		return menuItem;
+	public Long getCartId() {
+		return cartId;
 	}
-
-	public void setMenuItem(MenuItem menuItem) {
-		this.menuItem = menuItem;
+	public void setCartId(Long cartId) {
+		this.cartId = cartId;
 	}
-
-	public Integer getQuantity() {
-		return quantity;
+	public Boolean getIsActive() {
+		return isActive;
 	}
-
-	public void setQuantity(Integer quantity) {
-		this.quantity = quantity;
-	}
-
-	public double getTotalPrice() {
-		return totalPrice;
-	}
-
-	public void setTotalPrice(double totalPrice) {
-		this.totalPrice = totalPrice;
+	public void setIsActive(Boolean isActive) {
+		this.isActive = isActive;
 	}
 }

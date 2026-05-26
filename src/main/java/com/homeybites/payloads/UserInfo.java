@@ -1,21 +1,6 @@
-package com.homeybites.entities;
+package com.homeybites.payloads;
 
-import java.util.Collection;
-import java.util.List;
-
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-
-@Entity
-public class User implements UserDetails{
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+public class UserInfo {
 	private Long userId;
 	private String firstName;
 	private String middleName;
@@ -24,121 +9,183 @@ public class User implements UserDetails{
 	private boolean isVerified = false;
 	private String phoneNo;
 	private String dob;
-	private String password;
 	private String gender;
 	private String dietryPref;
-	private String universityName;
-	private String course;
-	private String companyName;
+	private String userRole;
 	private String businessName;
 	private String foodLicenseNo;
 	private String GSTIN;
-	private List<String> permissions;
-	private String userRole;
 	
 	private double latitude;
 	private double longitude;
 	private String serviceRadius;
 
-	
-	public User() {
+	public UserInfo() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
+
+	public UserInfo(Long userId, String firstName, String middleName, String lastName, String emailId,
+			boolean isVerified, String phoneNo, String dob, String gender, String dietryPref, String userRole) {
+		super();
+		this.userId = userId;
+		this.firstName = firstName;
+		this.middleName = middleName;
+		this.lastName = lastName;
+		this.emailId = emailId;
+		this.isVerified = isVerified;
+		this.phoneNo = phoneNo;
+		this.dob = dob;
+		this.gender = gender;
+		this.dietryPref = dietryPref;
+		this.userRole = userRole;
+	}
 	
+	public UserInfo(Long userId, String firstName, String middleName, String lastName, String emailId,
+			boolean isVerified, String phoneNo, String dob, String gender, String userRole) {
+		super();
+		this.userId = userId;
+		this.firstName = firstName;
+		this.middleName = middleName;
+		this.lastName = lastName;
+		this.emailId = emailId;
+		this.isVerified = isVerified;
+		this.phoneNo = phoneNo;
+		this.dob = dob;
+		this.gender = gender;
+		this.userRole = userRole;
+	}
+
+	public UserInfo(Long userId, String firstName, String middleName, String lastName, String emailId,
+			boolean isVerified, String phoneNo, String dob, String gender, String userRole, String businessName,
+			String foodLicenseNo, String gSTIN, double latitude, double longitude, String serviceRadius) {
+		super();
+		this.userId = userId;
+		this.firstName = firstName;
+		this.middleName = middleName;
+		this.lastName = lastName;
+		this.emailId = emailId;
+		this.isVerified = isVerified;
+		this.phoneNo = phoneNo;
+		this.dob = dob;
+		this.gender = gender;
+		this.userRole = userRole;
+		this.businessName = businessName;
+		this.foodLicenseNo = foodLicenseNo;
+		GSTIN = gSTIN;
+		this.latitude = latitude;
+		this.longitude = longitude;
+		this.serviceRadius = serviceRadius;
+	}
+
+	public UserInfo(Long userId, String firstName, String middleName, String lastName, String emailId,
+			boolean isVerified, String phoneNo, String dob, String gender, String dietryPref, String userRole,
+			String businessName, String foodLicenseNo, String gSTIN, double latitude, double longitude,
+			String serviceRadius) {
+		super();
+		this.userId = userId;
+		this.firstName = firstName;
+		this.middleName = middleName;
+		this.lastName = lastName;
+		this.emailId = emailId;
+		this.isVerified = isVerified;
+		this.phoneNo = phoneNo;
+		this.dob = dob;
+		this.gender = gender;
+		this.dietryPref = dietryPref;
+		this.userRole = userRole;
+		this.businessName = businessName;
+		this.foodLicenseNo = foodLicenseNo;
+		GSTIN = gSTIN;
+		this.latitude = latitude;
+		this.longitude = longitude;
+		this.serviceRadius = serviceRadius;
+	}
+
 	public Long getUserId() {
 		return userId;
 	}
+
 	public void setUserId(Long userId) {
 		this.userId = userId;
 	}
+
 	public String getFirstName() {
 		return firstName;
 	}
+
 	public void setFirstName(String firstName) {
 		this.firstName = firstName;
 	}
+
 	public String getMiddleName() {
 		return middleName;
 	}
+
 	public void setMiddleName(String middleName) {
 		this.middleName = middleName;
 	}
+
 	public String getLastName() {
 		return lastName;
 	}
+
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
 	}
+
 	public String getEmailId() {
 		return emailId;
 	}
+
 	public void setEmailId(String emailId) {
 		this.emailId = emailId;
 	}
+
 	public boolean isVerified() {
 		return isVerified;
 	}
+
 	public void setVerified(boolean isVerified) {
 		this.isVerified = isVerified;
 	}
+
 	public String getPhoneNo() {
 		return phoneNo;
 	}
+
 	public void setPhoneNo(String phoneNo) {
 		this.phoneNo = phoneNo;
 	}
+
 	public String getDob() {
 		return dob;
 	}
+
 	public void setDob(String dob) {
 		this.dob = dob;
 	}
-	public String getPassword() {
-		return password;
-	}
-	public void setPassword(String password) {
-		this.password = password;
-	}
+
 	public String getGender() {
 		return gender;
 	}
+
 	public void setGender(String gender) {
 		this.gender = gender;
 	}
+
 	public String getDietryPref() {
 		return dietryPref;
 	}
+
 	public void setDietryPref(String dietryPref) {
 		this.dietryPref = dietryPref;
 	}
-	public String getUniversityName() {
-		return universityName;
-	}
-	public void setUniversityName(String universityName) {
-		this.universityName = universityName;
-	}
-	public String getCourse() {
-		return course;
-	}
-	public void setCourse(String course) {
-		this.course = course;
-	}
-	public String getCompanyName() {
-		return companyName;
-	}
-	public void setCompanyName(String companyName) {
-		this.companyName = companyName;
-	}
-	public List<String> getPermissions() {
-		return permissions;
-	}
-	public void setPermissions(List<String> permissions) {
-		this.permissions = permissions;
-	}
+
 	public String getUserRole() {
 		return userRole;
 	}
+
 	public void setUserRole(String userRole) {
 		this.userRole = userRole;
 	}
@@ -167,17 +214,6 @@ public class User implements UserDetails{
 		GSTIN = gSTIN;
 	}
 
-	@Override
-	public Collection<? extends GrantedAuthority> getAuthorities() {
-		SimpleGrantedAuthority authority = new SimpleGrantedAuthority(userRole);
-		return List.of(authority);
-	}
-
-	@Override
-	public String getUsername() {
-		return emailId;
-	}
-	
 	public double getLatitude() {
 		return latitude;
 	}

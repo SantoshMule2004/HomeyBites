@@ -7,14 +7,20 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.homeybites.entities.Address;
+//import com.homeybites.entities.Address;
 import com.homeybites.entities.User;
-import com.homeybites.entities.UserCart;
+//import com.homeybites.entities.UserCart;
 import com.homeybites.exceptions.ResourceNotFoundException;
+import com.homeybites.payloads.BusinessDetaisRequest;
 import com.homeybites.payloads.OtpDto;
 import com.homeybites.payloads.PasswordDto;
-import com.homeybites.repositories.AddressRepository;
-import com.homeybites.repositories.CartRepository;
+import com.homeybites.payloads.RegisterUserRequest;
+import com.homeybites.payloads.UserInfo;
+//import com.homeybites.repositories.AddressRepository;
+//import com.homeybites.repositories.AddressRepository;
+//import com.homeybites.repositories.CartRepository;
 import com.homeybites.repositories.UserRepository;
+import com.homeybites.services.AddressService;
 import com.homeybites.services.EmailService;
 import com.homeybites.services.UserService;
 
@@ -24,11 +30,11 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	private UserRepository userRepository;
 
-	@Autowired
-	private CartRepository cartRepository;
+//	@Autowired
+//	private CartRepository cartRepository;
 
 	@Autowired
-	private AddressRepository addressRepository;
+	private AddressService addressService;
 
 	@Autowired
 	private EmailService emailService;
@@ -36,41 +42,42 @@ public class UserServiceImpl implements UserService {
 	private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(12);
 
 	@Override
-	public User registerNewUser(User user) {
-		user.setUserRole("ROLE_NORMAL_USER");
-		user.setPassword(this.passwordEncoder.encode(user.getPassword()));
-		User savedUser = this.userRepository.save(user);
+	public User registerNewUser(RegisterUserRequest user, String role) {
+		User newUser = new User();
 
-		this.sendOtp(savedUser.getEmailId());
+		newUser.setFirstName(user.getFirstName());
+		newUser.setMiddleName(user.getMiddleName());
+		newUser.setLastName(user.getLastName());
+		newUser.setEmailId(user.getEmailId());
+		newUser.setPhoneNo(user.getPhoneNo());
+		newUser.setVerified(user.isVerified());
+		newUser.setUserRole(role);
+		newUser.setDob(user.getDob());
+		newUser.setGender(user.getGender());
+		newUser.setPassword(this.passwordEncoder.encode(user.getPassword()));
 
-		return savedUser;
-	}
-
-	@Override
-	public User registerTiffinProvider(User user) {
-		user.setUserRole("ROLE_TIFFIN_PROVIDER");
-		user.setPassword(this.passwordEncoder.encode(user.getPassword()));
-		User savedUser = this.userRepository.save(user);
-
-		this.sendOtp(savedUser.getEmailId());
+		User savedUser = this.userRepository.save(newUser);
 
 		return savedUser;
 	}
 
 	@Override
-	public User addBussinessDetails(Integer providerId, User user) {
-
+	public User addBussinessDetails(Integer providerId, BusinessDetaisRequest bdRequest) {
 		User providerInfo = this.userRepository.findById(providerId)
 				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", providerId));
 
-		providerInfo.setBusinessName(user.getBusinessName());
-		providerInfo.setFoodLicenseNo(user.getFoodLicenseNo());
-		providerInfo.setGSTIN(user.getGSTIN());
+		providerInfo.setBusinessName(bdRequest.getBusinessName());
+		providerInfo.setFoodLicenseNo(bdRequest.getFoodLicenseNo());
+		providerInfo.setGSTIN(bdRequest.getGSTIN());
 
-		for (Address address : user.getAddress()) {
-			address.setUser(providerInfo);
-			providerInfo.getAddress().add(address);
-		}
+		Address address = new Address();
+		address.setAddressLine(bdRequest.getAddressLine());
+		address.setLandmark(bdRequest.getLandmark());
+		address.setCity(bdRequest.getCity());
+		address.setState(bdRequest.getState());
+		address.setCountry(bdRequest.getCountry());
+
+		this.addressService.addAddress(address, providerInfo.getUserId());
 
 		return this.userRepository.save(providerInfo);
 	}
@@ -81,7 +88,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public User updateUser(User user, Integer userId) {
+	public void updateUser(User user, Integer userId) {
 
 		User existingUser = this.userRepository.findById(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
@@ -99,44 +106,72 @@ public class UserServiceImpl implements UserService {
 		existingUser.setCompanyName(user.getCompanyName());
 		existingUser.setCourse(user.getCourse());
 
-		return this.userRepository.save(existingUser);
+		this.userRepository.save(existingUser);
 	}
 
 	@Override
-	public User updateBusinessDetails(User user, Integer userId, Integer addressId) {
+	public void updateBusinessDetails(User user, Integer userId, Integer addressId) {
 		User existingUser = this.userRepository.findById(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
 
 		existingUser.setBusinessName(user.getBusinessName());
 
-		Address address = this.addressRepository.findById(addressId)
-				.orElseThrow(() -> new ResourceNotFoundException("Address", "Id", addressId));
+//		Address address = this.addressRepository.findById(addressId)
+//				.orElseThrow(() -> new ResourceNotFoundException("Address", "Id", addressId));
+//
+////		Address bdRequest = user.getAddress().getFirst();
+//
+//		address.setAddressLine(bdRequest.getAddressLine());
+//		address.setLandmark(bdRequest.getLandmark());
+//		address.setCity(bdRequest.getCity());
+//		address.setState(bdRequest.getState());
+//		address.setCountry(bdRequest.getCountry());
+//		address.setLatitude(bdRequest.getLatitude());
+//		address.setLongitude(bdRequest.getLongitude());
+//		address.setServiceRadius(bdRequest.getServiceRadius());
+//
+//		this.addressRepository.save(address);
 
-		Address newAddress = user.getAddress().getFirst();
-
-		address.setAddressLine(newAddress.getAddressLine());
-		address.setLandmark(newAddress.getLandmark());
-		address.setCity(newAddress.getCity());
-		address.setState(newAddress.getState());
-		address.setCountry(newAddress.getCountry());
-		address.setLatitude(newAddress.getLatitude());
-		address.setLongitude(newAddress.getLongitude());
-		address.setServiceRadius(newAddress.getServiceRadius());
-
-		this.addressRepository.save(address);
-
-		return this.userRepository.save(existingUser);
+		this.userRepository.save(existingUser);
 	}
 
 	@Override
-	public User getUser(Integer userId) {
-		return this.userRepository.findById(userId)
+	public UserInfo getUser(Integer userId) {
+		User user = this.userRepository.findById(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
+
+		return new UserInfo(user.getUserId(), user.getFirstName(), user.getMiddleName(), user.getLastName(),
+				user.getEmailId(), user.isVerified(), user.getPhoneNo(), user.getDob(), user.getGender(),
+				user.getDietryPref(), user.getUserRole());
 	}
 
 	@Override
-	public User getUserByEmail(String emailId) {
-		return this.userRepository.findByEmailId(emailId)
+	public UserInfo getUserInfoByEmail(String emailId) {
+		return this.userRepository.findUserByEmail(emailId)
+				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", emailId));
+	}
+
+	@Override
+	public UserInfo getUserByEmail(String emailId) {
+		return this.userRepository.findUserByEmail(emailId)
+				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", emailId));
+	}
+
+	@Override
+	public UserInfo getLoggedInUser(String emailId) {
+		return this.userRepository.findUserByEmail(emailId)
+				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", emailId));
+	}
+
+	@Override
+	public UserInfo getLoggedInProvider(String emailId) {
+		return this.userRepository.findUserByEmail(emailId)
+				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", emailId));
+	}
+
+	@Override
+	public UserInfo getLoggedInAdmin(String emailId) {
+		return this.userRepository.findUserByEmail(emailId)
 				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", emailId));
 	}
 
@@ -151,7 +186,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public List<User> getUserByRole(String role) {
+	public List<UserInfo> getUserByRole(String role) {
 		return this.userRepository.findByUserRole(role);
 	}
 
@@ -160,20 +195,20 @@ public class UserServiceImpl implements UserService {
 		User user = this.userRepository.findById(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
 
-		List<UserCart> userCart = this.cartRepository.findByUser(user);
-		userCart.stream().forEach(cart -> cart.setMenuItem(null));
-		this.cartRepository.deleteAll(userCart);
+//		List<UserCart> userCart = this.cartRepository.findByUser(user);
+//		userCart.stream().forEach(cart -> cart.setMenuItem(null));
+//		this.cartRepository.deleteAll(userCart);
 
 		this.userRepository.delete(user);
 	}
 
 	@Override
-	public User updateContactDetails(String number, Integer userId) {
+	public void updateContactDetails(String number, Integer userId) {
 		User user = this.userRepository.findById(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
 
 		user.setPhoneNo(number);
-		return this.userRepository.save(user);
+		this.userRepository.save(user);
 	}
 
 	@Override
@@ -221,7 +256,10 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public String resetPassword(PasswordDto passwordDto, User user) {
+	public String resetPassword(PasswordDto passwordDto, String emailId) {
+		User user = this.userRepository.findByEmailId(emailId)
+				.orElseThrow(() -> new ResourceNotFoundException("Email", "Id", emailId));
+		
 		if (passwordEncoder.matches(passwordDto.getOldPassword(), user.getPassword())) {
 
 			if (passwordDto.getNewPassword() != null && passwordDto.getcPassword() != null
@@ -238,10 +276,12 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public boolean resetPass(PasswordDto passwordDto, User user) {
-
+	public boolean resetPass(PasswordDto passwordDto, String emailId) {
 		if (passwordDto.getNewPassword() != null && passwordDto.getcPassword() != null
 				&& passwordDto.getNewPassword().equals(passwordDto.getcPassword())) {
+			
+			User user = this.userRepository.findByEmailId(emailId)
+					.orElseThrow(() -> new ResourceNotFoundException("Email", "Id", emailId));
 
 			user.setPassword(passwordEncoder.encode(passwordDto.getNewPassword()));
 			this.userRepository.save(user);
@@ -269,4 +309,5 @@ public class UserServiceImpl implements UserService {
 		User savedUser = this.userRepository.save(user);
 		return savedUser;
 	}
+
 }
