@@ -52,8 +52,6 @@ public class UserServiceImpl implements UserService {
 		newUser.setPhoneNo(user.getPhoneNo());
 		newUser.setVerified(user.isVerified());
 		newUser.setUserRole(role);
-		newUser.setDob(user.getDob());
-		newUser.setGender(user.getGender());
 		newUser.setPassword(this.passwordEncoder.encode(user.getPassword()));
 
 		User savedUser = this.userRepository.save(newUser);

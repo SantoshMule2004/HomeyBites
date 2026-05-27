@@ -24,10 +24,6 @@ public class RegisterUserRequest {
 	private String phoneNo;
 	
 	@NotBlank
-	private String dob;
-	private String gender;
-	
-	@NotBlank
 	private String password;
 	
 	@NotBlank
@@ -79,22 +75,6 @@ public class RegisterUserRequest {
 
 	public void setPhoneNo(String phoneNo) {
 		this.phoneNo = phoneNo;
-	}
-
-	public String getDob() {
-		return dob;
-	}
-
-	public void setDob(String dob) {
-		this.dob = dob;
-	}
-
-	public String getGender() {
-		return gender;
-	}
-
-	public void setGender(String gender) {
-		this.gender = gender;
 	}
 
 	public String getPassword() {
