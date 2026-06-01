@@ -1,14 +1,18 @@
 package com.homeybites.exceptions;
 
+import java.net.UnknownHostException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.angus.mail.util.MailConnectException;
+import org.hibernate.exception.JDBCConnectionException;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.transaction.CannotCreateTransactionException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -145,5 +149,13 @@ public class GlobalExceptionHandler {
 		String message = ex.getMessage();
 		ApiException response = new ApiException(message, false);
 		return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+
+	// handler for database exception
+	@ExceptionHandler({ DataAccessException.class, CannotCreateTransactionException.class,
+			JDBCConnectionException.class, UnknownHostException.class })
+	public ResponseEntity<ApiException> handleDatabaseException(Exception ex) {
+		ApiException response = new ApiException("Database service is currently unavailable.", false);
+		return new ResponseEntity<>(response, HttpStatus.SERVICE_UNAVAILABLE);
 	}
 }

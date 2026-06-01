@@ -4,7 +4,12 @@ import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.naming.ServiceUnavailableException;
+
+import org.eclipse.angus.mail.util.MailConnectException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.MailAuthenticationException;
+import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -32,6 +37,19 @@ public class EmailServiceImpl implements EmailService {
 		mailMessage.setText(message);
 
 		mailSender.send(mailMessage);
+		
+//		try {
+//		    mailSender.send(mailMessage);
+//		} catch (MailConnectException ex) {
+//		    throw new ServiceUnavailableException(
+//		        "Email service is temporarily unavailable");
+//		} catch (MailAuthenticationException ex) {
+//		    throw new ServiceUnavailableException(
+//		        "Email configuration error");
+//		} catch (MailException ex) {
+//		    throw new ServiceUnavailableException(
+//		        "Unable to send email");
+//		}
 	}
 
 	@Override
