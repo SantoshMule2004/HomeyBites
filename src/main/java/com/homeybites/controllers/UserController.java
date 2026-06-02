@@ -19,6 +19,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.homeybites.entities.User;
 import com.homeybites.payloads.ApiResponse;
 import com.homeybites.payloads.PasswordDto;
+import com.homeybites.payloads.UpdateEmailDto;
+import com.homeybites.payloads.UpdatePhoneDto;
+import com.homeybites.payloads.UpdateUserDetailsDto;
 import com.homeybites.payloads.UserInfo;
 import com.homeybites.services.UserService;
 
@@ -36,6 +39,33 @@ public class UserController {
 	public ResponseEntity<ApiResponse> updateUser(@Valid @RequestBody User user, @PathVariable Integer userId) {
 		this.userService.updateUser(user, userId);
 		return new ResponseEntity<ApiResponse>(new ApiResponse("User updated successfully..!", true, null),
+				HttpStatus.OK);
+	}
+
+	// update user email id
+	@PutMapping("/{userId}/email")
+	public ResponseEntity<ApiResponse> updateUserEmail(@Valid @RequestBody UpdateEmailDto dto,
+			@PathVariable Integer userId) {
+		this.userService.updateUserEmail(dto.getEmail(), userId);
+		return new ResponseEntity<ApiResponse>(new ApiResponse("Email updated successfully..!", true, null),
+				HttpStatus.OK);
+	}
+
+	// update user phone number
+	@PutMapping("/{userId}/phoneno")
+	public ResponseEntity<ApiResponse> updateUserPhoneNo(@Valid @RequestBody UpdatePhoneDto dto,
+			@PathVariable Integer userId) {
+		this.userService.updateUserPhoneNo(dto.getPhoneNo(), userId);
+		return new ResponseEntity<ApiResponse>(new ApiResponse("Phone number updated successfully..!", true, null),
+				HttpStatus.OK);
+	}
+
+	// update user details (firstname, lastname)
+	@PutMapping("/{userId}/user-details")
+	public ResponseEntity<ApiResponse> updateUserDetails(@Valid @RequestBody UpdateUserDetailsDto dto,
+			@PathVariable Integer userId) {
+		this.userService.updateUserDetails(dto.getFirstName(), dto.getLastName(), userId);
+		return new ResponseEntity<ApiResponse>(new ApiResponse("Email updated successfully..!", true, null),
 				HttpStatus.OK);
 	}
 

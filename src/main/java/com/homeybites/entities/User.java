@@ -38,7 +38,7 @@ public class User implements UserDetails{
 	
 	private double latitude;
 	private double longitude;
-	private String serviceRadius;
+	private double serviceRadius;
 
 	
 	public User() {
@@ -194,11 +194,11 @@ public class User implements UserDetails{
 		this.longitude = longitude;
 	}
 
-	public String getServiceRadius() {
+	public double getServiceRadius() {
 		return serviceRadius;
 	}
 
-	public void setServiceRadius(String serviceRadius) {
+	public void setServiceRadius(double serviceRadius) {
 		this.serviceRadius = serviceRadius;
 	}
 }

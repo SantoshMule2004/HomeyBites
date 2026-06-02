@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.homeybites.entities.CartItem;
 import com.homeybites.payloads.ApiResponse;
+import com.homeybites.payloads.CartItemDto;
 import com.homeybites.services.CartService;
 
 @RestController
@@ -29,6 +30,13 @@ public class CartController {
 	public ResponseEntity<List<CartItem>> getUserCart(@PathVariable Long userId) {
 		List<CartItem> cart = this.cartService.getCart(userId);
 		return new ResponseEntity<List<CartItem>>(cart, HttpStatus.OK);
+	}
+
+	// get user cart with menu details
+	@GetMapping("/items/{userId}")
+	public ResponseEntity<List<CartItemDto>> getUserCartWithMenuDetials(@PathVariable Long userId) {
+		List<CartItemDto> cart = this.cartService.getCartItemWithMenuItems(userId);
+		return new ResponseEntity<List<CartItemDto>>(cart, HttpStatus.OK);
 	}
 
 	// add item to cart

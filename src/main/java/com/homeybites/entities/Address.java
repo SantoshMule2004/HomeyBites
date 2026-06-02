@@ -1,11 +1,7 @@
 package com.homeybites.entities;
 
-import com.homeybites.payloads.UserRoles;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -16,10 +12,11 @@ public class Address {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long addId;
 	private String addressLine;
-	private String landmark;
-	private String city;
-	private String state;
-	private String country;
+	private String area;
+	private String receiverName;
+	private String receiverContactNo;
+	private String latitude;
+	private String longitude;
 
 	@Column(name = "user_id")
 	private Long userId;
@@ -44,36 +41,44 @@ public class Address {
 		this.addressLine = addressLine;
 	}
 
-	public String getLandmark() {
-		return landmark;
+	public String getArea() {
+		return area;
 	}
 
-	public void setLandmark(String landmark) {
-		this.landmark = landmark;
+	public void setArea(String area) {
+		this.area = area;
 	}
 
-	public String getCity() {
-		return city;
+	public String getReceiverName() {
+		return receiverName;
 	}
 
-	public void setCity(String city) {
-		this.city = city;
+	public void setReceiverName(String receiverName) {
+		this.receiverName = receiverName;
 	}
 
-	public String getState() {
-		return state;
+	public String getReceiverContactNo() {
+		return receiverContactNo;
 	}
 
-	public void setState(String state) {
-		this.state = state;
+	public void setReceiverContactNo(String receiverContactNo) {
+		this.receiverContactNo = receiverContactNo;
 	}
 
-	public String getCountry() {
-		return country;
+	public String getLatitude() {
+		return latitude;
 	}
 
-	public void setCountry(String country) {
-		this.country = country;
+	public void setLatitude(String latitude) {
+		this.latitude = latitude;
+	}
+
+	public String getLongitude() {
+		return longitude;
+	}
+
+	public void setLongitude(String longitude) {
+		this.longitude = longitude;
 	}
 
 	public Long getUserId() {

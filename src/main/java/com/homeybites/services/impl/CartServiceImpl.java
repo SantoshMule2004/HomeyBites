@@ -10,6 +10,7 @@ import com.homeybites.entities.CartItem;
 import com.homeybites.entities.MenuItem;
 import com.homeybites.entities.UserCart;
 import com.homeybites.exceptions.ResourceNotFoundException;
+import com.homeybites.payloads.CartItemDto;
 import com.homeybites.repositories.CartItemRepository;
 import com.homeybites.repositories.CartRepository;
 import com.homeybites.repositories.MenuItemRepository;
@@ -88,5 +89,13 @@ public class CartServiceImpl implements CartService {
 
 	public UserCart createNewCart(Long userId) {
 		return this.cartRepository.save(new UserCart(userId, true));
+	}
+
+	@Override
+	public List<CartItemDto> getCartItemWithMenuItems(Long userId) {
+		UserCart usercart = this.cartRepository.findByUserIdAndIsActive(userId, true)
+				.orElseGet(() -> createNewCart(userId));
+
+		return this.cartItemRepository.findCartItemsWithMenuDetails(usercart.getCartId());
 	}
 }

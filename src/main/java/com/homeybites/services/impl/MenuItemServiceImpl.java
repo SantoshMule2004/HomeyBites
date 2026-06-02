@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.homeybites.entities.MenuItem;
 import com.homeybites.exceptions.ResourceNotFoundException;
 import com.homeybites.payloads.ImageInfo;
+import com.homeybites.payloads.MenuItemDto;
 import com.homeybites.repositories.MenuItemRepository;
 import com.homeybites.repositories.UserRepository;
 import com.homeybites.services.ImageService;
@@ -124,7 +125,7 @@ public class MenuItemServiceImpl implements MenuItemService {
 
 		menuItem.setActive(false);
 		this.menuItemRepository.save(menuItem);
-//		this.menuItemRepository.delete(menuItem);
+		// this.menuItemRepository.delete(menuItem);
 	}
 
 	@Override
@@ -136,5 +137,10 @@ public class MenuItemServiceImpl implements MenuItemService {
 	public MenuItem deleteMenuItem(MenuItem menuItem) {
 		menuItem.setActive(false);
 		return this.menuItemRepository.save(menuItem);
+	}
+
+	@Override
+	public List<MenuItemDto> getAllMenusWithProviders() {
+		return this.menuItemRepository.getAllMenusWithProviders();
 	}
 }

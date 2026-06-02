@@ -30,6 +30,10 @@ public interface UserService {
 	// updates user
 	void updateUser(User user, Integer userId);
 
+	void updateUserEmail(String emailId, Integer userId);
+	void updateUserPhoneNo(String phoneNo, Integer userId);
+	void updateUserDetails(String firstName, String lastName, Integer userId);
+
 	// updates business details
 	void updateBusinessDetails(User user, Integer userId, Integer addressId);
 

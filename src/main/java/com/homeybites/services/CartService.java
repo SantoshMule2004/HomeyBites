@@ -3,6 +3,7 @@ package com.homeybites.services;
 import java.util.List;
 
 import com.homeybites.entities.CartItem;
+import com.homeybites.payloads.CartItemDto;
 
 public interface CartService {
 
@@ -14,6 +15,9 @@ public interface CartService {
 
 	// get cart items
 	List<CartItem> getCart(Long userId);
+
+	// get cart items with menu details
+	List<CartItemDto> getCartItemWithMenuItems(Long userId);
 
 	// delete cart item
 	void deleteItemFromCart(Long cartItemId);

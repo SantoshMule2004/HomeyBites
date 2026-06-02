@@ -14,11 +14,11 @@ public class UserInfo {
 	private String userRole;
 	private String businessName;
 	private String foodLicenseNo;
-	private String GSTIN;
+	private String gstin;
 	
 	private double latitude;
 	private double longitude;
-	private String serviceRadius;
+	private double serviceRadius;
 
 	public UserInfo() {
 		super();
@@ -58,7 +58,7 @@ public class UserInfo {
 
 	public UserInfo(Long userId, String firstName, String middleName, String lastName, String emailId,
 			boolean isVerified, String phoneNo, String dob, String gender, String userRole, String businessName,
-			String foodLicenseNo, String gSTIN, double latitude, double longitude, String serviceRadius) {
+			String foodLicenseNo, String gSTIN, double latitude, double longitude, double serviceRadius) {
 		super();
 		this.userId = userId;
 		this.firstName = firstName;
@@ -72,7 +72,7 @@ public class UserInfo {
 		this.userRole = userRole;
 		this.businessName = businessName;
 		this.foodLicenseNo = foodLicenseNo;
-		GSTIN = gSTIN;
+		this.gstin = gSTIN;
 		this.latitude = latitude;
 		this.longitude = longitude;
 		this.serviceRadius = serviceRadius;
@@ -81,7 +81,7 @@ public class UserInfo {
 	public UserInfo(Long userId, String firstName, String middleName, String lastName, String emailId,
 			boolean isVerified, String phoneNo, String dob, String gender, String dietryPref, String userRole,
 			String businessName, String foodLicenseNo, String gSTIN, double latitude, double longitude,
-			String serviceRadius) {
+			double serviceRadius) {
 		super();
 		this.userId = userId;
 		this.firstName = firstName;
@@ -96,7 +96,7 @@ public class UserInfo {
 		this.userRole = userRole;
 		this.businessName = businessName;
 		this.foodLicenseNo = foodLicenseNo;
-		GSTIN = gSTIN;
+		this.gstin = gSTIN;
 		this.latitude = latitude;
 		this.longitude = longitude;
 		this.serviceRadius = serviceRadius;
@@ -207,11 +207,11 @@ public class UserInfo {
 	}
 
 	public String getGSTIN() {
-		return GSTIN;
+		return gstin;
 	}
 
 	public void setGSTIN(String gSTIN) {
-		GSTIN = gSTIN;
+		this.gstin = gSTIN;
 	}
 
 	public double getLatitude() {
@@ -230,11 +230,11 @@ public class UserInfo {
 		this.longitude = longitude;
 	}
 
-	public String getServiceRadius() {
+	public double getServiceRadius() {
 		return serviceRadius;
 	}
 
-	public void setServiceRadius(String serviceRadius) {
+	public void setServiceRadius(double serviceRadius) {
 		this.serviceRadius = serviceRadius;
 	}
 }

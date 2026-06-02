@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.homeybites.entities.MenuItem;
+import com.homeybites.payloads.MenuItemDto;
 
 public interface MenuItemRepository extends JpaRepository<MenuItem, Long> {
 
@@ -23,4 +24,17 @@ public interface MenuItemRepository extends JpaRepository<MenuItem, Long> {
     List<MenuItem> findByProviderIdInAndIsActiveTrue(List<Integer> providerIds);
 
 	List<MenuItem> findByMenuType(String menuType);
+
+	// getting menuitem with provider details
+	@Query("""
+        SELECT new com.homeybites.payloads.MenuItemDto(
+            m.menuId, m.menuName, m.price, m.description, m.count, 
+            m.isActive, m.menuType, m.imagePublicId, m.imageUrl, 
+            m.format, m.categoryId, 
+            p.userId, p.businessName, p.latitude, p.longitude, p.serviceRadius
+        )
+        FROM MenuItem m
+        LEFT JOIN User p ON m.providerId = p.userId
+    """)
+    List<MenuItemDto> getAllMenusWithProviders();
 }

@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.homeybites.entities.MenuItem;
+import com.homeybites.payloads.MenuItemDto;
 
 public interface MenuItemService {
 
@@ -24,6 +25,9 @@ public interface MenuItemService {
 
 	// get menu items of tiffin provider
 	List<MenuItem> getMenuItemByTiffinProvider(Long userId);
+
+	// get menuitem with provider details
+	List<MenuItemDto> getAllMenusWithProviders();
 
 	// get all menu items
 	List<MenuItem> getAllMenuItem();

@@ -20,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.homeybites.entities.MenuItem;
 import com.homeybites.payloads.ApiResponse;
+import com.homeybites.payloads.MenuItemDto;
 import com.homeybites.services.MenuItemService;
 
 import jakarta.validation.Valid;
@@ -62,6 +63,13 @@ public class MenuController {
 	public ResponseEntity<List<MenuItem>> getAllMenuItems() {
 		List<MenuItem> allMenuItem = this.menuItemService.getAllMenuItem();
 		return new ResponseEntity<List<MenuItem>>(allMenuItem, HttpStatus.OK);
+	}
+
+	// get all menu items with provider info
+	@GetMapping("/menuitem-provider")
+	public ResponseEntity<List<MenuItemDto>> getAllMenusWithProviders() {
+		List<MenuItemDto> allMenuItem = this.menuItemService.getAllMenusWithProviders();
+		return new ResponseEntity<List<MenuItemDto>>(allMenuItem, HttpStatus.OK);
 	}
 
 	// get all menu items by type

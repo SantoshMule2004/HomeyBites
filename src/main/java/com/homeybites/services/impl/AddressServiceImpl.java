@@ -40,10 +40,11 @@ public class AddressServiceImpl implements AddressService {
 				.orElseThrow(() -> new ResourceNotFoundException("Address", "Id", addressId));
 
 		address.setAddressLine(add.getAddressLine());
-		address.setCity(add.getCity());
-		address.setCountry(add.getCountry());
-		address.setLandmark(add.getLandmark());
-		address.setState(add.getState());
+		address.setArea(add.getArea());
+		address.setLatitude(add.getLatitude());
+		address.setLongitude(add.getLongitude());
+		address.setReceiverName(add.getReceiverName());
+		address.setReceiverContactNo(add.getReceiverContactNo());
 
 		return this.addressRepository.save(address);
 	}

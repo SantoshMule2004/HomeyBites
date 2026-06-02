@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.homeybites.entities.Address;
 //import com.homeybites.entities.Address;
@@ -30,8 +31,8 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	private UserRepository userRepository;
 
-//	@Autowired
-//	private CartRepository cartRepository;
+	// @Autowired
+	// private CartRepository cartRepository;
 
 	@Autowired
 	private AddressService addressService;
@@ -64,16 +65,20 @@ public class UserServiceImpl implements UserService {
 		User providerInfo = this.userRepository.findById(providerId)
 				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", providerId));
 
+		System.out.println("BusinessDetaisRequest: " + bdRequest);
+
 		providerInfo.setBusinessName(bdRequest.getBusinessName());
 		providerInfo.setFoodLicenseNo(bdRequest.getFoodLicenseNo());
 		providerInfo.setGSTIN(bdRequest.getGSTIN());
+		providerInfo.setLatitude(bdRequest.getLatitude());
+		providerInfo.setLongitude(bdRequest.getLongitude());
+		providerInfo.setServiceRadius(bdRequest.getServiceRadius());
 
 		Address address = new Address();
 		address.setAddressLine(bdRequest.getAddressLine());
-		address.setLandmark(bdRequest.getLandmark());
-		address.setCity(bdRequest.getCity());
-		address.setState(bdRequest.getState());
-		address.setCountry(bdRequest.getCountry());
+		address.setArea(bdRequest.getArea());
+		address.setLatitude(String.valueOf(bdRequest.getLatitude()));
+		address.setLongitude(String.valueOf(bdRequest.getLongitude()));
 
 		this.addressService.addAddress(address, providerInfo.getUserId());
 
@@ -114,21 +119,22 @@ public class UserServiceImpl implements UserService {
 
 		existingUser.setBusinessName(user.getBusinessName());
 
-//		Address address = this.addressRepository.findById(addressId)
-//				.orElseThrow(() -> new ResourceNotFoundException("Address", "Id", addressId));
-//
-////		Address bdRequest = user.getAddress().getFirst();
-//
-//		address.setAddressLine(bdRequest.getAddressLine());
-//		address.setLandmark(bdRequest.getLandmark());
-//		address.setCity(bdRequest.getCity());
-//		address.setState(bdRequest.getState());
-//		address.setCountry(bdRequest.getCountry());
-//		address.setLatitude(bdRequest.getLatitude());
-//		address.setLongitude(bdRequest.getLongitude());
-//		address.setServiceRadius(bdRequest.getServiceRadius());
-//
-//		this.addressRepository.save(address);
+		// Address address = this.addressRepository.findById(addressId)
+		// .orElseThrow(() -> new ResourceNotFoundException("Address", "Id",
+		// addressId));
+		//
+		//// Address bdRequest = user.getAddress().getFirst();
+		//
+		// address.setAddressLine(bdRequest.getAddressLine());
+		// address.setLandmark(bdRequest.getLandmark());
+		// address.setCity(bdRequest.getCity());
+		// address.setState(bdRequest.getState());
+		// address.setCountry(bdRequest.getCountry());
+		// address.setLatitude(bdRequest.getLatitude());
+		// address.setLongitude(bdRequest.getLongitude());
+		// address.setServiceRadius(bdRequest.getServiceRadius());
+		//
+		// this.addressRepository.save(address);
 
 		this.userRepository.save(existingUser);
 	}
@@ -193,9 +199,9 @@ public class UserServiceImpl implements UserService {
 		User user = this.userRepository.findById(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
 
-//		List<UserCart> userCart = this.cartRepository.findByUser(user);
-//		userCart.stream().forEach(cart -> cart.setMenuItem(null));
-//		this.cartRepository.deleteAll(userCart);
+		// List<UserCart> userCart = this.cartRepository.findByUser(user);
+		// userCart.stream().forEach(cart -> cart.setMenuItem(null));
+		// this.cartRepository.deleteAll(userCart);
 
 		this.userRepository.delete(user);
 	}
@@ -257,7 +263,7 @@ public class UserServiceImpl implements UserService {
 	public String resetPassword(PasswordDto passwordDto, String emailId) {
 		User user = this.userRepository.findByEmailId(emailId)
 				.orElseThrow(() -> new ResourceNotFoundException("Email", "Id", emailId));
-		
+
 		if (passwordEncoder.matches(passwordDto.getOldPassword(), user.getPassword())) {
 
 			if (passwordDto.getNewPassword() != null && passwordDto.getcPassword() != null
@@ -277,7 +283,7 @@ public class UserServiceImpl implements UserService {
 	public boolean resetPass(PasswordDto passwordDto, String emailId) {
 		if (passwordDto.getNewPassword() != null && passwordDto.getcPassword() != null
 				&& passwordDto.getNewPassword().equals(passwordDto.getcPassword())) {
-			
+
 			User user = this.userRepository.findByEmailId(emailId)
 					.orElseThrow(() -> new ResourceNotFoundException("Email", "Id", emailId));
 
@@ -308,4 +314,30 @@ public class UserServiceImpl implements UserService {
 		return savedUser;
 	}
 
+	@Override
+	@Transactional
+	public void updateUserEmail(String emailId, Integer userId) {
+		User user = userRepository.findById(userId)
+				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
+		user.setEmailId(emailId);
+		userRepository.save(user);
+	}
+
+	@Override
+	@Transactional
+	public void updateUserPhoneNo(String phoneNo, Integer userId) {
+		User user = userRepository.findById(userId)
+				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
+		user.setPhoneNo(phoneNo);
+		userRepository.save(user);
+	}
+
+	@Override
+	public void updateUserDetails(String firstName, String lastName, Integer userId) {
+		User user = userRepository.findById(userId)
+				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
+		user.setFirstName(firstName);
+		user.setLastName(lastName);
+		userRepository.save(user);
+	}
 }

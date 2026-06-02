@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import com.homeybites.entities.Address;
-import com.homeybites.payloads.UserRoles;
 
 public interface AddressRepository extends JpaRepository<Address, Long> {
 

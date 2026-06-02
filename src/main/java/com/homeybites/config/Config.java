@@ -3,6 +3,7 @@ package com.homeybites.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestClient;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
@@ -23,4 +24,9 @@ public class Config {
 	protected Cloudinary cloudinary() {
 		return new Cloudinary(ObjectUtils.asMap("cloud_name",name, "api_key",key, "api_secret",secret));
 	}
+
+	@Bean
+    protected RestClient restClient() {
+        return RestClient.create();
+    }
 }
