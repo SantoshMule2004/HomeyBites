@@ -52,35 +52,35 @@ public class MenuController {
 	}
 
 	// get menu item by id
-	@GetMapping("/menuitem/{menuId}")
+	@GetMapping("/public/menuitem/{menuId}")
 	public ResponseEntity<MenuItem> getMenuItem(@PathVariable Long menuId) {
 		MenuItem menuItem = this.menuItemService.getMenuItem(menuId);
 		return new ResponseEntity<MenuItem>(menuItem, HttpStatus.OK);
 	}
 
 	// get all menu items
-	@GetMapping("/menuitems")
+	@GetMapping("/public/menuitems")
 	public ResponseEntity<List<MenuItem>> getAllMenuItems() {
 		List<MenuItem> allMenuItem = this.menuItemService.getAllMenuItem();
 		return new ResponseEntity<List<MenuItem>>(allMenuItem, HttpStatus.OK);
 	}
 
 	// get all menu items with provider info
-	@GetMapping("/menuitem-provider")
+	@GetMapping("/public/menuitem-provider")
 	public ResponseEntity<List<MenuItemDto>> getAllMenusWithProviders() {
 		List<MenuItemDto> allMenuItem = this.menuItemService.getAllMenusWithProviders();
 		return new ResponseEntity<List<MenuItemDto>>(allMenuItem, HttpStatus.OK);
 	}
 
 	// get all menu items by type
-	@GetMapping("/menuitems/type")
+	@GetMapping("/public/menuitems/type")
 	public ResponseEntity<List<MenuItem>> getAllMenuItemsByType(@RequestParam String menuType) {
 		List<MenuItem> allMenuItem = this.menuItemService.getAllMenuItemByType(menuType);
 		return new ResponseEntity<List<MenuItem>>(allMenuItem, HttpStatus.OK);
 	}
 
 	// get all menu items of a category
-	@GetMapping("/category/{cId}/menuitems")
+	@GetMapping("/public/category/{cId}/menuitems")
 	public ResponseEntity<List<MenuItem>> getMenuItemByCategory(@PathVariable Long cId) {
 		List<MenuItem> menuItems = this.menuItemService.getMenuItemByCategory(cId);
 		return new ResponseEntity<List<MenuItem>>(menuItems, HttpStatus.OK);
@@ -94,7 +94,7 @@ public class MenuController {
 	}
 
 	// get all nearby menu items
-	@GetMapping("/nearby-menuitems")
+	@GetMapping("/public/nearby-menuitems")
 	public ResponseEntity<List<MenuItem>> getNearbyMenuItem(@RequestParam double lat, @RequestParam double lon) {
 		List<MenuItem> menuItems = this.menuItemService.getAllNearbyMenuItem(lat, lon);
 		return new ResponseEntity<List<MenuItem>>(menuItems, HttpStatus.OK);

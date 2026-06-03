@@ -17,6 +17,8 @@ public class Address {
 	private String receiverContactNo;
 	private String latitude;
 	private String longitude;
+	private String addressType;
+	private String addressName;
 
 	@Column(name = "user_id")
 	private Long userId;
@@ -87,5 +89,21 @@ public class Address {
 
 	public void setUserId(Long userId) {
 		this.userId = userId;
+	}
+
+	public String getAddressType() {
+		return addressType;
+	}
+
+	public void setAddressType(String addressType) {
+		this.addressType = addressType;
+	}
+
+	public String getAddressName() {
+		return addressName;
+	}
+
+	public void setAddressName(String addressName) {
+		this.addressName = addressName;
 	}
 }

@@ -65,7 +65,7 @@ public class UserController {
 	public ResponseEntity<ApiResponse> updateUserDetails(@Valid @RequestBody UpdateUserDetailsDto dto,
 			@PathVariable Integer userId) {
 		this.userService.updateUserDetails(dto.getFirstName(), dto.getLastName(), userId);
-		return new ResponseEntity<ApiResponse>(new ApiResponse("Email updated successfully..!", true, null),
+		return new ResponseEntity<ApiResponse>(new ApiResponse("User details updated successfully..!", true, null),
 				HttpStatus.OK);
 	}
 

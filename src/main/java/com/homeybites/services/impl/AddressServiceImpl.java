@@ -45,6 +45,8 @@ public class AddressServiceImpl implements AddressService {
 		address.setLongitude(add.getLongitude());
 		address.setReceiverName(add.getReceiverName());
 		address.setReceiverContactNo(add.getReceiverContactNo());
+		address.setAddressType(add.getAddressType());
+		address.setAddressName(add.getAddressName());
 
 		return this.addressRepository.save(address);
 	}

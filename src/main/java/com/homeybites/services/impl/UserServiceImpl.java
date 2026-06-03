@@ -8,18 +8,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.homeybites.entities.Address;
-//import com.homeybites.entities.Address;
 import com.homeybites.entities.User;
-//import com.homeybites.entities.UserCart;
 import com.homeybites.exceptions.ResourceNotFoundException;
 import com.homeybites.payloads.BusinessDetaisRequest;
 import com.homeybites.payloads.OtpDto;
 import com.homeybites.payloads.PasswordDto;
 import com.homeybites.payloads.RegisterUserRequest;
 import com.homeybites.payloads.UserInfo;
-//import com.homeybites.repositories.AddressRepository;
-//import com.homeybites.repositories.AddressRepository;
-//import com.homeybites.repositories.CartRepository;
 import com.homeybites.repositories.UserRepository;
 import com.homeybites.services.AddressService;
 import com.homeybites.services.EmailService;

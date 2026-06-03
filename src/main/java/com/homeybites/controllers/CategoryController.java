@@ -34,13 +34,13 @@ public class CategoryController {
 				HttpStatus.CREATED);
 	}
 
-	@GetMapping("/{cId}")
+	@GetMapping("/public/{cId}")
 	public ResponseEntity<Category> getCategory(@PathVariable Long cId) {
 		Category category = this.categoryService.getCategory(cId);
 		return new ResponseEntity<Category>(category, HttpStatus.OK);
 	}
 
-	@GetMapping("/")
+	@GetMapping("/public")
 	public ResponseEntity<List<Category>> getAllCategory() {
 		List<Category> allCategory = this.categoryService.getAllCategory();
 		return new ResponseEntity<List<Category>>(allCategory, HttpStatus.OK);
