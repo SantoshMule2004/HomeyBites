@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.homeybites.entities.MenuItem;
 import com.homeybites.payloads.ApiResponse;
-import com.homeybites.payloads.MenuItemDto;
+import com.homeybites.payloads.NearbyMenuProjection;
 import com.homeybites.services.MenuItemService;
 
 import jakarta.validation.Valid;
@@ -33,7 +34,7 @@ public class MenuController {
 	private MenuItemService menuItemService;
 
 	// add menu item
-	@PostMapping("/user/{userId}/category/{cId}/menuitem/")
+	@PostMapping(value = "/user/{userId}/category/{cId}/menuitem/", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<ApiResponse> addMenuItem(@Valid @RequestPart MenuItem menuItemData,
 			@RequestPart MultipartFile file, @PathVariable Long cId, @PathVariable Long userId)
 			throws IOException {
@@ -53,9 +54,10 @@ public class MenuController {
 
 	// get menu item by id
 	@GetMapping("/public/menuitem/{menuId}")
-	public ResponseEntity<MenuItem> getMenuItem(@PathVariable Long menuId) {
-		MenuItem menuItem = this.menuItemService.getMenuItem(menuId);
-		return new ResponseEntity<MenuItem>(menuItem, HttpStatus.OK);
+	public ResponseEntity<NearbyMenuProjection> getMenuItem(@PathVariable Long menuId, @RequestParam Double lat,
+			@RequestParam Double lng) {
+		NearbyMenuProjection menuItem = this.menuItemService.getMenuItem(menuId, lat, lng);
+		return new ResponseEntity<NearbyMenuProjection>(menuItem, HttpStatus.OK);
 	}
 
 	// get all menu items
@@ -65,38 +67,23 @@ public class MenuController {
 		return new ResponseEntity<List<MenuItem>>(allMenuItem, HttpStatus.OK);
 	}
 
-	// get all menu items with provider info
-	@GetMapping("/public/menuitem-provider")
-	public ResponseEntity<List<MenuItemDto>> getAllMenusWithProviders() {
-		List<MenuItemDto> allMenuItem = this.menuItemService.getAllMenusWithProviders();
-		return new ResponseEntity<List<MenuItemDto>>(allMenuItem, HttpStatus.OK);
-	}
-
-	// get all menu items by type
-	@GetMapping("/public/menuitems/type")
-	public ResponseEntity<List<MenuItem>> getAllMenuItemsByType(@RequestParam String menuType) {
-		List<MenuItem> allMenuItem = this.menuItemService.getAllMenuItemByType(menuType);
-		return new ResponseEntity<List<MenuItem>>(allMenuItem, HttpStatus.OK);
-	}
-
-	// get all menu items of a category
-	@GetMapping("/public/category/{cId}/menuitems")
-	public ResponseEntity<List<MenuItem>> getMenuItemByCategory(@PathVariable Long cId) {
-		List<MenuItem> menuItems = this.menuItemService.getMenuItemByCategory(cId);
-		return new ResponseEntity<List<MenuItem>>(menuItems, HttpStatus.OK);
+	// get all menuitems nearby user with filterations (category, menutype,
+	// maxprice, platformradius)
+	@GetMapping("/public/menuitem-nearby")
+	public ResponseEntity<List<NearbyMenuProjection>> getAllMenusWithProviders(@RequestParam Double lat,
+			@RequestParam Double lng, @RequestParam(defaultValue = "10000") Double platformRadius,
+			@RequestParam(required = false) Long categoryId,
+			@RequestParam(required = false) String menuType,
+			@RequestParam(required = false) Double maxPrice) {
+		List<NearbyMenuProjection> allMenuItem = this.menuItemService.findProviderNearbyUsers(lat, lng, platformRadius,
+				categoryId, menuType, maxPrice);
+		return new ResponseEntity<List<NearbyMenuProjection>>(allMenuItem, HttpStatus.OK);
 	}
 
 	// get all menu items of a tiffin provider
 	@GetMapping("/tiffin-provider/{userId}/menuitems")
 	public ResponseEntity<List<MenuItem>> getMenuItemByTiffinProvider(@PathVariable Long userId) {
 		List<MenuItem> menuItems = this.menuItemService.getMenuItemByTiffinProvider(userId);
-		return new ResponseEntity<List<MenuItem>>(menuItems, HttpStatus.OK);
-	}
-
-	// get all nearby menu items
-	@GetMapping("/public/nearby-menuitems")
-	public ResponseEntity<List<MenuItem>> getNearbyMenuItem(@RequestParam double lat, @RequestParam double lon) {
-		List<MenuItem> menuItems = this.menuItemService.getAllNearbyMenuItem(lat, lon);
 		return new ResponseEntity<List<MenuItem>>(menuItems, HttpStatus.OK);
 	}
 

@@ -6,7 +6,7 @@ import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.homeybites.entities.MenuItem;
-import com.homeybites.payloads.MenuItemDto;
+import com.homeybites.payloads.NearbyMenuProjection;
 
 public interface MenuItemService {
 
@@ -18,7 +18,7 @@ public interface MenuItemService {
 	MenuItem UploadMenuImage(MultipartFile file, Long menuId) throws IOException;
 
 	// get menu item
-	MenuItem getMenuItem(Long menuId);
+	NearbyMenuProjection getMenuItem(Long menuId, double userLat, double userLng);
 
 	// get menu items by category
 	List<MenuItem> getMenuItemByCategory(Long cId);
@@ -26,8 +26,10 @@ public interface MenuItemService {
 	// get menu items of tiffin provider
 	List<MenuItem> getMenuItemByTiffinProvider(Long userId);
 
-	// get menuitem with provider details
-	List<MenuItemDto> getAllMenusWithProviders();
+	// get all nearby menuitems from user
+	List<NearbyMenuProjection> findProviderNearbyUsers(double userLat, double userLng,
+			double maxAbsolutePlatformRadiusInMeters, Long categoryId,
+			String menuType, Double maxPrice);
 
 	// get all menu items
 	List<MenuItem> getAllMenuItem();

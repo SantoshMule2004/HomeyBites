@@ -10,11 +10,10 @@ import org.springframework.web.multipart.MultipartFile;
 import com.homeybites.entities.MenuItem;
 import com.homeybites.exceptions.ResourceNotFoundException;
 import com.homeybites.payloads.ImageInfo;
-import com.homeybites.payloads.MenuItemDto;
+import com.homeybites.payloads.NearbyMenuProjection;
 import com.homeybites.repositories.MenuItemRepository;
 import com.homeybites.repositories.UserRepository;
 import com.homeybites.services.ImageService;
-//import com.homeybites.services.ImageService;
 import com.homeybites.services.MenuItemService;
 
 @Service
@@ -59,9 +58,8 @@ public class MenuItemServiceImpl implements MenuItemService {
 	}
 
 	@Override
-	public MenuItem getMenuItem(Long menuId) {
-		return this.menuItemRepository.findById(menuId)
-				.orElseThrow(() -> new ResourceNotFoundException("Menu item", "id", menuId));
+	public NearbyMenuProjection getMenuItem(Long menuId, double userLat, double userLng) {
+		return this.menuItemRepository.getMenuItemById(menuId, userLat, userLng);
 	}
 
 	@Override
@@ -140,7 +138,10 @@ public class MenuItemServiceImpl implements MenuItemService {
 	}
 
 	@Override
-	public List<MenuItemDto> getAllMenusWithProviders() {
-		return this.menuItemRepository.getAllMenusWithProviders();
+	public List<NearbyMenuProjection> findProviderNearbyUsers(double userLat, double userLng,
+			double maxAbsolutePlatformRadiusInMeters, Long categoryId,
+			String menuType, Double maxPrice) {
+		return this.menuItemRepository.findProviderNearbyUsers(userLat, userLng, maxAbsolutePlatformRadiusInMeters,
+				categoryId, menuType, maxPrice);
 	}
 }
