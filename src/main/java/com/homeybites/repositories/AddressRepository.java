@@ -12,6 +12,8 @@ public interface AddressRepository extends JpaRepository<Address, Long> {
 
 	// get all address of user
 	List<Address> findByUserId(Long userId);
+	
+	Optional<Address> findByAddId(Long addId);
 
 	// get single address of a user
 	@Query(value = "select * from address where user_id = ? and add_id = ?", nativeQuery = true)

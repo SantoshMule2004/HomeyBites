@@ -36,10 +36,12 @@ public interface CartItemRepository extends JpaRepository<CartItem, Long> {
             m.imageUrl, 
             m.format, 
             m.categoryId, 
-            m.providerId
+            m.providerId,
+            u.businessName
         ) 
         FROM CartItem c 
-        JOIN MenuItem m ON c.menuItemId = m.menuId 
+        JOIN MenuItem m ON c.menuItemId = m.menuId
+        LEFT JOIN User u ON m.providerId = u.userId
         WHERE c.cartId = :cartId
     """)
     List<CartItemDto> findCartItemsWithMenuDetails(@Param("cartId") Long cartId);

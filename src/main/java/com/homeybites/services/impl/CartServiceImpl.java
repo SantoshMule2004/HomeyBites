@@ -16,6 +16,8 @@ import com.homeybites.repositories.CartRepository;
 import com.homeybites.repositories.MenuItemRepository;
 import com.homeybites.services.CartService;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class CartServiceImpl implements CartService {
 
@@ -29,6 +31,7 @@ public class CartServiceImpl implements CartService {
 	private MenuItemRepository menuItemRepository;
 
 	@Override
+	@Transactional
 	public void addItemsToCart(Long userId, Long itemId) {
 		UserCart usercart = this.cartRepository.findByUserIdAndIsActive(userId, true)
 				.orElseGet(() -> createNewCart(userId));
@@ -36,15 +39,18 @@ public class CartServiceImpl implements CartService {
 		Optional<CartItem> existingCartItem = this.cartItemRepository.findByCartIdAndMenuItemId(usercart.getCartId(),
 				itemId);
 
+		System.out.println("Existing total: " + usercart.getGrandTotal());
+
+		CartItem cartItem = new CartItem();
+
 		if (existingCartItem.isPresent()) {
-			CartItem cartItem = existingCartItem.get();
+			cartItem = existingCartItem.get();
 			cartItem.setQuantity(cartItem.getQuantity() + 1);
-			this.cartItemRepository.save(cartItem);
+			cartItem = this.cartItemRepository.save(cartItem);
 		} else {
 			MenuItem menuItem = this.menuItemRepository.findById(itemId)
 					.orElseThrow(() -> new ResourceNotFoundException("Menu item", "id", itemId));
 
-			CartItem cartItem = new CartItem();
 			cartItem.setMenuItemId(itemId);
 			cartItem.setPriceWhenAdded(menuItem.getPrice());
 			cartItem.setCartId(usercart.getCartId());
@@ -52,17 +58,41 @@ public class CartServiceImpl implements CartService {
 			cartItem.setPriceChanged(false);
 			cartItem.setQuantity(1);
 
-			this.cartItemRepository.save(cartItem);
+			cartItem = this.cartItemRepository.save(cartItem);
 		}
+
+		System.out.println("CartItem: " + cartItem);
+
+		usercart.setGrandTotal(
+				(usercart.getGrandTotal() != null ? usercart.getGrandTotal() : 0.0) + cartItem.getCurrentPrice());
+		usercart = this.cartRepository.save(usercart);
+
+		System.out.println(usercart);
 	}
 
 	@Override
+	@Transactional
 	public void updateCartItem(Long cartItemId, Integer quantity) {
 		CartItem cartItem = this.cartItemRepository.findById(cartItemId)
 				.orElseThrow(() -> new ResourceNotFoundException("CartItem", "Id", cartItemId));
 
+		UserCart usercart = this.cartRepository.findById(cartItem.getCartId())
+				.orElseGet(() -> createNewCart(cartItem.getCartId()));
+
+//		Double grandTotal = (usercart.getGrandTotal() != null ? usercart.getGrandTotal() : 0.0)
+//				- (cartItem.getCurrentPrice() * cartItem.getQuantity()) + (cartItem.getCurrentPrice() * quantity);
+//		usercart.setGrandTotal(grandTotal);
+
+		Double grandTotal = (usercart.getGrandTotal() != null ? usercart.getGrandTotal() : 0.0)
+				+ (cartItem.getCurrentPrice() * (quantity - cartItem.getQuantity()));
+		usercart.setGrandTotal(grandTotal);
+
+		System.out.println("Usercart" + usercart);
+
 		cartItem.setQuantity(quantity);
+
 		this.cartItemRepository.save(cartItem);
+		this.cartRepository.save(usercart);
 	}
 
 	@Override
@@ -81,14 +111,19 @@ public class CartServiceImpl implements CartService {
 	}
 
 	@Override
-	public void deleteCart(Long cartId) {
-		List<CartItem> cartItems = this.cartItemRepository.findByCartId(cartId);
-		this.cartItemRepository.deleteAll(cartItems);
+	@Transactional
+	public void deleteCart(Long userId) {
+		UserCart usercart = this.cartRepository.findByUserId(userId).orElseGet(() -> createNewCart(userId));
 
+		usercart.setGrandTotal(0.0);
+		List<CartItem> cartItems = this.cartItemRepository.findByCartId(usercart.getCartId());
+		System.out.println("cartitems- " + cartItems.size());
+		this.cartItemRepository.deleteAll(cartItems);
+		this.cartRepository.save(usercart);
 	}
 
 	public UserCart createNewCart(Long userId) {
-		return this.cartRepository.save(new UserCart(userId, true));
+		return this.cartRepository.save(new UserCart(userId, true, 0.0));
 	}
 
 	@Override

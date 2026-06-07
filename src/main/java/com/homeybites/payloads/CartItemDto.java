@@ -20,36 +20,39 @@ public class CartItemDto {
 	private String format;
 	private Long categoryId;
 	private Long providerId;
+    private String businessName;
 
     
     public CartItemDto() {
     }
-
-    public CartItemDto(Long cartItemId, Long cartId, Integer quantity, double priceWhenAdded, double currentPrice,
-            boolean isPriceChanged, Long menuItemId, String menuName, double price, String description, Long count,
-            boolean isActive, String menuType, String imagePublicId, String imageUrl, String format, Long categoryId,
-            Long providerId) {
-        this.cartItemId = cartItemId;
-        this.cartId = cartId;
-        this.quantity = quantity;
-        this.priceWhenAdded = priceWhenAdded;
-        this.currentPrice = currentPrice;
-        this.isPriceChanged = isPriceChanged;
-        this.menuItemId = menuItemId;
-        this.menuName = menuName;
-        this.price = price;
-        this.description = description;
-        this.count = count;
-        this.isActive = isActive;
-        this.menuType = menuType;
-        this.imagePublicId = imagePublicId;
-        this.imageUrl = imageUrl;
-        this.format = format;
-        this.categoryId = categoryId;
-        this.providerId = providerId;
-    }
     
-    public Long getCartItemId() {
+    public CartItemDto(Long cartItemId, Long cartId, Integer quantity, double priceWhenAdded, double currentPrice,
+			boolean isPriceChanged, Long menuItemId, String menuName, double price, String description, Long count,
+			boolean isActive, String menuType, String imagePublicId, String imageUrl, String format, Long categoryId,
+			Long providerId, String businessName) {
+		super();
+		this.cartItemId = cartItemId;
+		this.cartId = cartId;
+		this.quantity = quantity;
+		this.priceWhenAdded = priceWhenAdded;
+		this.currentPrice = currentPrice;
+		this.isPriceChanged = isPriceChanged;
+		this.menuItemId = menuItemId;
+		this.menuName = menuName;
+		this.price = price;
+		this.description = description;
+		this.count = count;
+		this.isActive = isActive;
+		this.menuType = menuType;
+		this.imagePublicId = imagePublicId;
+		this.imageUrl = imageUrl;
+		this.format = format;
+		this.categoryId = categoryId;
+		this.providerId = providerId;
+		this.businessName = businessName;
+	}
+
+	public Long getCartItemId() {
         return cartItemId;
     }
     public void setCartItemId(Long cartItemId) {
@@ -157,4 +160,22 @@ public class CartItemDto {
     public void setProviderId(Long providerId) {
         this.providerId = providerId;
     }
+
+	public String getBusinessName() {
+		return businessName;
+	}
+
+	public void setBusinessName(String businessName) {
+		this.businessName = businessName;
+	}
+
+	@Override
+	public String toString() {
+		return "CartItemDto [cartItemId=" + cartItemId + ", cartId=" + cartId + ", quantity=" + quantity
+				+ ", priceWhenAdded=" + priceWhenAdded + ", currentPrice=" + currentPrice + ", isPriceChanged="
+				+ isPriceChanged + ", menuItemId=" + menuItemId + ", menuName=" + menuName + ", price=" + price
+				+ ", description=" + description + ", count=" + count + ", isActive=" + isActive + ", menuType="
+				+ menuType + ", imagePublicId=" + imagePublicId + ", imageUrl=" + imageUrl + ", format=" + format
+				+ ", categoryId=" + categoryId + ", providerId=" + providerId + ", businessName=" + businessName + "]";
+	}
 }

@@ -82,4 +82,11 @@ public class CartItem {
 	public void setPriceChanged(boolean isPriceChanged) {
 		this.isPriceChanged = isPriceChanged;
 	}
+
+	@Override
+	public String toString() {
+		return "CartItem [cartItemId=" + cartItemId + ", cartId=" + cartId + ", menuItemId=" + menuItemId
+				+ ", quantity=" + quantity + ", priceWhenAdded=" + priceWhenAdded + ", currentPrice=" + currentPrice
+				+ ", isPriceChanged=" + isPriceChanged + "]";
+	}
 }

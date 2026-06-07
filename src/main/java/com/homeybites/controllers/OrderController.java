@@ -1,29 +1,41 @@
-//package com.homeybites.controllers;
-//
-//import java.time.LocalDate;
-//import java.util.List;
-//import java.util.Optional;
-//
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.http.ResponseEntity;
-//import org.springframework.web.bind.annotation.DeleteMapping;
-//import org.springframework.web.bind.annotation.GetMapping;
-//import org.springframework.web.bind.annotation.PathVariable;
-//import org.springframework.web.bind.annotation.PostMapping;
-//import org.springframework.web.bind.annotation.PutMapping;
-//import org.springframework.web.bind.annotation.RequestBody;
-//import org.springframework.web.bind.annotation.RequestMapping;
-//import org.springframework.web.bind.annotation.RequestParam;
-//import org.springframework.web.bind.annotation.RestController;
-//
+package com.homeybites.controllers;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.homeybites.services.CheckoutService;
+
 //import com.homeybites.entities.OrderInfo;
 //import com.homeybites.payloads.OrderResponse;
 //import com.homeybites.services.OrderService;
-//
-//@RestController
-//@RequestMapping("/api/v1/orders")
-//public class OrderController {
-//
+
+@RestController
+@RequestMapping("/api/v1/orders")
+public class OrderController {
+
+	@Autowired
+	private CheckoutService checkoutService;
+
+	@PostMapping("/place/{userId}")
+	public ResponseEntity<?> placeOrder(@PathVariable Long userId, @RequestParam Long addId,
+			@RequestParam String pmethod, @RequestParam String pstatus) {
+		this.checkoutService.processCheckout(userId, pmethod, pstatus, addId);
+		return ResponseEntity.ok("Order placed successfully..!");
+	}
+
 //	@Autowired
 //	private OrderService orderService;
 //
@@ -141,4 +153,4 @@
 //		boolean deleted = orderService.cancelOrder(id);
 //		return deleted ? ResponseEntity.ok("Order canceled successfully") : ResponseEntity.notFound().build();
 //	}
-//}
+}

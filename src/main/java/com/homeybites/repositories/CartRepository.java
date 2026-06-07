@@ -8,5 +8,7 @@ import com.homeybites.entities.UserCart;
 
 public interface CartRepository extends JpaRepository<UserCart, Long> {
 	Optional<UserCart> findByUserIdAndIsActive(Long userId, Boolean isActive);
+	
+	Optional<UserCart> findByUserId(Long userId);
 }
 
