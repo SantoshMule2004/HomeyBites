@@ -24,4 +24,8 @@ public interface CartService {
 
 	// delete cart
 	void deleteCart(Long userId);
+
+	long countItemsInCart(Long userId);
+
+	Double getGrandTotal(Long userId);
 }

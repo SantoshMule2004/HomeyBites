@@ -52,7 +52,7 @@ public class SecurityConfig {
 		return http.csrf(customizer -> customizer.disable())
 				.cors(ccustomizer -> ccustomizer.configurationSource(corsConfigurationSource()))
 				.authorizeHttpRequests(
-						request -> request.requestMatchers("/api/v1/auth/**", "/api/v1/public/**", "/api/v1/category/public/**").permitAll()
+						request -> request.requestMatchers("/api/v1/auth/**", "/api/v1/public/**", "/api/v1/category/public/**", "/api/v1/location/**").permitAll()
 								.anyRequest().authenticated())
 				.exceptionHandling(ex -> ex.authenticationEntryPoint(point)).httpBasic(Customizer.withDefaults())
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
