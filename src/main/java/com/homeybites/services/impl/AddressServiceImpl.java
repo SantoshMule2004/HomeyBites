@@ -47,6 +47,7 @@ public class AddressServiceImpl implements AddressService {
 		address.setReceiverContactNo(add.getReceiverContactNo());
 		address.setAddressType(add.getAddressType());
 		address.setAddressName(add.getAddressName());
+		address.setIsPrimary(add.getIsPrimary());
 
 		return this.addressRepository.save(address);
 	}

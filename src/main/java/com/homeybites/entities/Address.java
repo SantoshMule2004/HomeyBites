@@ -19,6 +19,7 @@ public class Address {
 	private String longitude;
 	private String addressType;
 	private String addressName;
+	private Boolean isPrimary = false;
 
 	@Column(name = "user_id")
 	private Long userId;
@@ -105,5 +106,13 @@ public class Address {
 
 	public void setAddressName(String addressName) {
 		this.addressName = addressName;
+	}
+
+	public Boolean getIsPrimary() {
+		return isPrimary;
+	}
+
+	public void setIsPrimary(Boolean isPrimary) {
+		this.isPrimary = isPrimary;
 	}
 }
