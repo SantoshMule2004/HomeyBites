@@ -79,9 +79,11 @@ public class CartServiceImpl implements CartService {
 		UserCart usercart = this.cartRepository.findById(cartItem.getCartId())
 				.orElseGet(() -> createNewCart(cartItem.getCartId()));
 
-//		Double grandTotal = (usercart.getGrandTotal() != null ? usercart.getGrandTotal() : 0.0)
-//				- (cartItem.getCurrentPrice() * cartItem.getQuantity()) + (cartItem.getCurrentPrice() * quantity);
-//		usercart.setGrandTotal(grandTotal);
+		// Double grandTotal = (usercart.getGrandTotal() != null ?
+		// usercart.getGrandTotal() : 0.0)
+		// - (cartItem.getCurrentPrice() * cartItem.getQuantity()) +
+		// (cartItem.getCurrentPrice() * quantity);
+		// usercart.setGrandTotal(grandTotal);
 
 		Double grandTotal = (usercart.getGrandTotal() != null ? usercart.getGrandTotal() : 0.0)
 				+ (cartItem.getCurrentPrice() * (quantity - cartItem.getQuantity()));
@@ -132,5 +134,18 @@ public class CartServiceImpl implements CartService {
 				.orElseGet(() -> createNewCart(userId));
 
 		return this.cartItemRepository.findCartItemsWithMenuDetails(usercart.getCartId());
+	}
+
+	@Override
+	public long countItemsInCart(Long userId) {
+		UserCart usercart = this.cartRepository.findByUserId(userId)
+				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
+
+		return this.cartItemRepository.countItemsInCart(usercart.getCartId());
+	}
+
+	@Override
+	public Double getGrandTotal(Long userId) {
+		return this.cartRepository.getGrandTotal(userId);
 	}
 }
