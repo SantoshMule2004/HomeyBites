@@ -27,7 +27,7 @@ public class CategoryController {
 	@Autowired
 	private CategoryService categoryService;
 
-	@PostMapping("/")
+	@PostMapping
 	public ResponseEntity<ApiResponse> addCategory(@Valid @RequestBody Category category) {
 		Category savedategory = this.categoryService.addCategory(category);
 		return new ResponseEntity<ApiResponse>(new ApiResponse("Category added successfully..!", true, savedategory),
@@ -59,5 +59,4 @@ public class CategoryController {
 		return new ResponseEntity<ApiResponse>(new ApiResponse("Category deleted successfully..!", true),
 				HttpStatus.NO_CONTENT);
 	}
-
 }

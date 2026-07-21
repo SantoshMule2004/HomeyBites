@@ -1,12 +1,16 @@
 package com.homeybites.services;
 
-import java.util.List;
+import org.springframework.data.domain.Pageable;
 
 import com.homeybites.entities.User;
+import com.homeybites.payloads.BusinessDetailsProjection;
 import com.homeybites.payloads.BusinessDetaisRequest;
 import com.homeybites.payloads.OtpDto;
+import com.homeybites.payloads.PageResponse;
 import com.homeybites.payloads.PasswordDto;
 import com.homeybites.payloads.RegisterUserRequest;
+import com.homeybites.payloads.UpdateUserDetailsDto;
+import com.homeybites.payloads.UserFilterRequest;
 import com.homeybites.payloads.UserInfo;
 
 public interface UserService {
@@ -17,31 +21,35 @@ public interface UserService {
 	// register admin
 	User registerAdmin(User user);
 
-	Integer getAllUserCount();
+	Long getAllUserCount();
+	
+	PageResponse<UserInfo> getUsers(UserFilterRequest filter, Pageable pageable);
 
-	Integer getUserCountByRole(String role);
+	Long getUserCountByRole(String role);
 
 	// add business details of tiffin provider
-	User addBussinessDetails(Integer providerId, BusinessDetaisRequest bdRequest);
+	BusinessDetailsProjection saveBusinessDetails(Long providerId, BusinessDetaisRequest bdRequest);
+	
+	BusinessDetailsProjection getBusinessDetails(Long providerId);
 
 	// save user
 	User saveUser(User user);
 
 	// updates user
-	void updateUser(User user, Integer userId);
+	void updateUser(User user, Long userId);
 
-	void updateUserEmail(String emailId, Integer userId);
-	void updateUserPhoneNo(String phoneNo, Integer userId);
-	void updateUserDetails(String firstName, String lastName, Integer userId);
+	void updateUserEmail(String emailId, Long userId);
+	void updateUserPhoneNo(String phoneNo, Long userId);
+	UserInfo updateUserDetails(UpdateUserDetailsDto dto, Long userId);
 
 	// updates business details
-	void updateBusinessDetails(User user, Integer userId, Integer addressId);
+	void updateBusinessDetails(User user, Long userId, Integer addressId);
 
 	// updating contact details
-	void updateContactDetails(String number, Integer userId);
+	void updateContactDetails(String number, Long userId);
 
 	// get single user
-	UserInfo getUser(Integer userId);
+	UserInfo getUser(Long userId);
 
 	// get single user by email id
 	UserInfo getUserInfoByEmail(String emailId);
@@ -61,14 +69,8 @@ public interface UserService {
 	// get single user by email id
 	boolean isUserPresent(String username);
 
-	// get all users
-	List<User> getAllUser();
-
-	// get all user with role
-	List<UserInfo> getUserByRole(String role);
-
 	// delete user
-	void deleteUser(Integer userId);
+	void deleteUser(Long userId);
 
 	// sending otp for verification
 	OtpDto sendOtp(String username);

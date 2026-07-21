@@ -17,34 +17,39 @@ import io.jsonwebtoken.Jwts;
 
 @Component
 public class JwtHelper {
-	
+
 	private static SecretKey SECRET_KEY;
-	
-    // directly using secretkey
-	public JwtHelper() throws NoSuchAlgorithmException
-	{
+
+	// directly using secretkey
+	public JwtHelper() throws NoSuchAlgorithmException {
 		KeyGenerator keyGenerator = KeyGenerator.getInstance("HmacSHA256");
 		SECRET_KEY = keyGenerator.generateKey();
 	}
 
 	// generating JWT token
-	public String generateToken(String username) {
+	public String generateToken(Long userId, String username) {
 		Map<String, Object> claims = new HashMap<>();
+		claims.put("userId", userId);
 		return Jwts.builder().claims().add(claims).subject(username).issuedAt(new Date(System.currentTimeMillis()))
 				.expiration(new Date(System.currentTimeMillis() + 60 * 60 * 1000)).and().signWith(get_key()).compact();
 	}
 
-	//generating secret key
+	// generating secret key
 	private SecretKey get_key() {
 		return JwtHelper.SECRET_KEY;
 	}
-	
-	
+
 	// validate token
 
 	// extracting username
 	public String extractUsername(String token) {
 		return extractClaim(token, Claims::getSubject); // extract user name from token
+	}
+
+	// extracting userId
+	public Long extractUserId(String token) {
+		Claims claims = Jwts.parser().verifyWith(SECRET_KEY).build().parseSignedClaims(token).getPayload();
+		return claims.get("userId", Long.class);
 	}
 
 	// extracting claims

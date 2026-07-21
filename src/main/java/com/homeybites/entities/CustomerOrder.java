@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,37 +15,45 @@ import jakarta.persistence.Id;
 @Entity
 public class CustomerOrder {
 	@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
+	@Column(name = "user_id", nullable = false)
+	private Long userId;
 
-    @Column(name = "grand_total", precision = 10, scale = 2, nullable = false)
-    private BigDecimal grandTotal;
+	@Column(name = "grand_total", precision = 10, scale = 2, nullable = false)
+	private BigDecimal grandTotal;
 
-    @Column(name = "tax_total", precision = 10, scale = 2, nullable = false)
-    private BigDecimal taxTotal;
+	@Column(name = "tax_total", precision = 10, scale = 2, nullable = false)
+	private BigDecimal taxTotal;
 
-    @Column(name = "discount_total", precision = 10, scale = 2, nullable = false)
-    private BigDecimal discountTotal;
-    
-    @Column(name = "payment_method", length = 50, nullable = false)
-    private String paymentMethod; // UPI, CARD, COD
+	@Column(name = "discount_total", precision = 10, scale = 2, nullable = false)
+	private BigDecimal discountTotal;
 
-    @Column(name = "payment_status", length = 50, nullable = false)
-    private String paymentStatus; // PENDING, SUCCESS, FAILED, REFUNDED
+//	@Column(name = "payment_method", length = 50, nullable = false)
+//	private String paymentMethod; // UPI, CARD, COD
+//
+//	@Column(name = "payment_status", length = 50, nullable = false)
+//	private String paymentStatus; // PENDING, SUCCESS, FAILED, REFUNDED
+//
+//	@Column(name = "payment_gateway_ref", length = 255)
+//	private String paymentGatewayRef; // e.g., Razorpay/Stripe transaction ID
 
-    @Column(name = "payment_gateway_ref", length = 255)
-    private String paymentGatewayRef; // e.g., Razorpay/Stripe transaction ID
+	// Storing as a JSON string or plain text to preserve the exact historical
+	// address
+	@Column(name = "delivery_address", columnDefinition = "TEXT", nullable = false)
+	private String deliveryAddress;
 
-    // Storing as a JSON string or plain text to preserve the exact historical address
-    @Column(name = "delivery_address", columnDefinition = "TEXT", nullable = false)
-    private String deliveryAddress; 
+	private String receiverName;
+	private String receiverContactNo;
 
-    @CreationTimestamp
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
+	@CreationTimestamp
+	@Column(name = "created_at", updatable = false)
+	private LocalDateTime createdAt;
+
+	@UpdateTimestamp
+	@Column(name = "updated_at")
+	private LocalDateTime updatedAt;
 
 	public CustomerOrder() {
 		super();
@@ -52,17 +61,13 @@ public class CustomerOrder {
 	}
 
 	public CustomerOrder(Long id, Long userId, BigDecimal grandTotal, BigDecimal taxTotal, BigDecimal discountTotal,
-			String paymentMethod, String paymentStatus, String paymentGatewayRef, String deliveryAddress,
-			LocalDateTime createdAt) {
+			String deliveryAddress, LocalDateTime createdAt) {
 		super();
 		this.id = id;
 		this.userId = userId;
 		this.grandTotal = grandTotal;
 		this.taxTotal = taxTotal;
 		this.discountTotal = discountTotal;
-		this.paymentMethod = paymentMethod;
-		this.paymentStatus = paymentStatus;
-		this.paymentGatewayRef = paymentGatewayRef;
 		this.deliveryAddress = deliveryAddress;
 		this.createdAt = createdAt;
 	}
@@ -107,21 +112,21 @@ public class CustomerOrder {
 		this.discountTotal = discountTotal;
 	}
 
-	public String getPaymentStatus() {
-		return paymentStatus;
-	}
-
-	public void setPaymentStatus(String paymentStatus) {
-		this.paymentStatus = paymentStatus;
-	}
-
-	public String getPaymentGatewayRef() {
-		return paymentGatewayRef;
-	}
-
-	public void setPaymentGatewayRef(String paymentGatewayRef) {
-		this.paymentGatewayRef = paymentGatewayRef;
-	}
+//	public String getPaymentStatus() {
+//		return paymentStatus;
+//	}
+//
+//	public void setPaymentStatus(String paymentStatus) {
+//		this.paymentStatus = paymentStatus;
+//	}
+//
+//	public String getPaymentGatewayRef() {
+//		return paymentGatewayRef;
+//	}
+//
+//	public void setPaymentGatewayRef(String paymentGatewayRef) {
+//		this.paymentGatewayRef = paymentGatewayRef;
+//	}
 
 	public String getDeliveryAddress() {
 		return deliveryAddress;
@@ -139,19 +144,43 @@ public class CustomerOrder {
 		this.createdAt = createdAt;
 	}
 
-	public String getPaymentMethod() {
-		return paymentMethod;
+//	public String getPaymentMethod() {
+//		return paymentMethod;
+//	}
+//
+//	public void setPaymentMethod(String paymentMethod) {
+//		this.paymentMethod = paymentMethod;
+//	}
+
+	public String getReceiverName() {
+		return receiverName;
 	}
 
-	public void setPaymentMethod(String paymentMethod) {
-		this.paymentMethod = paymentMethod;
+	public void setReceiverName(String receiverName) {
+		this.receiverName = receiverName;
+	}
+
+	public String getReceiverContactNo() {
+		return receiverContactNo;
+	}
+
+	public void setReceiverContactNo(String receiverContactNo) {
+		this.receiverContactNo = receiverContactNo;
+	}
+
+	public LocalDateTime getUpdatedAt() {
+		return updatedAt;
+	}
+
+	public void setUpdatedAt(LocalDateTime updatedAt) {
+		this.updatedAt = updatedAt;
 	}
 
 	@Override
 	public String toString() {
 		return "CustomerOrder [id=" + id + ", userId=" + userId + ", grandTotal=" + grandTotal + ", taxTotal="
-				+ taxTotal + ", discountTotal=" + discountTotal + ", paymentMethod=" + paymentMethod
-				+ ", paymentStatus=" + paymentStatus + ", paymentGatewayRef=" + paymentGatewayRef + ", deliveryAddress="
-				+ deliveryAddress + ", createdAt=" + createdAt + "]";
+				+ taxTotal + ", discountTotal=" + discountTotal + ", deliveryAddress=" + deliveryAddress
+				+ ", receiverName=" + receiverName + ", receiverContactNo=" + receiverContactNo + ", createdAt="
+				+ createdAt + ", updatedAt=" + updatedAt + "]";
 	}
 }

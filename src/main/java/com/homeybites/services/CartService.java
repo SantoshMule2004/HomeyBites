@@ -8,7 +8,7 @@ import com.homeybites.payloads.CartItemDto;
 public interface CartService {
 
 	// add item to cart
-	void addItemsToCart(Long cartId, Long itemId);
+	Integer addItemsToCart(Long cartId, Long itemId);
 
 	// update cart item
 	void updateCartItem(Long cartItemId, Integer quantity);

@@ -1,16 +1,18 @@
 package com.homeybites.controllers;
 
 import java.security.Principal;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,10 +20,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.homeybites.entities.User;
 import com.homeybites.payloads.ApiResponse;
+import com.homeybites.payloads.BusinessDetailsProjection;
+import com.homeybites.payloads.BusinessDetaisRequest;
+import com.homeybites.payloads.PageResponse;
 import com.homeybites.payloads.PasswordDto;
 import com.homeybites.payloads.UpdateEmailDto;
 import com.homeybites.payloads.UpdatePhoneDto;
 import com.homeybites.payloads.UpdateUserDetailsDto;
+import com.homeybites.payloads.UserFilterRequest;
 import com.homeybites.payloads.UserInfo;
 import com.homeybites.services.UserService;
 
@@ -36,16 +42,24 @@ public class UserController {
 
 	// update user
 	@PutMapping("/{userId}")
-	public ResponseEntity<ApiResponse> updateUser(@Valid @RequestBody User user, @PathVariable Integer userId) {
+	public ResponseEntity<ApiResponse> updateUser(@Valid @RequestBody User user, @PathVariable Long userId) {
 		this.userService.updateUser(user, userId);
 		return new ResponseEntity<ApiResponse>(new ApiResponse("User updated successfully..!", true, null),
 				HttpStatus.OK);
 	}
 
+	// checking working of @RequestAttribute
+	@GetMapping("/check")
+	public ResponseEntity<ApiResponse> getUserId(@RequestAttribute Long userId) {
+		UserInfo user = this.userService.getUser(userId);
+		return new ResponseEntity<ApiResponse>(
+				new ApiResponse("User fetched from @RequestAttribute - " + userId, true, user), HttpStatus.OK);
+	}
+
 	// update user email id
 	@PutMapping("/{userId}/email")
 	public ResponseEntity<ApiResponse> updateUserEmail(@Valid @RequestBody UpdateEmailDto dto,
-			@PathVariable Integer userId) {
+			@PathVariable Long userId) {
 		this.userService.updateUserEmail(dto.getEmail(), userId);
 		return new ResponseEntity<ApiResponse>(new ApiResponse("Email updated successfully..!", true, null),
 				HttpStatus.OK);
@@ -54,7 +68,7 @@ public class UserController {
 	// update user phone number
 	@PutMapping("/{userId}/phoneno")
 	public ResponseEntity<ApiResponse> updateUserPhoneNo(@Valid @RequestBody UpdatePhoneDto dto,
-			@PathVariable Integer userId) {
+			@PathVariable Long userId) {
 		this.userService.updateUserPhoneNo(dto.getPhoneNo(), userId);
 		return new ResponseEntity<ApiResponse>(new ApiResponse("Phone number updated successfully..!", true, null),
 				HttpStatus.OK);
@@ -63,15 +77,23 @@ public class UserController {
 	// update user details (firstname, lastname)
 	@PutMapping("/{userId}/user-details")
 	public ResponseEntity<ApiResponse> updateUserDetails(@Valid @RequestBody UpdateUserDetailsDto dto,
-			@PathVariable Integer userId) {
-		this.userService.updateUserDetails(dto.getFirstName(), dto.getLastName(), userId);
-		return new ResponseEntity<ApiResponse>(new ApiResponse("User details updated successfully..!", true, null),
+			@PathVariable Long userId) {
+		UserInfo userDetails = this.userService.updateUserDetails(dto, userId);
+		return new ResponseEntity<ApiResponse>(
+				new ApiResponse("User details updated successfully..!", true, userDetails), HttpStatus.OK);
+	}
+
+	// update business details
+	@PutMapping("/business-details/{userId}")
+	public ResponseEntity<ApiResponse> updateBusinessDetails(@RequestBody BusinessDetaisRequest request, @PathVariable Long userId) {
+		BusinessDetailsProjection details = this.userService.saveBusinessDetails(userId, request);
+		return new ResponseEntity<ApiResponse>(new ApiResponse("Business details updated successfully..!", true, details),
 				HttpStatus.OK);
 	}
 
 	// update business contact details
 	@PutMapping("/contact-details/{userId}")
-	public ResponseEntity<ApiResponse> updateContactDetails(@RequestParam String number, @PathVariable Integer userId) {
+	public ResponseEntity<ApiResponse> updateContactDetails(@RequestParam String number, @PathVariable Long userId) {
 		this.userService.updateContactDetails(number, userId);
 		return new ResponseEntity<ApiResponse>(new ApiResponse("Contact details updated successfully..!", true, null),
 				HttpStatus.OK);
@@ -87,23 +109,23 @@ public class UserController {
 
 	// get user by id
 	@GetMapping("/{userId}")
-	public ResponseEntity<ApiResponse> getUser(@PathVariable Integer userId) {
+	public ResponseEntity<ApiResponse> getUser(@PathVariable Long userId) {
 		UserInfo user = this.userService.getUser(userId);
 		return new ResponseEntity<ApiResponse>(new ApiResponse("User found..!", true, user), HttpStatus.OK);
 	}
 
 	// get user count
 	@GetMapping("/all/count")
-	public ResponseEntity<Integer> getAllUserCount() {
-		Integer count = this.userService.getAllUserCount();
-		return new ResponseEntity<Integer>(count, HttpStatus.OK);
+	public ResponseEntity<Long> getAllUserCount() {
+		Long count = this.userService.getAllUserCount();
+		return new ResponseEntity<Long>(count, HttpStatus.OK);
 	}
 
 	// get user count
 	@GetMapping("/count")
-	public ResponseEntity<Integer> getAllUserCount(@RequestParam String role) {
-		Integer count = this.userService.getUserCountByRole(role);
-		return new ResponseEntity<Integer>(count, HttpStatus.OK);
+	public ResponseEntity<Long> getAllUserCount(@RequestParam String role) {
+		Long count = this.userService.getUserCountByRole(role);
+		return new ResponseEntity<Long>(count, HttpStatus.OK);
 	}
 
 	// get user by email id
@@ -115,21 +137,22 @@ public class UserController {
 
 	// get all users
 	@GetMapping("/")
-	public ResponseEntity<List<User>> getAllUser() {
-		List<User> allUser = this.userService.getAllUser();
-		return new ResponseEntity<List<User>>(allUser, HttpStatus.OK);
+	public ResponseEntity<PageResponse<UserInfo>> getAllUser(@ModelAttribute UserFilterRequest filter,
+			Pageable pageable) {
+		PageResponse<UserInfo> allUser = this.userService.getUsers(filter, pageable);
+		return new ResponseEntity<PageResponse<UserInfo>>(allUser, HttpStatus.OK);
 	}
 
-	// get all users by role
-	@GetMapping("/role")
-	public ResponseEntity<List<UserInfo>> getAllUserByRole(@RequestParam String role) {
-		List<UserInfo> allUser = this.userService.getUserByRole(role);
-		return new ResponseEntity<List<UserInfo>>(allUser, HttpStatus.OK);
+	// get business details
+	@GetMapping("/business-details")
+	public ResponseEntity<BusinessDetailsProjection> getBusinessDetails(@RequestParam Long providerId) {
+		BusinessDetailsProjection bp = this.userService.getBusinessDetails(providerId);
+		return new ResponseEntity<>(bp, HttpStatus.OK);
 	}
 
 	// delete user
 	@DeleteMapping("/{userId}")
-	public ResponseEntity<ApiResponse> deleteUser(@PathVariable Integer userId) {
+	public ResponseEntity<ApiResponse> deleteUser(@PathVariable Long userId) {
 		this.userService.deleteUser(userId);
 		return new ResponseEntity<ApiResponse>(new ApiResponse("User deleted successfully..!", true),
 				HttpStatus.NO_CONTENT);

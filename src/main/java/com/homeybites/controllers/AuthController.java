@@ -23,6 +23,7 @@ import com.homeybites.payloads.JwtResponse;
 import com.homeybites.payloads.PasswordDto;
 import com.homeybites.payloads.RegisterUserRequest;
 import com.homeybites.payloads.UserInfo;
+import com.homeybites.payloads.UserRoles;
 import com.homeybites.services.UserService;
 
 import jakarta.validation.Valid;
@@ -49,8 +50,8 @@ public class AuthController {
 		UserInfo user = this.userService.getLoggedInUser(username);
 		JwtResponse response = new JwtResponse();
 
-		if (user.getUserRole().equals("ROLE_NORMAL_USER")) {
-			String token = jwtHelper.generateToken(jwtRequest.getUsername());
+		if (user.getUserRole().equals(UserRoles.ROLE_NORMAL_USER.name())) {
+			String token = jwtHelper.generateToken(user.getUserId(), jwtRequest.getUsername());
 			response.setMessage("Welocme to HomeyBites..!");
 			response.setStatus("success");
 			response.setToken(token);
@@ -90,7 +91,7 @@ public class AuthController {
 		if (user.getPassword() != null && user.getcPassword() != null
 				&& user.getPassword().equals(user.getcPassword())) {
 
-			this.userService.registerNewUser(user, "ROLE_NORMAL_USER");
+			this.userService.registerNewUser(user, UserRoles.ROLE_NORMAL_USER.name());
 
 			return new ResponseEntity<ApiResponse>(new ApiResponse("Registeration successfully..!", true, null),
 					HttpStatus.CREATED);
@@ -169,8 +170,8 @@ public class AuthController {
 		UserInfo user = this.userService.getLoggedInProvider(username);
 		JwtResponse response = new JwtResponse();
 
-		if (user.getUserRole().equals("ROLE_TIFFIN_PROVIDER")) {
-			String token = jwtHelper.generateToken(jwtRequest.getUsername());
+		if (user.getUserRole().equals(UserRoles.ROLE_TIFFIN_PROVIDER.name())) {
+			String token = jwtHelper.generateToken(user.getUserId(), jwtRequest.getUsername());
 			response.setMessage("Welocme to HomeyBites..!");
 			response.setStatus("success");
 			response.setToken(token);
@@ -198,9 +199,9 @@ public class AuthController {
 		if (user.getPassword() != null && user.getcPassword() != null
 				&& user.getPassword().equals(user.getcPassword())) {
 
-			this.userService.registerNewUser(user, "ROLE_TIFFIN_PROVIDER");
+			User newUser = this.userService.registerNewUser(user, UserRoles.ROLE_TIFFIN_PROVIDER.name());
 
-			return new ResponseEntity<ApiResponse>(new ApiResponse("Registeration successfully..!", true, null),
+			return new ResponseEntity<ApiResponse>(new ApiResponse("Registeration successfully..!", true, newUser.getUserId()),
 					HttpStatus.CREATED);
 		}
 
@@ -210,9 +211,9 @@ public class AuthController {
 
 	// add business details of tiffin provider
 	@PutMapping("/tiffin-provider/{providerId}/business-details")
-	public ResponseEntity<ApiResponse> addBusinnessDetails(@PathVariable Integer providerId,
+	public ResponseEntity<ApiResponse> addBusinnessDetails(@PathVariable Long providerId,
 			@RequestBody BusinessDetaisRequest bdRequest) {
-		this.userService.addBussinessDetails(providerId, bdRequest);
+		this.userService.saveBusinessDetails(providerId, bdRequest);
 		return new ResponseEntity<ApiResponse>(new ApiResponse("Bussiness details added successfully..!", true, null),
 				HttpStatus.OK);
 	}
@@ -226,8 +227,8 @@ public class AuthController {
 		UserInfo user = this.userService.getLoggedInAdmin(username);
 		JwtResponse response = new JwtResponse();
 
-		if (user.getUserRole().equals("ROLE_ADMIN")) {
-			String token = jwtHelper.generateToken(jwtRequest.getUsername());
+		if (user.getUserRole().equals(UserRoles.ROLE_ADMIN.name())) {
+			String token = jwtHelper.generateToken(user.getUserId(), jwtRequest.getUsername());
 			response.setMessage("Welocme to HomeyBites..!");
 			response.setStatus("success");
 			response.setToken(token);
@@ -254,7 +255,7 @@ public class AuthController {
 		if (user.getPassword() != null && user.getcPassword() != null
 				&& user.getPassword().equals(user.getcPassword())) {
 
-			User registeredUser = this.userService.registerNewUser(user, "ROLE_ADMIN");
+			User registeredUser = this.userService.registerNewUser(user, UserRoles.ROLE_ADMIN.name());
 
 			return new ResponseEntity<ApiResponse>(
 					new ApiResponse("Admin registered successfully..!", true, registeredUser), HttpStatus.CREATED);

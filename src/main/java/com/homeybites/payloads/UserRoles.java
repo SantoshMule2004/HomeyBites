@@ -1,7 +1,5 @@
 package com.homeybites.payloads;
 
 public enum UserRoles {
-	NORMAL_USER,
-	TIFFIN_PROVIDER,
-	ADMIN
+	ROLE_NORMAL_USER, ROLE_TIFFIN_PROVIDER, ROLE_ADMIN
 }

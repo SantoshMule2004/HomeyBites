@@ -2,7 +2,10 @@ package com.homeybites.services.impl;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,14 +13,21 @@ import org.springframework.transaction.annotation.Transactional;
 import com.homeybites.entities.Address;
 import com.homeybites.entities.User;
 import com.homeybites.exceptions.ResourceNotFoundException;
+import com.homeybites.payloads.BusinessDetailsProjection;
 import com.homeybites.payloads.BusinessDetaisRequest;
 import com.homeybites.payloads.OtpDto;
+import com.homeybites.payloads.PageResponse;
 import com.homeybites.payloads.PasswordDto;
 import com.homeybites.payloads.RegisterUserRequest;
+import com.homeybites.payloads.UpdateUserDetailsDto;
+import com.homeybites.payloads.UserFilterRequest;
 import com.homeybites.payloads.UserInfo;
+import com.homeybites.payloads.UserRoles;
+import com.homeybites.repositories.AddressRepository;
 import com.homeybites.repositories.UserRepository;
 import com.homeybites.services.AddressService;
 import com.homeybites.services.EmailService;
+import com.homeybites.services.ProviderMenuService;
 import com.homeybites.services.UserService;
 
 @Service
@@ -26,6 +36,9 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	private UserRepository userRepository;
 
+	@Autowired
+	private AddressRepository addressRepository;
+
 	// @Autowired
 	// private CartRepository cartRepository;
 
@@ -33,11 +46,15 @@ public class UserServiceImpl implements UserService {
 	private AddressService addressService;
 
 	@Autowired
+	private ProviderMenuService menuService;
+
+	@Autowired
 	private EmailService emailService;
 
 	private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(12);
 
 	@Override
+	@Transactional
 	public User registerNewUser(RegisterUserRequest user, String role) {
 		User newUser = new User();
 
@@ -52,11 +69,16 @@ public class UserServiceImpl implements UserService {
 
 		User savedUser = this.userRepository.save(newUser);
 
+		if (role.equals(UserRoles.ROLE_TIFFIN_PROVIDER.name())) {
+			menuService.createDefaultMenus(savedUser.getUserId());
+		}
+
 		return savedUser;
 	}
 
 	@Override
-	public User addBussinessDetails(Integer providerId, BusinessDetaisRequest bdRequest) {
+	@Transactional
+	public BusinessDetailsProjection saveBusinessDetails(Long providerId, BusinessDetaisRequest bdRequest) {
 		User providerInfo = this.userRepository.findById(providerId)
 				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", providerId));
 
@@ -67,17 +89,29 @@ public class UserServiceImpl implements UserService {
 		providerInfo.setGSTIN(bdRequest.getGSTIN());
 		providerInfo.setLatitude(bdRequest.getLatitude());
 		providerInfo.setLongitude(bdRequest.getLongitude());
-		providerInfo.setServiceRadius(bdRequest.getServiceRadius());
+		providerInfo.setServiceRadius(bdRequest.getServiceRadius() * 1000);
 
-		Address address = new Address();
+		List<Address> addresses = addressService.getAllAddress(providerId.intValue());
+
+		Address address;
+		if (!addresses.isEmpty()) {
+			address = addresses.get(0);
+			System.out.println("Address already added..");
+		} else {
+			address = new Address();
+			address.setUserId(providerId);
+		}
+
 		address.setAddressLine(bdRequest.getAddressLine());
 		address.setArea(bdRequest.getArea());
 		address.setLatitude(String.valueOf(bdRequest.getLatitude()));
 		address.setLongitude(String.valueOf(bdRequest.getLongitude()));
 
-		this.addressService.addAddress(address, providerInfo.getUserId());
+		addressRepository.save(address);
 
-		return this.userRepository.save(providerInfo);
+		this.userRepository.save(providerInfo);
+
+		return this.userRepository.getBusinessDetailsOfProvider(providerId);
 	}
 
 	@Override
@@ -86,7 +120,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public void updateUser(User user, Integer userId) {
+	public void updateUser(User user, Long userId) {
 
 		User existingUser = this.userRepository.findById(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
@@ -108,7 +142,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public void updateBusinessDetails(User user, Integer userId, Integer addressId) {
+	public void updateBusinessDetails(User user, Long userId, Integer addressId) {
 		User existingUser = this.userRepository.findById(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
 
@@ -135,13 +169,11 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public UserInfo getUser(Integer userId) {
+	public UserInfo getUser(Long userId) {
 		User user = this.userRepository.findById(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
 
-		return new UserInfo(user.getUserId(), user.getFirstName(), user.getMiddleName(), user.getLastName(),
-				user.getEmailId(), user.isVerified(), user.getPhoneNo(), user.getDob(), user.getGender(),
-				user.getDietryPref(), user.getUserRole());
+		return new UserInfo(user);
 	}
 
 	@Override
@@ -180,17 +212,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public List<User> getAllUser() {
-		return this.userRepository.findAll();
-	}
-
-	@Override
-	public List<UserInfo> getUserByRole(String role) {
-		return this.userRepository.findByUserRole(role);
-	}
-
-	@Override
-	public void deleteUser(Integer userId) {
+	public void deleteUser(Long userId) {
 		User user = this.userRepository.findById(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
 
@@ -202,7 +224,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public void updateContactDetails(String number, Integer userId) {
+	public void updateContactDetails(String number, Long userId) {
 		User user = this.userRepository.findById(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
 
@@ -291,13 +313,13 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public Integer getAllUserCount() {
-		return this.userRepository.getAllUserCount("ROLE_ADMIN");
+	public Long getAllUserCount() {
+		return this.userRepository.countUsersExcludingRole("ROLE_ADMIN");
 	}
 
 	@Override
-	public Integer getUserCountByRole(String role) {
-		return this.userRepository.getUserCount(role);
+	public Long getUserCountByRole(String role) {
+		return this.userRepository.countByUserRole(role);
 	}
 
 	@Override
@@ -311,7 +333,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	@Transactional
-	public void updateUserEmail(String emailId, Integer userId) {
+	public void updateUserEmail(String emailId, Long userId) {
 		User user = userRepository.findById(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
 		user.setEmailId(emailId);
@@ -320,7 +342,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	@Transactional
-	public void updateUserPhoneNo(String phoneNo, Integer userId) {
+	public void updateUserPhoneNo(String phoneNo, Long userId) {
 		User user = userRepository.findById(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
 		user.setPhoneNo(phoneNo);
@@ -328,11 +350,39 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public void updateUserDetails(String firstName, String lastName, Integer userId) {
+	@Transactional
+	public UserInfo updateUserDetails(UpdateUserDetailsDto dto, Long userId) {
 		User user = userRepository.findById(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
-		user.setFirstName(firstName);
-		user.setLastName(lastName);
-		userRepository.save(user);
+
+		user.setFirstName(dto.getFirstName());
+		user.setLastName(dto.getLastName());
+
+		if (dto.getDob() != null && !dto.getDob().isBlank()) {
+			user.setDob(dto.getDob().trim());
+		}
+
+		if (dto.getGender() != null && !dto.getGender().isBlank()) {
+			user.setGender(dto.getGender().trim());
+		}
+
+		if (dto.getPhoneNo() != null && !dto.getPhoneNo().isBlank()) {
+			user.setPhoneNo(dto.getPhoneNo().trim());
+		}
+
+		User savedUser = userRepository.save(user);
+
+		return new UserInfo(savedUser);
+	}
+
+	@Override
+	public PageResponse<UserInfo> getUsers(UserFilterRequest filter, Pageable pageable) {
+		Page<UserInfo> page = this.userRepository.findUsers(filter.getUserRole(), filter.getSearch(), pageable);
+		return new PageResponse<>(page);
+	}
+
+	@Override
+	public BusinessDetailsProjection getBusinessDetails(Long providerId) {
+		return this.userRepository.getBusinessDetailsOfProvider(providerId);
 	}
 }

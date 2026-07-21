@@ -19,7 +19,7 @@ public interface AddressRepository extends JpaRepository<Address, Long> {
 	@Query(value = "select * from address where user_id = ? and add_id = ?", nativeQuery = true)
 	Optional<Address> getAddress(Integer userId, Long addId);
 
-	// get single address of a user
+	// get all address of a user
 	@Query(value = "select * from address where user_id = ?", nativeQuery = true)
 	Optional<List<Address>> getAllAddressesOfUser(Integer userId);
 }

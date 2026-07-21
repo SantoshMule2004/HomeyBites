@@ -5,6 +5,7 @@ import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.coyote.BadRequestException;
 import org.eclipse.angus.mail.util.MailConnectException;
 import org.hibernate.exception.JDBCConnectionException;
 import org.springframework.dao.DataAccessException;
@@ -33,6 +34,14 @@ public class GlobalExceptionHandler {
 	// handles user not found exception
 	@ExceptionHandler(ResourceNotFoundException.class)
 	public ResponseEntity<ApiException> resourceNotFoundExceptionHandler(ResourceNotFoundException ex) {
+		String message = ex.getMessage();
+		ApiException response = new ApiException(message, false);
+		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+	}
+
+	// handles user not found exception
+	@ExceptionHandler(BadRequestException.class)
+	public ResponseEntity<ApiException> badRequestExceptionHandler(BadRequestException ex) {
 		String message = ex.getMessage();
 		ApiException response = new ApiException(message, false);
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
@@ -116,7 +125,7 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<ApiException> ExpiredJwtExceptionHandler(ExpiredJwtException ex) {
 //		String message = ex.getMessage();
 		ApiException response = new ApiException("JWT token expired..!", false);
-		return new ResponseEntity<ApiException>(response, HttpStatusCode.valueOf(498));
+		return new ResponseEntity<ApiException>(response, HttpStatus.UNAUTHORIZED);
 	}
 
 	// handler for malformed data in JWT token
@@ -132,7 +141,7 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<ApiException> SignatureExceptionHandler(SignatureException ex) {
 //		String message = ex.getMessage();
 		ApiException response = new ApiException("Invalid JWT token..!", false);
-		return new ResponseEntity<ApiException>(response, HttpStatusCode.valueOf(498));
+		return new ResponseEntity<ApiException>(response, HttpStatus.UNAUTHORIZED);
 	}
 
 	// handler for email connection timeout

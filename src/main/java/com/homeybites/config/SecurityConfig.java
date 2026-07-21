@@ -5,7 +5,6 @@ import java.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -51,9 +50,10 @@ public class SecurityConfig {
 	protected SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		return http.csrf(customizer -> customizer.disable())
 				.cors(ccustomizer -> ccustomizer.configurationSource(corsConfigurationSource()))
-				.authorizeHttpRequests(
-						request -> request.requestMatchers("/health/**", "/api/v1/auth/**", "/api/v1/public/**", "/api/v1/category/public/**").permitAll()
-								.anyRequest().authenticated())
+				.authorizeHttpRequests(request -> request
+						.requestMatchers("/health/**", "/api/v1/auth/**","/api/v1/location/**", "/api/v1/public/**",
+								"/api/v1/category/public/**", "/api/v1/tiffinplan/public/**")
+						.permitAll().anyRequest().authenticated())
 				.exceptionHandling(ex -> ex.authenticationEntryPoint(point)).httpBasic(Customizer.withDefaults())
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.addFilterBefore(this.jwtFilter(), UsernamePasswordAuthenticationFilter.class).build();
@@ -80,7 +80,7 @@ public class SecurityConfig {
 		corsConfiguration.setAllowedOrigins(Arrays.asList("http://localhost:5173", "https://homey-bites.netlify.app/",
 				"https://homeybitesdashboard.netlify.app/"));
 		corsConfiguration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept"));
-		corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+		corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
 		corsConfiguration.setMaxAge(3600L);
 
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

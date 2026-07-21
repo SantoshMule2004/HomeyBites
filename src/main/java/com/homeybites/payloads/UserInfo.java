@@ -1,5 +1,7 @@
 package com.homeybites.payloads;
 
+import com.homeybites.entities.User;
+
 public class UserInfo {
 	private Long userId;
 	private String firstName;
@@ -24,58 +26,26 @@ public class UserInfo {
 		super();
 		// TODO Auto-generated constructor stub
 	}
-
-	public UserInfo(Long userId, String firstName, String middleName, String lastName, String emailId,
-			boolean isVerified, String phoneNo, String dob, String gender, String dietryPref, String userRole) {
-		super();
-		this.userId = userId;
-		this.firstName = firstName;
-		this.middleName = middleName;
-		this.lastName = lastName;
-		this.emailId = emailId;
-		this.isVerified = isVerified;
-		this.phoneNo = phoneNo;
-		this.dob = dob;
-		this.gender = gender;
-		this.dietryPref = dietryPref;
-		this.userRole = userRole;
-	}
 	
-	public UserInfo(Long userId, String firstName, String middleName, String lastName, String emailId,
-			boolean isVerified, String phoneNo, String dob, String gender, String userRole) {
+	public UserInfo(User user) {
 		super();
-		this.userId = userId;
-		this.firstName = firstName;
-		this.middleName = middleName;
-		this.lastName = lastName;
-		this.emailId = emailId;
-		this.isVerified = isVerified;
-		this.phoneNo = phoneNo;
-		this.dob = dob;
-		this.gender = gender;
-		this.userRole = userRole;
-	}
-
-	public UserInfo(Long userId, String firstName, String middleName, String lastName, String emailId,
-			boolean isVerified, String phoneNo, String dob, String gender, String userRole, String businessName,
-			String foodLicenseNo, String gSTIN, double latitude, double longitude, double serviceRadius) {
-		super();
-		this.userId = userId;
-		this.firstName = firstName;
-		this.middleName = middleName;
-		this.lastName = lastName;
-		this.emailId = emailId;
-		this.isVerified = isVerified;
-		this.phoneNo = phoneNo;
-		this.dob = dob;
-		this.gender = gender;
-		this.userRole = userRole;
-		this.businessName = businessName;
-		this.foodLicenseNo = foodLicenseNo;
-		this.gstin = gSTIN;
-		this.latitude = latitude;
-		this.longitude = longitude;
-		this.serviceRadius = serviceRadius;
+		this.userId = user.getUserId();
+		this.firstName = user.getFirstName();
+		this.middleName = user.getMiddleName();
+		this.lastName = user.getLastName();
+		this.emailId = user.getEmailId();
+		this.isVerified = user.isVerified();
+		this.phoneNo = user.getPhoneNo();
+		this.dob = user.getDob();
+		this.gender = user.getGender();
+		this.dietryPref = user.getDietryPref();
+		this.userRole = user.getUserRole();
+		this.businessName = user.getBusinessName();
+		this.foodLicenseNo = user.getFoodLicenseNo();
+		this.gstin = user.getGSTIN();
+		this.latitude = user.getLatitude();
+		this.longitude = user.getLongitude();
+		this.serviceRadius = user.getServiceRadius();
 	}
 
 	public UserInfo(Long userId, String firstName, String middleName, String lastName, String emailId,

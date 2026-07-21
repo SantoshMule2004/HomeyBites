@@ -26,6 +26,8 @@ public class CartItem {
 	
 	private boolean isPriceChanged = false;
 	
+	@Column(name = "provider_id", nullable = false)
+	private Long providerId;
 
 	public Long getCartItemId() {
 		return cartItemId;
@@ -83,10 +85,18 @@ public class CartItem {
 		this.isPriceChanged = isPriceChanged;
 	}
 
+	public Long getProviderId() {
+		return providerId;
+	}
+
+	public void setProviderId(Long providerId) {
+		this.providerId = providerId;
+	}
+
 	@Override
 	public String toString() {
 		return "CartItem [cartItemId=" + cartItemId + ", cartId=" + cartId + ", menuItemId=" + menuItemId
 				+ ", quantity=" + quantity + ", priceWhenAdded=" + priceWhenAdded + ", currentPrice=" + currentPrice
-				+ ", isPriceChanged=" + isPriceChanged + "]";
+				+ ", isPriceChanged=" + isPriceChanged + ", providerId=" + providerId + "]";
 	}
 }

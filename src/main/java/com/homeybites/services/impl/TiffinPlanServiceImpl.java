@@ -1,55 +1,160 @@
-//package com.homeybites.services.impl;
-//
-//import java.time.LocalDateTime;
-//import java.util.ArrayList;
-//import java.util.List;
-//import java.util.stream.Collectors;
-//
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.stereotype.Service;
-//
-//import com.homeybites.entities.MenuItem;
-//import com.homeybites.entities.Subscription;
-//import com.homeybites.entities.TiffinDays;
-//import com.homeybites.entities.TiffinPlan;
-//import com.homeybites.entities.User;
-//import com.homeybites.entities.Log.TiffinPlanLog;
-//import com.homeybites.exceptions.ResourceNotFoundException;
-//import com.homeybites.payloads.UpdateMenuItemDto;
-//import com.homeybites.repositories.MenuItemRepository;
-//import com.homeybites.repositories.SubscriptionRepository;
-//import com.homeybites.repositories.TiffinPlanLogRepository;
-//import com.homeybites.repositories.TiffindaysRepository;
-//import com.homeybites.repositories.TiffinplanRepository;
-//import com.homeybites.repositories.UserRepository;
-//import com.homeybites.services.TiffinPlanService;
-//
-//@Service
-//public class TiffinPlanServiceImpl implements TiffinPlanService {
-//
-//	@Autowired
-//	private TiffinplanRepository tiffinplanRepository;
-//
-//	@Autowired
-//	private TiffindaysRepository tiffindaysRepository;
-//
-//	@Autowired
-//	private TiffinPlanLogRepository tiffinPlanLogRepository;
-//
-//	@Autowired
-//	private SubscriptionRepository subscriptionRepository;
-//
-//	@Autowired
-//	private UserRepository userRepository;
-//
-//	@Autowired
-//	private MenuItemRepository menuItemRepository;
-//
+package com.homeybites.services.impl;
+
+import org.springframework.stereotype.Service;
+
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
+
+import com.homeybites.entities.TiffinPlan;
+import com.homeybites.exceptions.ResourceNotFoundException;
+import com.homeybites.payloads.CreateTiffinPlanDTO;
+import com.homeybites.payloads.NearbyTiffinPlanProjection;
+import com.homeybites.payloads.PageResponse;
+import com.homeybites.payloads.TiffinPlanFilterRequest;
+import com.homeybites.repositories.TiffinplanRepository;
+import com.homeybites.repositories.UserRepository;
+import com.homeybites.services.TiffinPlanService;
+
+import jakarta.transaction.Transactional;
+
+@Service
+public class TiffinPlanServiceImpl implements TiffinPlanService {
+
+	private final TiffinplanRepository planRepository;
+	private final UserRepository userRepository;
+
+	public TiffinPlanServiceImpl(TiffinplanRepository planRepository, UserRepository userRepository) {
+		this.planRepository = planRepository;
+		this.userRepository = userRepository;
+	}
+
+	// 1. CREATE A NEW PLAN
+	@Override
+	@Transactional
+	public TiffinPlan createPlan(Long providerId, CreateTiffinPlanDTO req) {
+		TiffinPlan plan = new TiffinPlan();
+		plan.setProviderId(providerId);
+		plan.setPlanName(req.getPlanName());
+		plan.setValidityDays(req.getValidityDays());
+
+		// Meal Offerings & Dynamic Pricing (Nullify price if not offered)
+		plan.setOffersBreakfast(req.isOffersBreakfast());
+		plan.setPricePerBreakfast(req.isOffersBreakfast() ? req.getPricePerBreakfast() : null);
+
+		plan.setOffersLunch(req.isOffersLunch());
+		plan.setPricePerLunch(req.isOffersLunch() ? req.getPricePerLunch() : null);
+
+		plan.setOffersDinner(req.isOffersDinner());
+		plan.setPricePerDinner(req.isOffersDinner() ? req.getPricePerDinner() : null);
+
+		// System controlled fields
+		plan.setMaxCapacity(req.getMaxCapacity());
+		plan.setActiveSubscribers(0); // Hardcoded for fresh plans
+		plan.setActive(true); // Active by default
+
+		return planRepository.save(plan);
+	}
+
+	// 2. UPDATE AN EXISTING PLAN
+	@Override
+	@Transactional
+	public TiffinPlan updatePlan(Long providerId, Long planId, CreateTiffinPlanDTO req) {
+		TiffinPlan plan = planRepository.findById(planId)
+				.orElseThrow(() -> new ResourceNotFoundException("TiffinPlan", "id", planId));
+
+		// Security Check: Does this kitchen own this plan?
+		if (!plan.getProviderId().equals(providerId)) {
+			throw new SecurityException("Unauthorized to edit this plan.");
+		}
+
+		// Capacity Safety Check: You cannot lower capacity below current active users
+		if (req.getMaxCapacity() < plan.getActiveSubscribers()) {
+			throw new IllegalArgumentException("Cannot reduce capacity to " + req.getMaxCapacity()
+					+ ". You already have " + plan.getActiveSubscribers() + " active subscribers.");
+		}
+
+		plan.setPlanName(req.getPlanName());
+		plan.setValidityDays(req.getValidityDays());
+
+		plan.setOffersBreakfast(req.isOffersBreakfast());
+		plan.setPricePerBreakfast(req.isOffersBreakfast() ? req.getPricePerBreakfast() : null);
+
+		plan.setOffersLunch(req.isOffersLunch());
+		plan.setPricePerLunch(req.isOffersLunch() ? req.getPricePerLunch() : null);
+
+		plan.setOffersDinner(req.isOffersDinner());
+		plan.setPricePerDinner(req.isOffersDinner() ? req.getPricePerDinner() : null);
+
+		plan.setMaxCapacity(req.getMaxCapacity());
+
+		return planRepository.save(plan);
+	}
+
+	// 3. SOFT DELETE / TOGGLE STATUS
+	@Override
+	@Transactional
+	public void togglePlanStatus(Long providerId, Long planId, boolean isActive) {
+		TiffinPlan plan = planRepository.findById(planId)
+				.orElseThrow(() -> new ResourceNotFoundException("TiffinPlan", "id", planId));
+
+		if (!plan.getProviderId().equals(providerId)) {
+			throw new SecurityException("Unauthorized access.");
+		}
+
+		plan.setActive(isActive);
+		planRepository.save(plan);
+	}
+
+	// 4. FETCH PLANS FOR PROVIDER DASHBOARD (Shows both Active and Inactive)
+	@Override
+	public PageResponse<TiffinPlan> getAllProviderPlans(Long providerId, TiffinPlanFilterRequest filter,
+			Pageable pageable) {
+		Page<TiffinPlan> page = this.planRepository.getTiffinPlansByProvider(providerId, filter.getOffersBreakfast(),
+				filter.getOffersLunch(), filter.getOffersDinner(), filter.getIsActive(), filter.getSearch(), pageable);
+
+		return new PageResponse<>(page);
+	}
+
+	@Override
+	public boolean isPlanPresent(String planName, Long providerId) {
+		this.userRepository.findById(providerId)
+				.orElseThrow(() -> new ResourceNotFoundException("Provider", "Id", providerId));
+		return this.planRepository.existsByPlanNameAndProviderId(planName, providerId);
+	}
+
+	@Override
+	public PageResponse<NearbyTiffinPlanProjection> findNearbyTiffinPlans(double userLat, double userLng,
+			double maxAbsolutePlatformRadiusInMeters, Boolean wantsBreakfast, Boolean wantsLunch, Boolean wantsDinner,
+			Pageable pageable) {
+		Page<NearbyTiffinPlanProjection> page = this.planRepository.findNearbyTiffinPlans(userLat, userLng,
+				maxAbsolutePlatformRadiusInMeters, wantsBreakfast, wantsLunch, wantsDinner, pageable);
+
+		return new PageResponse<>(page);
+	}
+
+	@Override
+	public TiffinPlan getTiffinPlanId(Long planId) {
+		return this.planRepository.findById(planId)
+				.orElseThrow(() -> new ResourceNotFoundException("TiffinPlan", "Id", planId));
+	}
+
+	@Override
+	public void deleteTiffinPlan(Long planId, Long providerId) {
+		TiffinPlan plan = planRepository.findById(planId)
+				.orElseThrow(() -> new ResourceNotFoundException("TiffinPlan", "id", planId));
+
+		if (!plan.getProviderId().equals(providerId)) {
+			throw new SecurityException("Unauthorized access.");
+		}
+
+		this.planRepository.delete(plan);
+	}
+
 //	@Override
-//	public TiffinPlan addTiffinPlan(TiffinPlan tiffinPlan, Integer providerId) {
+//	public void addTiffinPlan(CreateTiffinPlanDTO tiffinPlan, Long providerId) {
 //
-//		User provider = this.userRepository.findById(providerId)
-//				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", providerId));
+//		User provider = this.userRepository.findById(providerId.intValue())
+//				.orElseThrow(() -> new ResourceNotFoundException("Provider", "Id", providerId));
 //
 //		tiffinPlan.setUser(provider);
 //		tiffinPlan.setCreatedAt(LocalDateTime.now());
@@ -198,12 +303,6 @@
 //	}
 //
 //	@Override
-//	public TiffinPlan getTiffinPlan(Integer planId) {
-//		return this.tiffinplanRepository.findById(planId)
-//				.orElseThrow(() -> new ResourceNotFoundException("TiffinPlan", "Id", planId));
-//	}
-//
-//	@Override
 //	public List<TiffinPlan> getAllTiffinPlansOfProvider(Integer providerId) {
 //
 //		User provider = this.userRepository.findById(providerId)
@@ -289,12 +388,7 @@
 //		this.tiffinPlanLogRepository.delete(planLog);
 //	}
 //
-//	@Override
-//	public boolean isPlanPresent(String planName, Integer userId) {
-//		User provider = this.userRepository.findById(userId)
-//				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
-//		return this.tiffinplanRepository.existsByPlanNameAndUser(planName, provider);
-//	}
+
 //
 //	@Override
 //	public List<TiffinDays> getAllTiffinDaysByMenuItem(Integer menuId) {
@@ -307,4 +401,4 @@
 //		return this.tiffinPlanLogRepository.findById(planId)
 //				.orElseThrow(() -> new ResourceNotFoundException("TiffinPlanLog", "Id", planId));
 //	}
-//}
+}

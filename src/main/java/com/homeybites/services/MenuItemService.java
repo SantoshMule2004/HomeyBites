@@ -5,14 +5,22 @@ import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import org.springframework.data.domain.Pageable;
+
 import com.homeybites.entities.MenuItem;
 import com.homeybites.payloads.NearbyMenuProjection;
+import com.homeybites.payloads.PageResponse;
+import com.homeybites.payloads.MenuFilterRequest;
+import com.homeybites.payloads.MenuProjection;
 
 public interface MenuItemService {
 
-	// add new menu item
-	MenuItem addMenuItem(MenuItem menuItemData, MultipartFile file, Long categoryId, Long providerId)
+	// add new menu item with image
+	MenuItem addMenuItemWithImage(MenuItem menuItemData, MultipartFile file, Long categoryId, Long providerId)
 			throws IOException;
+
+	// add new menu item
+	MenuItem addMenuItem(MenuItem menuItemData, Long categoryId, Long providerId);
 
 	// uploading menu image
 	MenuItem UploadMenuImage(MultipartFile file, Long menuId) throws IOException;
@@ -24,12 +32,12 @@ public interface MenuItemService {
 	List<MenuItem> getMenuItemByCategory(Long cId);
 
 	// get menu items of tiffin provider
-	List<MenuItem> getMenuItemByTiffinProvider(Long userId);
+	PageResponse<MenuProjection> getMenuItemByTiffinProvider(Long providerId, MenuFilterRequest menuFilters, Pageable pageable);
 
 	// get all nearby menuitems from user
-	List<NearbyMenuProjection> findProviderNearbyUsers(double userLat, double userLng,
-			double maxAbsolutePlatformRadiusInMeters, Long categoryId,
-			String menuType, Double maxPrice);
+	PageResponse<NearbyMenuProjection> findProviderNearbyUsers(double userLat, double userLng,
+			double maxAbsolutePlatformRadiusInMeters, Long categoryId, String menuType, Double maxPrice,
+			Pageable pageable);
 
 	// get all menu items
 	List<MenuItem> getAllMenuItem();
@@ -37,15 +45,12 @@ public interface MenuItemService {
 	// get all menu items by menu type
 	List<MenuItem> getAllMenuItemByType(String menuType);
 
-	// get all menu items within 5km radius of user
-	List<MenuItem> getAllNearbyMenuItem(double latitude, double longitude);
-
 	// update menu item
 	MenuItem updateMenuItem(MenuItem menuItem, Long menuId);
 
 	// delete menu item
-	void deleteMenuItem(Long menuId);
+	void toggleActivateMenu(Long menuId, boolean isActive);
 
 	// delete menu item
-	MenuItem deleteMenuItem(MenuItem menuItem);
+	void deleteMenuItem(Long menuId);
 }

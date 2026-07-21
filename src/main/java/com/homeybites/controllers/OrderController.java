@@ -1,18 +1,23 @@
 package com.homeybites.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.homeybites.payloads.ApiResponse;
+import com.homeybites.payloads.OrderFilterDto;
+import com.homeybites.payloads.OrderProjection;
+import com.homeybites.payloads.PageResponse;
+import com.homeybites.payloads.OrderResponseDto;
 import com.homeybites.services.CheckoutService;
-
-//import com.homeybites.entities.OrderInfo;
-//import com.homeybites.payloads.OrderResponse;
-//import com.homeybites.services.OrderService;
 
 @RestController
 @RequestMapping("/api/v1/orders")
@@ -21,6 +26,7 @@ public class OrderController {
 	@Autowired
 	private CheckoutService checkoutService;
 
+	// Place Order
 	@PostMapping("/place/{userId}")
 	public ResponseEntity<?> placeOrder(@PathVariable Long userId, @RequestParam Long addId,
 			@RequestParam String pmethod, @RequestParam String pstatus) {
@@ -28,121 +34,68 @@ public class OrderController {
 		return ResponseEntity.ok("Order placed successfully..!");
 	}
 
-//	@Autowired
-//	private OrderService orderService;
-//
-//	// API to place order
-//	@PostMapping("/place/{userId}")
-//	public ResponseEntity<OrderInfo> placeOrder(@RequestBody OrderInfo order, @PathVariable Integer userId) {
-//		OrderInfo newOrder = orderService.placeOrder(order, userId);
-//		return ResponseEntity.ok(newOrder);
-//	}
-//
-//	// API to get order by id
-//	@GetMapping("/count/{id}")
-//	public ResponseEntity<Integer> getOrderCount(@PathVariable Integer id) {
-//		Integer count = this.orderService.getOrderCount(id);
-//		return ResponseEntity.ok(count);
-//	}
-//
-//	// API to get order by id
-//	@GetMapping("/count")
-//	public ResponseEntity<Integer> getTotalOrderCount() {
-//		Integer count = this.orderService.getTotalOrderCount();
-//		return ResponseEntity.ok(count);
-//	}
-//
-//	// API to get order by id
-//	@GetMapping("/{id}")
-//	public ResponseEntity<OrderInfo> getOrder(@PathVariable Integer id) {
-//		Optional<OrderInfo> order = orderService.getOrderById(id);
-//		return order.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
-//	}
-//
-//	// API to get all order
-//	@GetMapping("/all")
-//	public ResponseEntity<OrderResponse> getAllOrders(
-//			@RequestParam(defaultValue = "10", required = false) Integer pageSize,
-//			@RequestParam(defaultValue = "0", required = false) Integer pageNumber,
-//			@RequestParam(defaultValue = "orderId", required = false) String sortBy,
-//			@RequestParam(defaultValue = "ASC", required = false) String sortIn) {
-//		return ResponseEntity.ok(orderService.getAllOrders(pageNumber, pageSize, sortBy, sortIn));
-//	}
-//
-//	// API to get todays orders
-//	@GetMapping("/today/{providerId}")
-//	public ResponseEntity<List<OrderInfo>> getAllTodaysOrders(@PathVariable Integer providerId) {
-//		return ResponseEntity.ok(orderService.getTodaysOrder(providerId));
-//	}
-//
-//	// API to get all todays orders
-//	@GetMapping("/today/all")
-//	public ResponseEntity<List<OrderInfo>> getAllTodaysOrders() {
-//		return ResponseEntity.ok(orderService.getAllTodaysOrder());
-//	}
-//
-//	// API to get all orders by status
-//	@GetMapping("/{status}")
-//	public ResponseEntity<List<OrderInfo>> getAllOrdersByStatus(@PathVariable String status) {
-//		return ResponseEntity.ok(orderService.getOrderByStatus(status));
-//	}
-//
-//	// API to get all order belonging to tiffin provider
-//	@GetMapping("/all/{providerId}")
-//	public ResponseEntity<List<OrderInfo>> getAllOrdersOfTiffinProvider(@PathVariable Integer providerId,
-//			@RequestParam String status) {
-//		return ResponseEntity.ok(orderService.getOrderOfTiffinProvider(providerId, status));
-//	}
-//
-//	// API to get all order belonging to tiffin provider
-//	@GetMapping("/provider/{providerId}")
-//	public ResponseEntity<List<OrderInfo>> getTiffinProviderOrders(@PathVariable Integer providerId,
-//			@RequestParam String startDate, @RequestParam String endDate) {
-//		LocalDate start = LocalDate.parse(startDate);
-//		LocalDate end = LocalDate.parse(endDate);
-//		return ResponseEntity.ok(orderService.getAllOrderOfTiffinProvider(providerId, start, end));
-//	}
-//
-//	// API to get all order belonging to tiffin provider
-//	@GetMapping("/range")
-//	public ResponseEntity<List<OrderInfo>> getOrdersInrange(@RequestParam String startDate,
-//			@RequestParam String endDate) {
-//		LocalDate start = LocalDate.parse(startDate);
-//		LocalDate end = LocalDate.parse(endDate);
-//		return ResponseEntity.ok(orderService.getAllOrderInRange(start, end));
-//	}
-//
-//	// API to get all subscription order belonging to tiffin provider
-//	@GetMapping("/subscription/{providerId}")
-//	public ResponseEntity<List<OrderInfo>> getSubscriptionOrdersOfTiffinProvider(@PathVariable Integer providerId,
-//			@RequestParam String status) {
-//		return ResponseEntity.ok(orderService.getSubscriptionOrderOfTiffinProvider(providerId, status));
-//	}
-//
-//	// API to get all menuitem order belonging to tiffin provider
-//	@GetMapping("/menuitem/{providerId}")
-//	public ResponseEntity<List<OrderInfo>> getMenuItemOrdersOfTiffinProvider(@PathVariable Integer providerId,
-//			@RequestParam String status) {
-//		return ResponseEntity.ok(orderService.getMenuItemOrderOfTiffinProvider(providerId, status));
-//	}
-//
-//	// API to get order history
-//	@GetMapping("/history/{userId}")
-//	public ResponseEntity<List<OrderInfo>> getOrderHistory(@PathVariable Integer userId) {
-//		return ResponseEntity.ok(orderService.getOrderHistory());
-//	}
-//
-//	// update order status
-//	@PutMapping("/update/{id}")
-//	public ResponseEntity<OrderInfo> updateOrder(@PathVariable Integer id, @RequestParam String status) {
-//		OrderInfo order = orderService.updateOrderStatus(id, status);
-//		return order != null ? ResponseEntity.ok(order) : ResponseEntity.notFound().build();
-//	}
-//
-//	// cancel order
-//	@DeleteMapping("/cancel/{id}")
-//	public ResponseEntity<String> cancelOrder(@PathVariable Integer id) {
-//		boolean deleted = orderService.cancelOrder(id);
-//		return deleted ? ResponseEntity.ok("Order canceled successfully") : ResponseEntity.notFound().build();
-//	}
+	// Get Customer orders
+	@GetMapping("/customer/{userId}")
+	public ResponseEntity<PageResponse<OrderProjection>> getCustomerOrders(@PathVariable Long userId,
+			@ModelAttribute OrderFilterDto filter, Pageable pageable) {
+		PageResponse<OrderProjection> orders = checkoutService.getCustomerOrderHistory(userId, filter, pageable);
+		return ResponseEntity.ok(orders);
+	}
+
+	// get customer order details
+	@GetMapping("/{orderId}/customer/{userId}/")
+	public ResponseEntity<ApiResponse> getCustomerOrder(@PathVariable Long userId, @PathVariable Long orderId) {
+		OrderResponseDto order = checkoutService.getCustomerOrderDetails(userId, orderId);
+		return ResponseEntity.ok(new ApiResponse("Order fetched Successfully..!", true, order));
+	}
+
+	// cancel order
+	@PutMapping("{userId}/customer/{providerOrderId}/cancel")
+	public ResponseEntity<ApiResponse> cancelOrder(@PathVariable Long userId, @PathVariable Long providerOrderId) {
+		checkoutService.cancelOrder(userId, providerOrderId);
+		return ResponseEntity.ok(new ApiResponse("Order cancelled successfully.", true, null));
+	}
+
+	/* provider APIs */
+
+	// get all provider orders
+	@GetMapping("/provider/{providerId}/all")
+	public ResponseEntity<PageResponse<OrderResponseDto>> getProviderOrders(@PathVariable Long providerId,
+			@ModelAttribute OrderFilterDto filter, Pageable pageable) {
+		PageResponse<OrderResponseDto> orders = checkoutService.findOrders(providerId, filter, pageable);
+		return ResponseEntity.ok(orders);
+	}
+
+	// get provider order details
+	@GetMapping("/provider/{providerId}/provider-order/{providerOrderId}")
+	public ResponseEntity<ApiResponse> getProviderOrder(@PathVariable Long providerId,
+			@PathVariable Long providerOrderId) {
+		OrderResponseDto order = checkoutService.findOrderDetails(providerOrderId, providerId);
+		return ResponseEntity.ok(new ApiResponse("Order fetched successfully.", true, order));
+	}
+
+	// update order status - PENDING, PREPARING, OUT_FOR_DELIVERY, DELIVERED
+	@PutMapping("/provider/{providerId}/status/{providerOrderId}")
+	public ResponseEntity<ApiResponse> updateOrderStatus(@PathVariable Long providerId,
+			@PathVariable Long providerOrderId, @RequestParam String status) {
+		checkoutService.updateProviderOrderStatus(providerOrderId, providerId, status);
+		return ResponseEntity.ok(new ApiResponse(true, "Order status updated successfully."));
+	}
+
+	/* Admin APIs */
+
+	// get all provider orders
+	@GetMapping("/admin/all")
+	public ResponseEntity<PageResponse<OrderResponseDto>> getAdminOrders(@ModelAttribute OrderFilterDto filter,
+			Pageable pageable) {
+		PageResponse<OrderResponseDto> orders = checkoutService.findOrders(null, filter, pageable);
+		return ResponseEntity.ok(orders);
+	}
+
+	// get provider order details
+	@GetMapping("/admin/order/{orderId}")
+	public ResponseEntity<ApiResponse> getAdminOrder(@PathVariable Long orderId) {
+		OrderResponseDto order = checkoutService.findOrderDetails(orderId, null);
+		return ResponseEntity.ok(new ApiResponse("Order fetched successfully.", true, order));
+	}
 }

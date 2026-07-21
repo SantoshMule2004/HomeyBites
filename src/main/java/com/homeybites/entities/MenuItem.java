@@ -1,5 +1,10 @@
 package com.homeybites.entities;
 
+import java.time.LocalDateTime;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -39,6 +44,14 @@ public class MenuItem {
 	
 	@Column(name = "provider_id", nullable = false)
 	private Long providerId;
+	
+	@CreationTimestamp
+	@Column(name = "created_at", updatable = false)
+	private LocalDateTime createdAt;
+
+	@UpdateTimestamp
+	@Column(name = "updated_at")
+	private LocalDateTime updatedAt;
 
 	
 	public Long getMenuId() {
@@ -135,5 +148,29 @@ public class MenuItem {
 
 	public void setProviderId(Long providerId) {
 		this.providerId = providerId;
+	}
+
+	public LocalDateTime getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(LocalDateTime createdAt) {
+		this.createdAt = createdAt;
+	}
+
+	public LocalDateTime getUpdatedAt() {
+		return updatedAt;
+	}
+
+	public void setUpdatedAt(LocalDateTime updatedAt) {
+		this.updatedAt = updatedAt;
+	}
+
+	@Override
+	public String toString() {
+		return "MenuItem [menuId=" + menuId + ", menuName=" + menuName + ", price=" + price + ", description="
+				+ description + ", count=" + count + ", isActive=" + isActive + ", menuType=" + menuType
+				+ ", imagePublicId=" + imagePublicId + ", imageUrl=" + imageUrl + ", format=" + format + ", categoryId="
+				+ categoryId + ", providerId=" + providerId + ", createdAt=" + createdAt + "]";
 	}
 }

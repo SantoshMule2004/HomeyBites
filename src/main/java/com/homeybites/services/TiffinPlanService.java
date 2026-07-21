@@ -1,28 +1,39 @@
-//package com.homeybites.services;
-//
-//import java.util.List;
-//
-//import com.homeybites.entities.TiffinDays;
-//import com.homeybites.entities.TiffinPlan;
-////import com.homeybites.entities.Log.TiffinPlanLog;
-//import com.homeybites.payloads.UpdateMenuItemDto;
-//
-//public interface TiffinPlanService {
-//
-//	// to check if plan is present by given name
-//	boolean isPlanPresent(String planName, Integer userId);
-//
-//	// add tiffin plan
-//	TiffinPlan addTiffinPlan(TiffinPlan tiffinPlan, Integer providerId);
-//
+package com.homeybites.services;
+
+import com.homeybites.entities.TiffinPlan;
+import com.homeybites.payloads.CreateTiffinPlanDTO;
+import com.homeybites.payloads.NearbyTiffinPlanProjection;
+import com.homeybites.payloads.PageResponse;
+import com.homeybites.payloads.TiffinPlanFilterRequest;
+
+import org.springframework.data.domain.Pageable;
+
+public interface TiffinPlanService {
+	// add tiffin plan
+	TiffinPlan createPlan(Long providerId, CreateTiffinPlanDTO req);
+
+	TiffinPlan updatePlan(Long providerId, Long planId, CreateTiffinPlanDTO req);
+
+	void togglePlanStatus(Long providerId, Long planId, boolean isActive);
+
+	PageResponse<TiffinPlan> getAllProviderPlans(Long providerId, TiffinPlanFilterRequest filter, Pageable pageable);
+
+	// get all nearby tiffinplans from user
+	PageResponse<NearbyTiffinPlanProjection> findNearbyTiffinPlans(double userLat, double userLng,
+			double maxAbsolutePlatformRadiusInMeters, Boolean wantsBreakfast, Boolean wantsLunch, Boolean wantsDinner,
+			Pageable pageable);
+
+//	 to check if plan is present by given name
+	boolean isPlanPresent(String planName, Long providerId);
+
+	// get tiffin plan
+	TiffinPlan getTiffinPlanId(Long planId);
+
+	// delete tiffin plan
+	void deleteTiffinPlan(Long planId, Long providerId);
+	
 //	// update tiffin plan
 //	TiffinPlan updateTiffinPlan(TiffinPlan tiffinPlan, Integer planId);
-//
-//	// update menuitems on specific day
-//	TiffinPlan updateMenuItemOnDay(Integer planId, String day, UpdateMenuItemDto updateMenuItemDto);
-//
-//	// get tiffin plan
-//	TiffinPlan getTiffinPlan(Integer planId);
 //
 //	// get tiffin plan log
 ////	TiffinPlanLog getTiffinPlanLog(Integer planId);
@@ -33,12 +44,7 @@
 //	// get all tiffin plans
 //	List<TiffinPlan> getAllTiffinPlans();
 //
-//	// get all tiffin Days
-//	List<TiffinDays> getAllTiffinDaysByMenuItem(Integer menuId);
-//
-//	// delete tiffin plan
-//	void deleteTiffinPlan(Integer planId);
 //
 //	// delete tiffin plan log
 //	void deleteTiffinPlanLog(Integer planId);
-//}
+}

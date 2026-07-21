@@ -48,7 +48,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
 				token = authHeader.substring(7);
 //				System.out.println("Token : " + token);
-				
+
 				username = jwtHelper.extractUsername(token);
 			}
 
@@ -63,6 +63,8 @@ public class JwtFilter extends OncePerRequestFilter {
 
 					authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 					SecurityContextHolder.getContext().setAuthentication(authToken);
+
+					request.setAttribute("userId", jwtHelper.extractUserId(token));
 				} else {
 					System.out.println("Validation failed.");
 				}

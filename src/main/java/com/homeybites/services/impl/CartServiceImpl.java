@@ -32,9 +32,22 @@ public class CartServiceImpl implements CartService {
 
 	@Override
 	@Transactional
-	public void addItemsToCart(Long userId, Long itemId) {
+	public Integer addItemsToCart(Long userId, Long itemId) {
+		MenuItem menuItem = this.menuItemRepository.findById(itemId)
+				.orElseThrow(() -> new ResourceNotFoundException("Menu item", "id", itemId));
+		
 		UserCart usercart = this.cartRepository.findByUserIdAndIsActive(userId, true)
 				.orElseGet(() -> createNewCart(userId));
+		
+		Optional<CartItem> firstItemInCart = cartItemRepository.findFirstByCartId(usercart.getCartId());
+
+        if (firstItemInCart.isPresent()) {
+            Long existingProviderId = firstItemInCart.get().getProviderId();
+            
+            if (!existingProviderId.equals(menuItem.getProviderId())) {
+                return 1;
+            }
+        }
 
 		Optional<CartItem> existingCartItem = this.cartItemRepository.findByCartIdAndMenuItemId(usercart.getCartId(),
 				itemId);
@@ -48,15 +61,13 @@ public class CartServiceImpl implements CartService {
 			cartItem.setQuantity(cartItem.getQuantity() + 1);
 			cartItem = this.cartItemRepository.save(cartItem);
 		} else {
-			MenuItem menuItem = this.menuItemRepository.findById(itemId)
-					.orElseThrow(() -> new ResourceNotFoundException("Menu item", "id", itemId));
-
 			cartItem.setMenuItemId(itemId);
 			cartItem.setPriceWhenAdded(menuItem.getPrice());
 			cartItem.setCartId(usercart.getCartId());
 			cartItem.setCurrentPrice(menuItem.getPrice());
 			cartItem.setPriceChanged(false);
 			cartItem.setQuantity(1);
+			cartItem.setProviderId(menuItem.getProviderId());
 
 			cartItem = this.cartItemRepository.save(cartItem);
 		}
@@ -68,6 +79,7 @@ public class CartServiceImpl implements CartService {
 		usercart = this.cartRepository.save(usercart);
 
 		System.out.println(usercart);
+		return 0;
 	}
 
 	@Override
@@ -106,9 +118,20 @@ public class CartServiceImpl implements CartService {
 	}
 
 	@Override
-	public void deleteItemFromCart(Long cartItemId) {
+	public void deleteItemFromCart(Long cartItemId) {	
 		CartItem cartItem = this.cartItemRepository.findById(cartItemId)
 				.orElseThrow(() -> new ResourceNotFoundException("CartItem", "Id", cartItemId));
+		
+		UserCart usercart = this.cartRepository.findById(cartItem.getCartId())
+				.orElseGet(() -> createNewCart(cartItem.getCartId()));
+		
+		System.out.println("GrandTotal: " + usercart.getGrandTotal() + ", carItem price: " + cartItem.getCurrentPrice());
+		
+		usercart.setGrandTotal(usercart.getGrandTotal() - cartItem.getCurrentPrice());
+		
+		System.out.println("GrandTotal after update: " + usercart.getGrandTotal());
+		
+		this.cartRepository.save(usercart);
 		this.cartItemRepository.delete(cartItem);
 	}
 

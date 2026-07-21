@@ -52,7 +52,15 @@ public class CartController {
 	// add item to cart
 	@PostMapping("/{userId}/item/{itemId}")
 	public ResponseEntity<ApiResponse> addItemToCart(@PathVariable Long userId, @PathVariable Long itemId) {
-		this.cartService.addItemsToCart(userId, itemId);
+		Integer result = this.cartService.addItemsToCart(userId, itemId);
+
+		if (result.equals(1)) {
+			ApiResponse response = new ApiResponse(
+					"Your cart contains items from another provider. Please clear your cart to add this item.", false,
+					null);
+			return new ResponseEntity<ApiResponse>(response, HttpStatus.CONFLICT);
+		}
+
 		ApiResponse response = new ApiResponse("Item added successfully..!", true, null);
 		return new ResponseEntity<ApiResponse>(response, HttpStatus.OK);
 	}

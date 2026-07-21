@@ -9,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -19,9 +20,14 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import org.springframework.data.domain.Pageable;
+
 import com.homeybites.entities.MenuItem;
 import com.homeybites.payloads.ApiResponse;
+import com.homeybites.payloads.MenuFilterRequest;
 import com.homeybites.payloads.NearbyMenuProjection;
+import com.homeybites.payloads.PageResponse;
+import com.homeybites.payloads.MenuProjection;
 import com.homeybites.services.MenuItemService;
 
 import jakarta.validation.Valid;
@@ -33,19 +39,28 @@ public class MenuController {
 	@Autowired
 	private MenuItemService menuItemService;
 
-	// add menu item
-	@PostMapping(value = "/user/{userId}/category/{cId}/menuitem/", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<ApiResponse> addMenuItem(@Valid @RequestPart MenuItem menuItemData,
-			@RequestPart MultipartFile file, @PathVariable Long cId, @PathVariable Long userId)
-			throws IOException {
+	// add menu item with image
+	@PostMapping(value = "/menuitem-image/tiffin-provider/{providerId}/category/{cId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<ApiResponse> addMenuItemWithImage(@Valid @RequestPart MenuItem menuItemData,
+			@RequestPart MultipartFile file, @PathVariable Long cId, @PathVariable Long providerId) throws IOException {
 
-		MenuItem menuItem = this.menuItemService.addMenuItem(menuItemData, file, cId, userId);
+		MenuItem menuItem = this.menuItemService.addMenuItemWithImage(menuItemData, file, cId, providerId);
+		return new ResponseEntity<ApiResponse>(new ApiResponse("MenuItem added successfully..!", true, menuItem),
+				HttpStatus.CREATED);
+	}
+
+	// add menu item
+	@PostMapping(value = "/menuitem/tiffin-provider/{providerId}/category/{cId}")
+	public ResponseEntity<ApiResponse> addMenuItem(@Valid @RequestBody MenuItem menuItemData, @PathVariable Long cId,
+			@PathVariable Long providerId) throws IOException {
+
+		MenuItem menuItem = this.menuItemService.addMenuItem(menuItemData, cId, providerId);
 		return new ResponseEntity<ApiResponse>(new ApiResponse("MenuItem added successfully..!", true, menuItem),
 				HttpStatus.CREATED);
 	}
 
 	// upload menu item image
-	@PostMapping("/menuitem/upload/{menuId}")
+	@PostMapping(value = "/menuitem/upload/{menuId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<?> uploadMenuImage(@RequestParam MultipartFile file, @PathVariable Long menuId)
 			throws IOException {
 		this.menuItemService.UploadMenuImage(file, menuId);
@@ -70,34 +85,52 @@ public class MenuController {
 	// get all menuitems nearby user with filterations (category, menutype,
 	// maxprice, platformradius)
 	@GetMapping("/public/menuitem-nearby")
-	public ResponseEntity<List<NearbyMenuProjection>> getAllMenusWithProviders(@RequestParam Double lat,
+	public ResponseEntity<PageResponse<NearbyMenuProjection>> getAllMenusWithProviders(@RequestParam Double lat,
 			@RequestParam Double lng, @RequestParam(defaultValue = "10000") Double platformRadius,
-			@RequestParam(required = false) Long categoryId,
-			@RequestParam(required = false) String menuType,
-			@RequestParam(required = false) Double maxPrice) {
-		List<NearbyMenuProjection> allMenuItem = this.menuItemService.findProviderNearbyUsers(lat, lng, platformRadius,
-				categoryId, menuType, maxPrice);
-		return new ResponseEntity<List<NearbyMenuProjection>>(allMenuItem, HttpStatus.OK);
+			@RequestParam(required = false) Long categoryId, @RequestParam(required = false) String menuType,
+			@RequestParam(required = false) Double maxPrice, Pageable pageable) {
+		PageResponse<NearbyMenuProjection> allMenuItem = this.menuItemService.findProviderNearbyUsers(lat, lng,
+				platformRadius, categoryId, menuType, maxPrice, pageable);
+		return new ResponseEntity<PageResponse<NearbyMenuProjection>>(allMenuItem, HttpStatus.OK);
 	}
 
-	// get all menu items of a tiffin provider
-	@GetMapping("/tiffin-provider/{userId}/menuitems")
-	public ResponseEntity<List<MenuItem>> getMenuItemByTiffinProvider(@PathVariable Long userId) {
-		List<MenuItem> menuItems = this.menuItemService.getMenuItemByTiffinProvider(userId);
-		return new ResponseEntity<List<MenuItem>>(menuItems, HttpStatus.OK);
+	// get all menu items of a tiffin provider with filteration for menuType,
+	// isActive, categoryId, search
+	@GetMapping("/tiffin-provider/{providerId}/menuitems")
+	public ResponseEntity<PageResponse<MenuProjection>> getMenuItemByTiffinProvider(@PathVariable Long providerId,
+			@ModelAttribute MenuFilterRequest filter, Pageable pageable) {
+		System.out.println("ProviderId: " + providerId);
+		PageResponse<MenuProjection> menuItems = this.menuItemService.getMenuItemByTiffinProvider(providerId, filter,
+				pageable);
+		System.out.println("response:" + menuItems);
+		return new ResponseEntity<PageResponse<MenuProjection>>(menuItems, HttpStatus.OK);
 	}
 
 	// Update menu item
 	@PutMapping("/menuitem/{menuId}")
 	public ResponseEntity<ApiResponse> updateMenuItem(@Valid @RequestBody MenuItem menuItem,
 			@PathVariable Long menuId) {
+		System.out.println("MenuItem: " + menuItem);
 		MenuItem updatedMenuItem = this.menuItemService.updateMenuItem(menuItem, menuId);
 		return new ResponseEntity<ApiResponse>(
 				new ApiResponse("menuitem updated successfully.>!", true, updatedMenuItem), HttpStatus.OK);
 	}
 
-	// delete menu item
-	@DeleteMapping("/menuitem/{menuId}")
+	// toggle activate menu
+	@PutMapping("/menuitem/toggle/{menuId}")
+	public ResponseEntity<ApiResponse> toggleActivateMenu(@PathVariable Long menuId, @RequestParam Boolean isActive) {
+		this.menuItemService.toggleActivateMenu(menuId, isActive);
+
+		if (isActive)
+			return new ResponseEntity<ApiResponse>(new ApiResponse("Menuitem activated successfully..!", true),
+					HttpStatus.NO_CONTENT);
+
+		return new ResponseEntity<ApiResponse>(new ApiResponse("menuitem de-activated successfully..!", true),
+				HttpStatus.NO_CONTENT);
+	}
+
+	// permanently delete menu item
+	@DeleteMapping("/menuitem/delete/{menuId}")
 	public ResponseEntity<ApiResponse> deleteMenuItem(@PathVariable Long menuId) {
 		this.menuItemService.deleteMenuItem(menuId);
 		return new ResponseEntity<ApiResponse>(new ApiResponse("menuitem deleted successfully..!", true),
