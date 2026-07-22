@@ -40,6 +40,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 			    u.businessName,
 			    u.foodLicenseNo,
 			    u.GSTIN,
+			    u.active,
 			    u.latitude,
 			    u.longitude,
 			    u.serviceRadius
@@ -85,6 +86,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 			    u.business_name AS businessName,
 			    u.food_license_no AS foodLicenseNo,
 			    u.gstin AS gstin,
+			    u.active AS active,
 			    u.latitude AS latitude,
 			    u.longitude AS longitude,
 			    u.service_radius AS serviceRadius

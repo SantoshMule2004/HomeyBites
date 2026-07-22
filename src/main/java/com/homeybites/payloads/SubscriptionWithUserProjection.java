@@ -13,9 +13,9 @@ public interface SubscriptionWithUserProjection {
 	Long getPlanId();
 
 	Long getProviderId();
-	
+
 	String getPlanName();
-	
+
 	Integer getValidityDays();
 
 	Boolean getIncludesBreakfast();
@@ -46,15 +46,13 @@ public interface SubscriptionWithUserProjection {
 
 	LocalDateTime getCreatedAt();
 
-	String getFirstName();
-
-	String getMiddleName();
-
-	String getLastName();
-
 	String getEmailId();
 
 	String getPhoneNo();
 
 	Boolean getIsVerified();
+
+	String getCustomerName();
+
+	String getProviderName();
 }

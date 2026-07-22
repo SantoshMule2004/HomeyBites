@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.homeybites.entities.Payment;
+import com.homeybites.exceptions.BadRequestException;
 import com.homeybites.exceptions.ResourceNotFoundException;
 import com.homeybites.payloads.PageResponse;
 import com.homeybites.payloads.PaymentDetailsProjection;
@@ -66,9 +67,12 @@ public class PaymentServiceImpl implements PaymentService {
 
 	@Override
 	public PageResponse<PaymentHistoryProjection> getPayments(PaymentFilterRequest filter, Pageable pageable) {
-		LocalDateTime startDateTime = filter.getStartDate() != null ? filter.getStartDate().atStartOfDay() : null;
 
-		LocalDateTime endDateTime = filter.getEndDate() != null ? filter.getEndDate().atTime(23, 59, 59) : null;
+		filter = this.verifyDateFilter(filter);
+
+		LocalDateTime startDateTime = filter.getStartDate().atStartOfDay();
+
+		LocalDateTime endDateTime = filter.getEndDate().atTime(23, 59, 59);
 
 		String paymentStatus = filter.getPaymentStatus() != null ? filter.getPaymentStatus().name() : null;
 
@@ -231,6 +235,27 @@ public class PaymentServiceImpl implements PaymentService {
 		}
 
 		paymentRepository.save(payment);
+	}
+
+	private PaymentFilterRequest verifyDateFilter(PaymentFilterRequest filter) {
+		final LocalDate MIN_DATE = LocalDate.of(1970, 1, 1);
+
+		LocalDate today = LocalDate.now();
+
+		if (filter.getStartDate() == null && filter.getEndDate() == null) {
+			filter.setStartDate(today);
+			filter.setEndDate(today);
+		} else if (filter.getStartDate() != null && filter.getEndDate() == null) {
+			filter.setEndDate(filter.getStartDate());
+		} else if (filter.getStartDate() == null) {
+			filter.setStartDate(MIN_DATE);
+		}
+
+		if (filter.getStartDate().isAfter(filter.getEndDate())) {
+			throw new BadRequestException("Start date cannot be after end date.");
+		}
+
+		return filter;
 	}
 
 }

@@ -18,6 +18,8 @@ public class UserInfo {
 	private String foodLicenseNo;
 	private String gstin;
 	
+	private Boolean active;
+	
 	private double latitude;
 	private double longitude;
 	private double serviceRadius;
@@ -27,6 +29,31 @@ public class UserInfo {
 		// TODO Auto-generated constructor stub
 	}
 	
+	public UserInfo(Long userId, String firstName, String middleName, String lastName, String emailId,
+			boolean isVerified, String phoneNo, String dob, String gender, String dietryPref, String userRole,
+			String businessName, String foodLicenseNo, String GSTIN, Boolean active, double latitude, double longitude,
+			double serviceRadius) {
+		super();
+		this.userId = userId;
+		this.firstName = firstName;
+		this.middleName = middleName;
+		this.lastName = lastName;
+		this.emailId = emailId;
+		this.isVerified = isVerified;
+		this.phoneNo = phoneNo;
+		this.dob = dob;
+		this.gender = gender;
+		this.dietryPref = dietryPref;
+		this.userRole = userRole;
+		this.businessName = businessName;
+		this.foodLicenseNo = foodLicenseNo;
+		this.gstin = GSTIN;
+		this.active = active;
+		this.latitude = latitude;
+		this.longitude = longitude;
+		this.serviceRadius = serviceRadius;
+	}
+
 	public UserInfo(User user) {
 		super();
 		this.userId = user.getUserId();
@@ -43,33 +70,10 @@ public class UserInfo {
 		this.businessName = user.getBusinessName();
 		this.foodLicenseNo = user.getFoodLicenseNo();
 		this.gstin = user.getGSTIN();
+		this.active = user.getActive();
 		this.latitude = user.getLatitude();
 		this.longitude = user.getLongitude();
 		this.serviceRadius = user.getServiceRadius();
-	}
-
-	public UserInfo(Long userId, String firstName, String middleName, String lastName, String emailId,
-			boolean isVerified, String phoneNo, String dob, String gender, String dietryPref, String userRole,
-			String businessName, String foodLicenseNo, String gSTIN, double latitude, double longitude,
-			double serviceRadius) {
-		super();
-		this.userId = userId;
-		this.firstName = firstName;
-		this.middleName = middleName;
-		this.lastName = lastName;
-		this.emailId = emailId;
-		this.isVerified = isVerified;
-		this.phoneNo = phoneNo;
-		this.dob = dob;
-		this.gender = gender;
-		this.dietryPref = dietryPref;
-		this.userRole = userRole;
-		this.businessName = businessName;
-		this.foodLicenseNo = foodLicenseNo;
-		this.gstin = gSTIN;
-		this.latitude = latitude;
-		this.longitude = longitude;
-		this.serviceRadius = serviceRadius;
 	}
 
 	public Long getUserId() {
@@ -176,12 +180,20 @@ public class UserInfo {
 		this.foodLicenseNo = foodLicenseNo;
 	}
 
-	public String getGSTIN() {
+	public String getGstin() {
 		return gstin;
 	}
 
-	public void setGSTIN(String gSTIN) {
-		this.gstin = gSTIN;
+	public void setGstin(String gstin) {
+		this.gstin = gstin;
+	}
+
+	public Boolean getActive() {
+		return active;
+	}
+
+	public void setActive(Boolean active) {
+		this.active = active;
 	}
 
 	public double getLatitude() {

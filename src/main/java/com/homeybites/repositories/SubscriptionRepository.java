@@ -32,44 +32,52 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, Long
 
 	@Query(value = """
 			SELECT
-			    s.id AS id,
-			    s.user_id AS userId,
-			    s.plan_id AS planId,
-			    s.provider_id AS providerId,
+			 s.id AS id,
+			 s.user_id AS userId,
+			 s.plan_id AS planId,
+			 s.provider_id AS providerId,
 
-				s.plan_name AS planName,
-				s.validity_days AS validityDays,
-				
-			    s.includes_breakfast AS includesBreakfast,
-			    s.includes_lunch AS includesLunch,
-			    s.includes_dinner AS includesDinner,
+			 s.plan_name AS planName,
+			 s.validity_days AS validityDays,
 
-			    s.breakfast_price AS breakfastPrice,
-			    s.lunch_price AS lunchPrice,
-			    s.dinner_price AS dinnerPrice,
+			 s.includes_breakfast AS includesBreakfast,
+			 s.includes_lunch AS includesLunch,
+			 s.includes_dinner AS includesDinner,
 
-			    s.start_date AS startDate,
-			    s.current_end_date AS currentEndDate,
-			    s.total_paused_days AS totalPausedDays,
+			 s.breakfast_price AS breakfastPrice,
+			 s.lunch_price AS lunchPrice,
+			 s.dinner_price AS dinnerPrice,
 
-			    s.status AS status,
+			 s.start_date AS startDate,
+			 s.current_end_date AS currentEndDate,
+			 s.total_paused_days AS totalPausedDays,
 
-			    s.pause_start_date AS pauseStartDate,
-			    s.auto_resume_date AS autoResumeDate,
+			 s.status AS status,
 
-			    s.delivery_address_id AS deliveryAddressId,
-			    s.created_at AS createdAt,
+			 s.pause_start_date AS pauseStartDate,
+			 s.auto_resume_date AS autoResumeDate,
 
-			    u.first_name AS firstName,
-			    u.middle_name AS middleName,
-			    u.last_name AS lastName,
-			    u.email_id AS emailId,
-			    u.phone_no AS phoneNo,
-			    u.is_verified AS isVerified
+			 s.delivery_address_id AS deliveryAddressId,
+			 s.created_at AS createdAt,
+
+			 CONCAT_WS(' ',
+			     customer.first_name,
+			     customer.middle_name,
+			     customer.last_name
+			 ) AS customerName,
+
+			 customer.email_id AS emailId,
+			 customer.phone_no AS phoneNo,
+			 customer.is_verified AS isVerified,
+
+			 provider.business_name AS providerName
 
 			FROM subscriptions s
-			INNER JOIN `user` u
-			    ON s.user_id = u.user_id
+			INNER JOIN user customer
+			ON s.user_id = customer.user_id
+
+			INNER JOIN user provider
+			 ON s.provider_id = provider.user_id
 
 			WHERE (:providerId IS NULL OR s.provider_id = :providerId)
 
@@ -79,14 +87,15 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, Long
 			    :search IS NULL
 			    OR LOWER(
 			        CONCAT(
-			            u.first_name,
+			            customer.first_name,
 			            ' ',
-			            COALESCE(u.middle_name,''),
+			            COALESCE(customer.middle_name,''),
 			            ' ',
-			            u.last_name
+			            customer.last_name
 			        )
 			    ) LIKE LOWER(CONCAT('%', :search, '%'))
-			    OR LOWER(u.email_id) LIKE LOWER(CONCAT('%', :search, '%'))
+			    OR provider.business_name LIKE CONCAT('%', :search, '%')
+			    OR LOWER(customer.email_id) LIKE LOWER(CONCAT('%', :search, '%'))
 			)
 
 			ORDER BY s.created_at DESC
@@ -95,8 +104,11 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, Long
 			countQuery = """
 					SELECT COUNT(*)
 					FROM subscriptions s
-					INNER JOIN `user` u
-					    ON s.user_id = u.user_id
+					INNER JOIN user customer
+					ON s.user_id = customer.user_id
+
+					INNER JOIN user provider
+					ON s.provider_id = provider.user_id
 
 					WHERE (:providerId IS NULL OR s.provider_id = :providerId)
 
@@ -106,14 +118,15 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, Long
 					    :search IS NULL
 					    OR LOWER(
 					        CONCAT(
-					            u.first_name,
+					            customer.first_name,
 					            ' ',
-					            COALESCE(u.middle_name,''),
+					            COALESCE(customer.middle_name,''),
 					            ' ',
-					            u.last_name
+					            customer.last_name
 					        )
 					    ) LIKE LOWER(CONCAT('%', :search, '%'))
-					    OR LOWER(u.email_id) LIKE LOWER(CONCAT('%', :search, '%'))
+					    OR provider.business_name LIKE CONCAT('%', :search, '%')
+					    OR LOWER(customer.email_id) LIKE LOWER(CONCAT('%', :search, '%'))
 					)
 					""",
 
