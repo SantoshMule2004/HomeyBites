@@ -13,7 +13,7 @@ public interface CategoryService {
 	Category getCategory(Long categoryId);
 	
 	//get all category
-	List<Category> getAllCategory();
+	List<Category> getAllCategory(Boolean isActive);
 	
 	//update category
 	Category updateCategory(Category category, Long categoryId);

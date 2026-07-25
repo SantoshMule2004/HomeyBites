@@ -1,7 +1,9 @@
 package com.homeybites.services.impl;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
@@ -9,6 +11,7 @@ import com.homeybites.entities.Address;
 import com.homeybites.entities.Payment;
 import com.homeybites.entities.Subscription;
 import com.homeybites.entities.TiffinPlan;
+import com.homeybites.exceptions.BadRequestException;
 import com.homeybites.exceptions.ResourceNotFoundException;
 import com.homeybites.payloads.PaymentStatus;
 import com.homeybites.payloads.PaymentType;
@@ -16,6 +19,7 @@ import com.homeybites.payloads.SubscriptionRequestDTO;
 import com.homeybites.payloads.SubscriptionStatus;
 import com.homeybites.repositories.AddressRepository;
 import com.homeybites.repositories.PaymentRepository;
+import com.homeybites.repositories.ProviderHolidayRepository;
 import com.homeybites.repositories.SubscriptionRepository;
 import com.homeybites.repositories.TiffinplanRepository;
 import com.homeybites.services.SubscriptionCheckoutService;
@@ -28,13 +32,15 @@ public class SubscriptionCheckoutServiceImpl implements SubscriptionCheckoutServ
 	private final SubscriptionRepository subscriptionRepository;
 	private final AddressRepository addressRepository;
 	private final PaymentRepository paymentRepository;
+	private final ProviderHolidayRepository holidayRepository;
 
 	public SubscriptionCheckoutServiceImpl(TiffinplanRepository planRepo, SubscriptionRepository subRepo,
-			AddressRepository addressRepo, PaymentRepository paymentRepo) {
+			AddressRepository addressRepo, PaymentRepository paymentRepo, ProviderHolidayRepository holidayRepo) {
 		this.planRepository = planRepo;
 		this.subscriptionRepository = subRepo;
 		this.addressRepository = addressRepo;
 		this.paymentRepository = paymentRepo;
+		this.holidayRepository = holidayRepo;
 	}
 
 	@Override
@@ -43,7 +49,20 @@ public class SubscriptionCheckoutServiceImpl implements SubscriptionCheckoutServ
 		TiffinPlan plan = planRepository.findById(planId)
 				.orElseThrow(() -> new ResourceNotFoundException("TiffinPlan", "id", planId));
 
-		// Edge Case 4: Atomic Capacity Check using the custom SQL update
+		LocalDate tomorrow = LocalDate.now().plusDays(1);
+
+		if (req.getStartDate().isBefore(tomorrow)) {
+			throw new BadRequestException("Subscription start date must be tomorrow or later.");
+		}
+
+		if (holidayRepository.existsByProviderIdAndClosedDateAndIsActiveTrue(plan.getProviderId(),
+				req.getStartDate())) {
+
+			throw new BadRequestException(
+					"The provider is unavailable on the selected start date. Please choose another date.");
+		}
+
+		// Atomic Capacity Check using the custom SQL update
 		int rowsUpdated = planRepository.incrementSubscribersIfCapacityAllows(planId);
 		if (rowsUpdated == 0) {
 			return false;
@@ -105,9 +124,11 @@ public class SubscriptionCheckoutServiceImpl implements SubscriptionCheckoutServ
 		payment.setTaxAmount(BigDecimal.ZERO);
 		payment.setDiscountAmount(BigDecimal.ZERO);
 
-//		payment.setPaymentMethod(req.getPaymentMethod());
+		payment.setPaymentMethod("UPI");
 
 		payment.setPaymentStatus(PaymentStatus.PAID.name());
+
+		payment.setTransactionId(UUID.randomUUID().toString());
 
 //		payment.setTransactionId(transactionId);
 

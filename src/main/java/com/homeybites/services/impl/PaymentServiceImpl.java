@@ -38,9 +38,11 @@ public class PaymentServiceImpl implements PaymentService {
 	@Override
 	public PageResponse<PaymentHistoryProjection> getCustomerPayments(Long customerId, PaymentFilterRequest filter,
 			Pageable pageable) {
-		LocalDateTime startDateTime = filter.getStartDate() != null ? filter.getStartDate().atStartOfDay() : null;
+		filter = this.verifyDateFilter(filter);
 
-		LocalDateTime endDateTime = filter.getEndDate() != null ? filter.getEndDate().atTime(23, 59, 59) : null;
+		LocalDateTime startDateTime = filter.getStartDate().atStartOfDay();
+
+		LocalDateTime endDateTime = filter.getEndDate().atTime(23, 59, 59);
 
 		String paymentStatus = filter.getPaymentStatus() != null ? filter.getPaymentStatus().name() : null;
 
@@ -53,9 +55,11 @@ public class PaymentServiceImpl implements PaymentService {
 	@Override
 	public PageResponse<PaymentHistoryProjection> getProviderPayments(Long providerId, PaymentFilterRequest filter,
 			Pageable pageable) {
-		LocalDateTime startDateTime = filter.getStartDate() != null ? filter.getStartDate().atStartOfDay() : null;
+		filter = this.verifyDateFilter(filter);
 
-		LocalDateTime endDateTime = filter.getEndDate() != null ? filter.getEndDate().atTime(23, 59, 59) : null;
+		LocalDateTime startDateTime = filter.getStartDate().atStartOfDay();
+
+		LocalDateTime endDateTime = filter.getEndDate().atTime(23, 59, 59);
 
 		String paymentStatus = filter.getPaymentStatus() != null ? filter.getPaymentStatus().name() : null;
 

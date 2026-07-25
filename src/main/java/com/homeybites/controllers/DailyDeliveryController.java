@@ -29,10 +29,11 @@ public class DailyDeliveryController {
 	@GetMapping
 	public ResponseEntity<PageResponse<ProviderDeliveryViewProjection>> getTodaysDeliveries(
 			@RequestAttribute("userId") Long providerId, @RequestParam(required = false) MealType mealType,
-			@RequestParam(required = false) String search, Pageable pageable) {
+			@RequestParam(required = false) DailyDeliveryStatus status, @RequestParam(required = false) String search,
+			Pageable pageable) {
 
 		PageResponse<ProviderDeliveryViewProjection> deliveries = this.dailyDeliveryService
-				.getTodaysDeliveries(providerId, mealType, search, pageable);
+				.getTodaysDeliveries(providerId, mealType, status, search, pageable);
 		return new ResponseEntity<>(deliveries, HttpStatus.OK);
 	}
 

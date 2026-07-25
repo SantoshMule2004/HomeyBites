@@ -1,5 +1,6 @@
 package com.homeybites.repositories;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.domain.Pageable;
@@ -124,6 +125,12 @@ public interface MenuItemRepository extends JpaRepository<MenuItem, Long> {
 			            ST_GeomFromText(CONCAT('POINT(', :lat, ' ', :lng, ')'), 4326)
 			        ) <= u.service_radius
 			    AND m.is_active = true
+			    AND NOT EXISTS (
+							SELECT 1
+							FROM provider_holidays ph
+							WHERE ph.provider_id = u.user_id
+							AND ph.closed_date = :deliveryDate
+						)
 			    AND (:categoryId IS NULL OR m.category_id = :categoryId)
 			    AND (:menuType IS NULL OR m.menu_type = :menuType)
 			    AND (:maxPrice IS NULL OR m.price <= :maxPrice)
@@ -147,6 +154,12 @@ public interface MenuItemRepository extends JpaRepository<MenuItem, Long> {
 					            ST_GeomFromText(CONCAT('POINT(', :lat, ' ', :lng, ')'), 4326)
 					        ) <= u.service_radius
 					    AND m.is_active = true
+					    AND NOT EXISTS (
+							SELECT 1
+							FROM provider_holidays ph
+							WHERE ph.provider_id = u.user_id
+							AND ph.closed_date = :deliveryDate
+						)
 					    AND (:categoryId IS NULL OR m.category_id = :categoryId)
 					    AND (:menuType IS NULL OR m.menu_type = :menuType)
 					    AND (:maxPrice IS NULL OR m.price <= :maxPrice)
@@ -155,7 +168,8 @@ public interface MenuItemRepository extends JpaRepository<MenuItem, Long> {
 			nativeQuery = true)
 	Page<NearbyMenuProjection> findProviderNearbyUsers(@Param("lat") double userLat, @Param("lng") double userLng,
 			@Param("maxLimit") double maxAbsolutePlatformRadiusInMeters, @Param("categoryId") Long categoryId,
-			@Param("menuType") String menuType, @Param("maxPrice") Double maxPrice, Pageable pageable);
+			@Param("menuType") String menuType, @Param("maxPrice") Double maxPrice,
+			@Param("deliveryDate") LocalDate deliveryDate, Pageable pageable);
 
 	@Query("""
 			SELECT COUNT(m)

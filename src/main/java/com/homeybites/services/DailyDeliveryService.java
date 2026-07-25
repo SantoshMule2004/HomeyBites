@@ -8,7 +8,8 @@ import com.homeybites.payloads.PageResponse;
 import com.homeybites.payloads.ProviderDeliveryViewProjection;
 
 public interface DailyDeliveryService {
-	PageResponse<ProviderDeliveryViewProjection> getTodaysDeliveries(Long providerId, MealType mealType, String search, Pageable pageable);
+	PageResponse<ProviderDeliveryViewProjection> getTodaysDeliveries(Long providerId, MealType mealType,
+			DailyDeliveryStatus status, String search, Pageable pageable);
 
 	void updateDeliveryStatus(Long providerId, Long deliveryId, DailyDeliveryStatus newStatus);
 }

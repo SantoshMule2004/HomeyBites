@@ -27,12 +27,13 @@ public class DailyDeliveryServiceImpl implements DailyDeliveryService {
 
 	@Override
 	public PageResponse<ProviderDeliveryViewProjection> getTodaysDeliveries(Long providerId, MealType mealType,
-			String search, Pageable pageable) {
+			DailyDeliveryStatus status, String search, Pageable pageable) {
 		LocalDate today = LocalDate.now();
 		String mealTypeStr = (mealType != null) ? mealType.name() : null;
+		String statusStr = (status != null) ? status.name() : null;
 
 		Page<ProviderDeliveryViewProjection> page = deliveryRepository.findDeliveriesWithUserDetails(providerId, today,
-				mealTypeStr, search, pageable);
+				mealTypeStr, statusStr, search, pageable);
 
 		return new PageResponse<>(page);
 	}

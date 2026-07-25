@@ -42,7 +42,7 @@ public class CategoryController {
 
 	@GetMapping("/public")
 	public ResponseEntity<List<Category>> getAllCategory() {
-		List<Category> allCategory = this.categoryService.getAllCategory();
+		List<Category> allCategory = this.categoryService.getAllCategory(true);
 		return new ResponseEntity<List<Category>>(allCategory, HttpStatus.OK);
 	}
 

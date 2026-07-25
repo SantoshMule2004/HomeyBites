@@ -32,6 +32,7 @@ public interface DailyDeliveryRepository extends JpaRepository<DailyDelivery, Lo
 			WHERE d.provider_id = :providerId
 			  AND d.delivery_date = :targetDate
 			  AND (:mealType IS NULL OR d.meal_type = :mealType)
+			  AND (:status IS NULL OR d.status = :status)
 			  AND (
 			        :search IS NULL
 			        OR TRIM(:search) = ''
@@ -52,6 +53,7 @@ public interface DailyDeliveryRepository extends JpaRepository<DailyDelivery, Lo
 			WHERE d.provider_id = :providerId
 			  AND d.delivery_date = :targetDate
 			  AND (:mealType IS NULL OR d.meal_type = :mealType)
+			  AND (:status IS NULL OR d.status = :status)
 			  AND (
 			        :search IS NULL
 			        OR TRIM(:search) = ''
@@ -61,7 +63,7 @@ public interface DailyDeliveryRepository extends JpaRepository<DailyDelivery, Lo
 			""", nativeQuery = true)
 	Page<ProviderDeliveryViewProjection> findDeliveriesWithUserDetails(@Param("providerId") Long providerId,
 			@Param("targetDate") LocalDate targetDate, @Param("mealType") String mealType,
-			@Param("search") String search, Pageable pageable);
+			@Param("status") String status, @Param("search") String search, Pageable pageable);
 
 	@Query(value = """
 			SELECT COUNT(*)

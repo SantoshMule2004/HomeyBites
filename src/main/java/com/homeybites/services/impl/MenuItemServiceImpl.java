@@ -1,6 +1,7 @@
 package com.homeybites.services.impl;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -145,7 +146,7 @@ public class MenuItemServiceImpl implements MenuItemService {
 			double maxAbsolutePlatformRadiusInMeters, Long categoryId, String menuType, Double maxPrice,
 			Pageable pageable) {
 		Page<NearbyMenuProjection> page = this.menuItemRepository.findProviderNearbyUsers(userLat, userLng,
-				maxAbsolutePlatformRadiusInMeters, categoryId, menuType, maxPrice, pageable);
+				maxAbsolutePlatformRadiusInMeters, categoryId, menuType, maxPrice, LocalDate.now(), pageable);
 
 		return new PageResponse<>(page);
 	}

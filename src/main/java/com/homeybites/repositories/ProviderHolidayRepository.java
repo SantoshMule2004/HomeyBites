@@ -23,4 +23,7 @@ public interface ProviderHolidayRepository extends JpaRepository<ProviderHoliday
 
 	// Fetch all holidays for the dashboard
 	Page<ProviderHoliday> findByProviderIdOrderByClosedDateAsc(Long providerId, Pageable pageable);
+
+	// Checking the holiday
+	boolean existsByProviderIdAndClosedDateAndIsActiveTrue(Long providerId, LocalDate closedDate);
 }
