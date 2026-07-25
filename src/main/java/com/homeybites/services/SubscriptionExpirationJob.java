@@ -24,11 +24,13 @@ public class SubscriptionExpirationJob {
         this.planRepository = planRepo;
     }
 
-    // Runs every night at 12:05 AM (Just after the deliveries are generated)
-    @Scheduled(cron = "0 5 0 * * ?")
+    // Runs every night at 12:10 AM (Just after the deliveries are generated)
+    @Scheduled(cron = "0 10 0 * * ?", zone = "Asia/Kolkata")
     @Transactional
     public void processExpiredSubscriptions() {
         LocalDate today = LocalDate.now();
+        
+        System.out.println("process Expired Subscriptions");
         
         // Find all ACTIVE or PAUSED subscriptions whose end date was yesterday or earlier
         List<Subscription> expiredSubscriptions = subscriptionRepository

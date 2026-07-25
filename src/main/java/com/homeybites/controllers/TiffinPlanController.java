@@ -23,6 +23,7 @@ import com.homeybites.payloads.CreateTiffinPlanDTO;
 import com.homeybites.payloads.NearbyTiffinPlanProjection;
 import com.homeybites.payloads.PageResponse;
 import com.homeybites.payloads.TiffinPlanFilterRequest;
+import com.homeybites.services.DeliveryGenerationJob;
 import com.homeybites.services.TiffinPlanService;
 
 import jakarta.validation.Valid;
@@ -34,6 +35,9 @@ public class TiffinPlanController {
 	@Autowired
 	private TiffinPlanService tiffinPlanService;
 
+	@Autowired
+	private DeliveryGenerationJob deliveryGenerationJob;
+	
 	// add tiffin plan
 	@PostMapping("/tiffin-provider/{providerId}")
 	public ResponseEntity<ApiResponse> addTiffinPlan(@Valid @RequestBody CreateTiffinPlanDTO plan,
@@ -112,5 +116,12 @@ public class TiffinPlanController {
 		this.tiffinPlanService.deleteTiffinPlan(planId, providerId);
 		ApiResponse apiResponse = new ApiResponse("Tiffin plan deleted successfully..!", true);
 		return new ResponseEntity<ApiResponse>(apiResponse, HttpStatus.OK);
+	}
+
+	// GENERATE DELIVERY
+	@GetMapping("/public/generate")
+	public ResponseEntity<String> generateDeliveries() {
+		this.deliveryGenerationJob.generateDailyDeliveries();
+		return new ResponseEntity<>("GENERATE", HttpStatus.OK);
 	}
 }

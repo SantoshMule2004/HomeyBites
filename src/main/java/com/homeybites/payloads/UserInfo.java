@@ -1,5 +1,7 @@
 package com.homeybites.payloads;
 
+import java.time.LocalDateTime;
+
 import com.homeybites.entities.User;
 
 public class UserInfo {
@@ -23,6 +25,7 @@ public class UserInfo {
 	private double latitude;
 	private double longitude;
 	private double serviceRadius;
+	private LocalDateTime createdAt;
 
 	public UserInfo() {
 		super();
@@ -32,7 +35,7 @@ public class UserInfo {
 	public UserInfo(Long userId, String firstName, String middleName, String lastName, String emailId,
 			boolean isVerified, String phoneNo, String dob, String gender, String dietryPref, String userRole,
 			String businessName, String foodLicenseNo, String GSTIN, Boolean active, double latitude, double longitude,
-			double serviceRadius) {
+			double serviceRadius, LocalDateTime createdAt) {
 		super();
 		this.userId = userId;
 		this.firstName = firstName;
@@ -52,6 +55,7 @@ public class UserInfo {
 		this.latitude = latitude;
 		this.longitude = longitude;
 		this.serviceRadius = serviceRadius;
+		this.createdAt = createdAt;
 	}
 
 	public UserInfo(User user) {
@@ -74,6 +78,7 @@ public class UserInfo {
 		this.latitude = user.getLatitude();
 		this.longitude = user.getLongitude();
 		this.serviceRadius = user.getServiceRadius();
+		this.createdAt = user.getCreatedAt();
 	}
 
 	public Long getUserId() {
@@ -218,5 +223,13 @@ public class UserInfo {
 
 	public void setServiceRadius(double serviceRadius) {
 		this.serviceRadius = serviceRadius;
+	}
+
+	public LocalDateTime getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(LocalDateTime createdAt) {
+		this.createdAt = createdAt;
 	}
 }

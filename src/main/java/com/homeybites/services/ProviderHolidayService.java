@@ -2,9 +2,11 @@ package com.homeybites.services;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.homeybites.entities.ProviderHoliday;
+import com.homeybites.payloads.PageResponse;
 import com.homeybites.payloads.ProviderHolidayDTO;
 
 public interface ProviderHolidayService {
@@ -12,7 +14,7 @@ public interface ProviderHolidayService {
 
 	List<ProviderHoliday> getUpcomingHolidays(Long providerId, Pageable pageable);
 	
-	List<ProviderHoliday> getAllHolidays(Long providerId);
+	PageResponse<ProviderHoliday> getAllHolidays(Long providerId, Pageable pageable);
 	
 	void updateHoliday(Long providerId, Long holidayId, ProviderHolidayDTO req);
 	

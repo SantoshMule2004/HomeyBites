@@ -1,7 +1,6 @@
 package com.homeybites.repositories;
 
 import java.time.LocalDate;
-import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,5 +22,5 @@ public interface ProviderHolidayRepository extends JpaRepository<ProviderHoliday
 			LocalDate today, Pageable pageable);
 
 	// Fetch all holidays for the dashboard
-	List<ProviderHoliday> findByProviderIdOrderByClosedDateAsc(Long providerId);
+	Page<ProviderHoliday> findByProviderIdOrderByClosedDateAsc(Long providerId, Pageable pageable);
 }

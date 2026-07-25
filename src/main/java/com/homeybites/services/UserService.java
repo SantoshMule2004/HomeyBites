@@ -3,7 +3,7 @@ package com.homeybites.services;
 import org.springframework.data.domain.Pageable;
 
 import com.homeybites.entities.User;
-import com.homeybites.payloads.BusinessDetailsProjection;
+import com.homeybites.payloads.UserDetailsProjection;
 import com.homeybites.payloads.BusinessDetaisRequest;
 import com.homeybites.payloads.OtpDto;
 import com.homeybites.payloads.PageResponse;
@@ -23,14 +23,14 @@ public interface UserService {
 
 	Long getAllUserCount();
 	
-	PageResponse<UserInfo> getUsers(UserFilterRequest filter, Pageable pageable);
+	PageResponse<UserDetailsProjection> getUsers(UserFilterRequest filter, Pageable pageable);
 
 	Long getUserCountByRole(String role);
 
 	// add business details of tiffin provider
-	BusinessDetailsProjection saveBusinessDetails(Long providerId, BusinessDetaisRequest bdRequest);
+	UserDetailsProjection saveBusinessDetails(Long providerId, BusinessDetaisRequest bdRequest);
 	
-	BusinessDetailsProjection getBusinessDetails(Long providerId);
+	UserDetailsProjection getUserDetails(Long providerId);
 
 	// save user
 	User saveUser(User user);

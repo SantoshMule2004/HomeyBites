@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
 
 import com.homeybites.entities.Subscription;
 import com.homeybites.payloads.SubscriptionStatus;
@@ -11,6 +12,7 @@ import com.homeybites.repositories.SubscriptionRepository;
 
 import jakarta.transaction.Transactional;
 
+@Service
 public class SubscriptionStateTransitionJob {
 	private final SubscriptionRepository subscriptionRepository;
 
@@ -18,11 +20,13 @@ public class SubscriptionStateTransitionJob {
 		this.subscriptionRepository = subRepo;
 	}
 
-	// Runs every night at 12:00 AM (Just BEFORE the deliveries are generated)
-	@Scheduled(cron = "0 0 0 * * ?")
+	// Runs every night at 12:01 AM (Just BEFORE the deliveries are generated)
+	@Scheduled(cron = "0 1 0 * * ?", zone = "Asia/Kolkata")
 	@Transactional
 	public void processStateTransitions() {
 		LocalDate today = LocalDate.now();
+		
+		System.out.println("process State Transitions");
 
 		// 1. ACTIVATE SCHEDULED PAUSES
 		List<Subscription> subscriptionsToPause = subscriptionRepository.findByStatusAndPauseStartDate(SubscriptionStatus.ACTIVE, today);

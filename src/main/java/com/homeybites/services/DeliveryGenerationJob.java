@@ -2,6 +2,7 @@ package com.homeybites.services;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -34,8 +35,8 @@ public class DeliveryGenerationJob {
 		this.providerMenuItemRepository = providerMenuItemRepo;
 	}
 
-	// Runs every night at 12:01 AM
-	@Scheduled(cron = "0 1 0 * * ?")
+	// Runs every night at 12:05 AM
+	@Scheduled(cron = "0 5 0 * * ?", zone = "Asia/Kolkata")
 	@Transactional
 	public void generateDailyDeliveries() {
 		LocalDate today = LocalDate.now();
@@ -43,7 +44,11 @@ public class DeliveryGenerationJob {
 		List<Subscription> activeSubscriptions = subscriptionRepository
 				.findByStatusAndCurrentEndDateGreaterThanEqual(SubscriptionStatus.ACTIVE, today);
 
+		System.out.println("Subscriptions: " + activeSubscriptions);
+
 		for (Subscription sub : activeSubscriptions) {
+
+			System.out.println("Current Processing Subscription: " + sub);
 
 			// Edge Case 2: Skip generation if the Provider is on Holiday today
 			long isHoliday = holidayRepository.countByProviderIdAndClosedDateAndIsActiveTrue(sub.getProviderId(),
@@ -68,10 +73,19 @@ public class DeliveryGenerationJob {
 
 	private void saveDeliveryRow(Subscription sub, MealType mealType, LocalDate date) {
 
+		System.out.println("Saving delivery for: " + sub.getReceiverName());
+
 		String dayOfWeek = date.getDayOfWeek().name(); // MONDAY
 
-		ProviderMenuItem item = this.providerMenuItemRepository
-				.findMenuForDelivery(sub.getProviderId(), dayOfWeek, mealType.name()).get();
+		Optional<ProviderMenuItem> itemOpt = this.providerMenuItemRepository.findMenuForDelivery(sub.getProviderId(),
+				dayOfWeek, mealType.name());
+
+		if (itemOpt.isEmpty()) {
+			throw new RuntimeException(
+					"No menu found for provider=" + sub.getProviderId() + ", day=" + dayOfWeek + ", meal=" + mealType);
+		}
+
+		ProviderMenuItem item = itemOpt.get();
 
 		DailyDelivery delivery = new DailyDelivery();
 		delivery.setSubscriptionId(sub.getId());

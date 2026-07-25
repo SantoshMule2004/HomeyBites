@@ -11,7 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.homeybites.entities.User;
-import com.homeybites.payloads.BusinessDetailsProjection;
+import com.homeybites.payloads.UserDetailsProjection;
 import com.homeybites.payloads.RecentProviderProjection;
 import com.homeybites.payloads.RecentUserProjection;
 import com.homeybites.payloads.UserInfo;
@@ -43,7 +43,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 			    u.active,
 			    u.latitude,
 			    u.longitude,
-			    u.serviceRadius
+			    u.serviceRadius,
+			    u.createdAt
 			)
 			FROM User u
 			WHERE u.emailId = :emailId
@@ -52,23 +53,39 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
 	@Query(value = """
 			SELECT
+			    u.user_id AS userId,
+			    u.first_name AS firstName,
+			    u.middle_name AS middleName,
+			    u.last_name AS lastName,
+			    u.email_id AS emailId,
+			    u.is_verified AS isVerified,
+			    u.phone_no AS phoneNo,
+			    u.dob AS dob,
+			    u.gender AS gender,
+			    u.dietry_pref AS dietryPref,
+			    u.user_role AS userRole,
+
 			    u.business_name AS businessName,
 			    u.food_license_no AS foodLicenseNo,
-			    u.gstin AS GSTIN,
+			    u.gstin AS gstin,
+
+			    u.active AS active,
+
 			    u.latitude AS latitude,
 			    u.longitude AS longitude,
 			    u.service_radius AS serviceRadius,
 
 			    a.address_line AS addressLine,
-			    a.area AS area
+			    a.area AS area,
+			    
+			    u.created_at AS createdAt
 
 			FROM user u
 			LEFT JOIN address a
 			    ON a.user_id = u.user_id
-
 			WHERE u.user_id = :userId
 			""", nativeQuery = true)
-	BusinessDetailsProjection getBusinessDetailsOfProvider(@Param("userId") Long userId);
+	UserDetailsProjection getUserDetailsWithAddress(@Param("userId") Long userId);
 
 	@Query(value = """
 			SELECT
@@ -89,7 +106,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 			    u.active AS active,
 			    u.latitude AS latitude,
 			    u.longitude AS longitude,
-			    u.service_radius AS serviceRadius
+			    u.service_radius AS serviceRadius,
+			    u.created_at AS createdAt
 			FROM `user` u
 			WHERE
 			    (:userRole IS NULL OR u.user_role = :userRole)
@@ -132,7 +150,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 					""",
 
 			nativeQuery = true)
-	Page<UserInfo> findUsers(@Param("userRole") String userRole, @Param("search") String search, Pageable pageable);
+	Page<UserDetailsProjection> findUsers(@Param("userRole") String userRole, @Param("search") String search, Pageable pageable);
 
 	// dashboard related
 

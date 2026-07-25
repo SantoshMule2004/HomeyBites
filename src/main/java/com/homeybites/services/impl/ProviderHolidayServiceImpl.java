@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.homeybites.entities.ProviderHoliday;
 import com.homeybites.exceptions.ResourceNotFoundException;
+import com.homeybites.payloads.PageResponse;
 import com.homeybites.payloads.ProviderHolidayDTO;
 import com.homeybites.repositories.ProviderHolidayRepository;
 import com.homeybites.services.ProviderHolidayService;
@@ -72,8 +73,8 @@ public class ProviderHolidayServiceImpl implements ProviderHolidayService {
 	}
 
 	@Override
-	public List<ProviderHoliday> getAllHolidays(Long providerId) {
-		return holidayRepository.findByProviderIdOrderByClosedDateAsc(providerId);
+	public PageResponse<ProviderHoliday> getAllHolidays(Long providerId, Pageable pageable) {
+		return new PageResponse<>(holidayRepository.findByProviderIdOrderByClosedDateAsc(providerId, pageable));
 	}
 
 	@Override

@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.homeybites.entities.User;
 import com.homeybites.payloads.ApiResponse;
-import com.homeybites.payloads.BusinessDetailsProjection;
+import com.homeybites.payloads.UserDetailsProjection;
 import com.homeybites.payloads.BusinessDetaisRequest;
 import com.homeybites.payloads.PageResponse;
 import com.homeybites.payloads.PasswordDto;
@@ -86,7 +86,7 @@ public class UserController {
 	// update business details
 	@PutMapping("/business-details/{userId}")
 	public ResponseEntity<ApiResponse> updateBusinessDetails(@RequestBody BusinessDetaisRequest request, @PathVariable Long userId) {
-		BusinessDetailsProjection details = this.userService.saveBusinessDetails(userId, request);
+		UserDetailsProjection details = this.userService.saveBusinessDetails(userId, request);
 		return new ResponseEntity<ApiResponse>(new ApiResponse("Business details updated successfully..!", true, details),
 				HttpStatus.OK);
 	}
@@ -137,16 +137,16 @@ public class UserController {
 
 	// get all users
 	@GetMapping("/")
-	public ResponseEntity<PageResponse<UserInfo>> getAllUser(@ModelAttribute UserFilterRequest filter,
+	public ResponseEntity<PageResponse<UserDetailsProjection>> getAllUser(@ModelAttribute UserFilterRequest filter,
 			Pageable pageable) {
-		PageResponse<UserInfo> allUser = this.userService.getUsers(filter, pageable);
-		return new ResponseEntity<PageResponse<UserInfo>>(allUser, HttpStatus.OK);
+		PageResponse<UserDetailsProjection> allUser = this.userService.getUsers(filter, pageable);
+		return new ResponseEntity<>(allUser, HttpStatus.OK);
 	}
 
 	// get business details
-	@GetMapping("/business-details")
-	public ResponseEntity<BusinessDetailsProjection> getBusinessDetails(@RequestParam Long providerId) {
-		BusinessDetailsProjection bp = this.userService.getBusinessDetails(providerId);
+	@GetMapping("/user-details")
+	public ResponseEntity<UserDetailsProjection> getUserDetails(@RequestParam Long providerId) {
+		UserDetailsProjection bp = this.userService.getUserDetails(providerId);
 		return new ResponseEntity<>(bp, HttpStatus.OK);
 	}
 

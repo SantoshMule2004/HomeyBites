@@ -276,4 +276,17 @@ public class Subscription {
 	public void setUpdatedAt(LocalDateTime updatedAt) {
 		this.updatedAt = updatedAt;
 	}
+
+	@Override
+	public String toString() {
+		return "Subscription [id=" + id + ", userId=" + userId + ", planId=" + planId + ", providerId=" + providerId
+				+ ", planName=" + planName + ", validityDays=" + validityDays + ", includesBreakfast="
+				+ includesBreakfast + ", includesLunch=" + includesLunch + ", includesDinner=" + includesDinner
+				+ ", breakfastPrice=" + breakfastPrice + ", lunchPrice=" + lunchPrice + ", dinnerPrice=" + dinnerPrice
+				+ ", startDate=" + startDate + ", currentEndDate=" + currentEndDate + ", totalPausedDays="
+				+ totalPausedDays + ", status=" + status + ", pauseStartDate=" + pauseStartDate + ", autoResumeDate="
+				+ autoResumeDate + ", deliveryAddress=" + deliveryAddress + ", receiverName=" + receiverName
+				+ ", receiverContactNo=" + receiverContactNo + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt
+				+ "]";
+	}
 }

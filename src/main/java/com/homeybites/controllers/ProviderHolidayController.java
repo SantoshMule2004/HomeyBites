@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.homeybites.entities.ProviderHoliday;
 import com.homeybites.payloads.ApiResponse;
+import com.homeybites.payloads.PageResponse;
 import com.homeybites.payloads.ProviderHolidayDTO;
 import com.homeybites.services.ProviderHolidayService;
 
@@ -47,9 +48,16 @@ public class ProviderHolidayController {
 
 	// 3. GET ALL UPCOMING HOLIDAYS (For the Dashboard UI)
 	@GetMapping("/all")
-	public ResponseEntity<ApiResponse> getAllHolidays(@RequestAttribute("userId") Long providerId) {
-		return new ResponseEntity<ApiResponse>(new ApiResponse(true, holidayService.getAllHolidays(providerId)),
-				HttpStatus.OK);
+	public ResponseEntity<PageResponse<ProviderHoliday>> getAllHolidays(@RequestAttribute("userId") Long providerId,
+			Pageable pageable) {
+		return new ResponseEntity<>(holidayService.getAllHolidays(providerId, pageable), HttpStatus.OK);
+	}
+
+	// 3. GET ALL UPCOMING HOLIDAYS FOR ADMIN (For the Dashboard UI)
+	@GetMapping("/all/{providerId}")
+	public ResponseEntity<PageResponse<ProviderHoliday>> getAllHolidaysForAdmin(@PathVariable Long providerId,
+			Pageable pageable) {
+		return new ResponseEntity<>(holidayService.getAllHolidays(providerId, pageable), HttpStatus.OK);
 	}
 
 	// 4. UPDATE A HOLIDAY

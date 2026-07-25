@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.homeybites.entities.Address;
 import com.homeybites.entities.User;
 import com.homeybites.exceptions.ResourceNotFoundException;
-import com.homeybites.payloads.BusinessDetailsProjection;
+import com.homeybites.payloads.UserDetailsProjection;
 import com.homeybites.payloads.BusinessDetaisRequest;
 import com.homeybites.payloads.OtpDto;
 import com.homeybites.payloads.PageResponse;
@@ -78,7 +78,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	@Transactional
-	public BusinessDetailsProjection saveBusinessDetails(Long providerId, BusinessDetaisRequest bdRequest) {
+	public UserDetailsProjection saveBusinessDetails(Long providerId, BusinessDetaisRequest bdRequest) {
 		User providerInfo = this.userRepository.findById(providerId)
 				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", providerId));
 
@@ -111,7 +111,7 @@ public class UserServiceImpl implements UserService {
 
 		this.userRepository.save(providerInfo);
 
-		return this.userRepository.getBusinessDetailsOfProvider(providerId);
+		return this.userRepository.getUserDetailsWithAddress(providerId);
 	}
 
 	@Override
@@ -376,13 +376,13 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public PageResponse<UserInfo> getUsers(UserFilterRequest filter, Pageable pageable) {
-		Page<UserInfo> page = this.userRepository.findUsers(filter.getUserRole(), filter.getSearch(), pageable);
+	public PageResponse<UserDetailsProjection> getUsers(UserFilterRequest filter, Pageable pageable) {
+		Page<UserDetailsProjection> page = this.userRepository.findUsers(filter.getUserRole(), filter.getSearch(), pageable);
 		return new PageResponse<>(page);
 	}
 
 	@Override
-	public BusinessDetailsProjection getBusinessDetails(Long providerId) {
-		return this.userRepository.getBusinessDetailsOfProvider(providerId);
+	public UserDetailsProjection getUserDetails(Long providerId) {
+		return this.userRepository.getUserDetailsWithAddress(providerId);
 	}
 }
