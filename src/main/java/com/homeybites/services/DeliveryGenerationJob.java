@@ -36,7 +36,7 @@ public class DeliveryGenerationJob {
 	}
 
 	// Runs every night at 12:05 AM
-	@Scheduled(cron = "0 5 0 * * ?", zone = "Asia/Kolkata")
+	@Scheduled(cron = "0 5 0 * * ?")
 	@Transactional
 	public void generateDailyDeliveries() {
 		LocalDate today = LocalDate.now();

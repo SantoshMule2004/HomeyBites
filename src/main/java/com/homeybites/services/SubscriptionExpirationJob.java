@@ -25,7 +25,7 @@ public class SubscriptionExpirationJob {
     }
 
     // Runs every night at 12:10 AM (Just after the deliveries are generated)
-    @Scheduled(cron = "0 10 0 * * ?", zone = "Asia/Kolkata")
+    @Scheduled(cron = "0 10 0 * * ?")
     @Transactional
     public void processExpiredSubscriptions() {
         LocalDate today = LocalDate.now();

@@ -21,7 +21,7 @@ public class SubscriptionStateTransitionJob {
 	}
 
 	// Runs every night at 12:01 AM (Just BEFORE the deliveries are generated)
-	@Scheduled(cron = "0 1 0 * * ?", zone = "Asia/Kolkata")
+	@Scheduled(cron = "0 1 0 * * ?")
 	@Transactional
 	public void processStateTransitions() {
 		LocalDate today = LocalDate.now();
